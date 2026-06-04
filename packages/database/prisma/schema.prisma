@@ -1,0 +1,633 @@
+// ═══════════════════════════════════════════════════
+// LifeLedger — Prisma Schema
+// ═══════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════════════════
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DEACTIVATED
+  DELETED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum DocumentStatus {
+  ACTIVE
+  EXPIRING_SOON
+  EXPIRED
+  ARCHIVED
+}
+
+enum OcrStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  SKIPPED
+}
+
+enum FamilyRole {
+  ADMIN
+  MEMBER
+  CHILD
+  VIEWER
+}
+
+enum FamilyMemberStatus {
+  ACTIVE
+  INVITED
+  REMOVED
+}
+
+enum EmergencyAccessStatus {
+  REQUESTED
+  WAITING
+  GRANTED
+  DENIED
+  EXPIRED
+  REVOKED
+}
+
+enum EmergencyResolvedBy {
+  OWNER
+  TIMEOUT
+  ADMIN
+}
+
+enum LegacyDirectiveType {
+  WILL
+  INSTRUCTION
+  LETTER
+  CUSTOM
+}
+
+enum DigitalAssetType {
+  EMAIL
+  SOCIAL_MEDIA
+  BANKING
+  CRYPTO
+  SUBSCRIPTION
+  DOMAIN
+  OTHER
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIAL
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum NotificationType {
+  EXPIRY_WARNING
+  SECURITY_ALERT
+  ACTIVITY
+  SYSTEM
+  EMERGENCY
+  FAMILY
+  BILLING
+}
+
+enum TagSource {
+  MANUAL
+  AI_GENERATED
+}
+
+enum AuditAction {
+  AUTH_REGISTER
+  AUTH_LOGIN
+  AUTH_LOGOUT
+  AUTH_PASSWORD_CHANGE
+  AUTH_MFA_ENABLE
+  AUTH_MFA_DISABLE
+  DOCUMENT_UPLOAD
+  DOCUMENT_VIEW
+  DOCUMENT_UPDATE
+  DOCUMENT_DELETE
+  DOCUMENT_SHARE
+  DOCUMENT_DOWNLOAD
+  FAMILY_CREATE
+  FAMILY_INVITE
+  FAMILY_REMOVE
+  FAMILY_ROLE_CHANGE
+  EMERGENCY_CONTACT_ADD
+  EMERGENCY_ACCESS_REQUEST
+  EMERGENCY_ACCESS_GRANT
+  EMERGENCY_ACCESS_DENY
+  ADMIN_USER_SUSPEND
+  ADMIN_USER_DELETE
+  ADMIN_FEATURE_TOGGLE
+}
+
+// ═══════════════════════════════════════════════════
+// USER & AUTH
+// ═══════════════════════════════════════════════════
+
+model User {
+  id                  String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email               String     @unique @db.VarChar(255)
+  emailVerified       Boolean    @default(false) @map("email_verified")
+  phone               String?    @unique @db.VarChar(20)
+  phoneVerified       Boolean    @default(false) @map("phone_verified")
+  passwordHash        String     @map("password_hash") @db.VarChar(255)
+  fullName            String     @map("full_name") @db.VarChar(255)
+  avatarUrl           String?    @map("avatar_url") @db.VarChar(500)
+  dateOfBirth         DateTime?  @map("date_of_birth") @db.Date
+  gender              Gender?
+  mfaEnabled          Boolean    @default(false) @map("mfa_enabled")
+  mfaSecret           String?    @map("mfa_secret") @db.VarChar(255)
+  status              UserStatus @default(ACTIVE)
+  onboardingCompleted Boolean    @default(false) @map("onboarding_completed")
+  preferredLanguage   String     @default("en") @map("preferred_language") @db.VarChar(10)
+  timezone            String     @default("Asia/Kolkata") @db.VarChar(50)
+  isAdmin             Boolean    @default(false) @map("is_admin")
+  lastLoginAt         DateTime?  @map("last_login_at")
+  createdAt           DateTime   @default(now()) @map("created_at")
+  updatedAt           DateTime   @updatedAt @map("updated_at")
+  deletedAt           DateTime?  @map("deleted_at")
+
+  documents         Document[]
+  sessions          UserSession[]
+  familyMemberships FamilyMembership[]
+  emergencyContacts EmergencyContact[]
+  notifications     Notification[]
+  subscription      Subscription?
+  legacyVault       LegacyVault?
+  auditLogs         AuditLog[]
+  createdFamilies   Family[]           @relation("FamilyCreator")
+  invitedMembers    FamilyMembership[] @relation("InvitedBy")
+  documentTags      DocumentTag[]
+  shareLinks        ShareLink[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  refreshTokenHash String   @map("refresh_token_hash") @db.VarChar(255)
+  deviceName       String?  @map("device_name") @db.VarChar(255)
+  deviceFingerprint String? @map("device_fingerprint") @db.VarChar(255)
+  ipAddress        String   @map("ip_address") @db.VarChar(45)
+  isTrusted        Boolean  @default(false) @map("is_trusted")
+  lastActiveAt     DateTime @default(now()) @map("last_active_at")
+  expiresAt        DateTime @map("expires_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_sessions")
+}
+
+// ═══════════════════════════════════════════════════
+// DOCUMENTS
+// ═══════════════════════════════════════════════════
+
+model Category {
+  id           String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String @unique @db.VarChar(100)
+  slug         String @unique @db.VarChar(100)
+  icon         String @db.VarChar(50)
+  color        String @db.VarChar(7)
+  displayOrder Int    @map("display_order")
+  isActive     Boolean @default(true) @map("is_active")
+
+  subCategories SubCategory[]
+  documents     Document[]
+
+  @@map("categories")
+}
+
+model SubCategory {
+  id             String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  categoryId     String  @map("category_id") @db.Uuid
+  name           String  @db.VarChar(100)
+  slug           String  @db.VarChar(100)
+  metadataSchema Json?   @map("metadata_schema") @db.JsonB
+  displayOrder   Int     @map("display_order")
+
+  category  Category   @relation(fields: [categoryId], references: [id])
+  documents Document[]
+
+  @@unique([categoryId, slug])
+  @@map("sub_categories")
+}
+
+model Document {
+  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String         @map("user_id") @db.Uuid
+  familyId       String?        @map("family_id") @db.Uuid
+  categoryId     String         @map("category_id") @db.Uuid
+  subCategoryId  String?        @map("sub_category_id") @db.Uuid
+  title          String         @db.VarChar(255)
+  description    String?        @db.Text
+  fileName       String         @map("file_name") @db.VarChar(255)
+  fileUrl        String         @map("file_url") @db.VarChar(500)
+  fileSize       BigInt         @map("file_size")
+  mimeType       String         @map("mime_type") @db.VarChar(100)
+  thumbnailUrl   String?        @map("thumbnail_url") @db.VarChar(500)
+  status         DocumentStatus @default(ACTIVE)
+  issueDate      DateTime?      @map("issue_date") @db.Date
+  expiryDate     DateTime?      @map("expiry_date") @db.Date
+  documentNumber String?        @map("document_number") @db.VarChar(100)
+  issuer         String?        @db.VarChar(255)
+  isFavorite     Boolean        @default(false) @map("is_favorite")
+  isSensitive    Boolean        @default(false) @map("is_sensitive")
+  ocrStatus      OcrStatus      @default(PENDING) @map("ocr_status")
+  ocrText        String?        @map("ocr_text") @db.Text
+  aiSummary      String?        @map("ai_summary") @db.Text
+  version        Int            @default(1)
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  deletedAt      DateTime?      @map("deleted_at")
+
+  user          User              @relation(fields: [userId], references: [id])
+  family        Family?           @relation(fields: [familyId], references: [id])
+  category      Category          @relation(fields: [categoryId], references: [id])
+  subCategory   SubCategory?      @relation(fields: [subCategoryId], references: [id])
+  metadata      DocumentMetadata?
+  versions      DocumentVersion[]
+  tags          DocumentTag[]
+  shareLinks    ShareLink[]
+  emergencyDocs EmergencyDocumentSet[]
+
+  @@index([userId])
+  @@index([userId, categoryId])
+  @@index([expiryDate])
+  @@index([userId, status])
+  @@index([userId, deletedAt])
+  @@map("documents")
+}
+
+model DocumentMetadata {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  documentId       String   @unique @map("document_id") @db.Uuid
+  extractedFields  Json     @default("{}") @map("extracted_fields") @db.JsonB
+  manualFields     Json     @default("{}") @map("manual_fields") @db.JsonB
+  confidenceScores Json     @default("{}") @map("confidence_scores") @db.JsonB
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("document_metadata")
+}
+
+model DocumentVersion {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  documentId    String   @map("document_id") @db.Uuid
+  versionNumber Int      @map("version_number")
+  fileUrl       String   @map("file_url") @db.VarChar(500)
+  fileSize      BigInt   @map("file_size")
+  uploadedBy    String   @map("uploaded_by") @db.Uuid
+  changeNote    String?  @map("change_note") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, versionNumber])
+  @@map("document_versions")
+}
+
+model DocumentTag {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  documentId String    @map("document_id") @db.Uuid
+  tag        String    @db.VarChar(50)
+  createdBy  String    @map("created_by") @db.Uuid
+  source     TagSource @default(MANUAL)
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [createdBy], references: [id])
+
+  @@unique([documentId, tag])
+  @@map("document_tags")
+}
+
+model ShareLink {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  documentId   String   @map("document_id") @db.Uuid
+  createdBy    String   @map("created_by") @db.Uuid
+  token        String   @unique @db.VarChar(64)
+  passwordHash String?  @map("password_hash") @db.VarChar(255)
+  expiresAt    DateTime @map("expires_at")
+  maxViews     Int      @default(10) @map("max_views")
+  viewCount    Int      @default(0) @map("view_count")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  creator  User     @relation(fields: [createdBy], references: [id])
+
+  @@map("share_links")
+}
+
+// ═══════════════════════════════════════════════════
+// FAMILY
+// ═══════════════════════════════════════════════════
+
+model Family {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String   @db.VarChar(255)
+  createdBy  String   @map("created_by") @db.Uuid
+  avatarUrl  String?  @map("avatar_url") @db.VarChar(500)
+  maxMembers Int      @default(6) @map("max_members")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  creator   User               @relation("FamilyCreator", fields: [createdBy], references: [id])
+  members   FamilyMembership[]
+  documents Document[]
+
+  @@map("families")
+}
+
+model FamilyMembership {
+  id           String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  familyId     String             @map("family_id") @db.Uuid
+  userId       String             @map("user_id") @db.Uuid
+  role         FamilyRole
+  relationship String?            @db.VarChar(50)
+  joinedAt     DateTime           @default(now()) @map("joined_at")
+  invitedBy    String             @map("invited_by") @db.Uuid
+  status       FamilyMemberStatus @default(ACTIVE)
+
+  family  Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id])
+  inviter User   @relation("InvitedBy", fields: [invitedBy], references: [id])
+
+  @@unique([familyId, userId])
+  @@map("family_memberships")
+}
+
+// ═══════════════════════════════════════════════════
+// EMERGENCY
+// ═══════════════════════════════════════════════════
+
+model EmergencyContact {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  contactName  String   @map("contact_name") @db.VarChar(255)
+  contactEmail String   @map("contact_email") @db.VarChar(255)
+  contactPhone String   @map("contact_phone") @db.VarChar(20)
+  relationship String   @db.VarChar(50)
+  priority     Int      @default(1)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user         User                   @relation(fields: [userId], references: [id])
+  accessLogs   EmergencyAccessLog[]
+  documentSets EmergencyDocumentSet[]
+
+  @@map("emergency_contacts")
+}
+
+model EmergencyDocumentSet {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String   @map("user_id") @db.Uuid
+  documentId         String   @map("document_id") @db.Uuid
+  emergencyContactId String?  @map("emergency_contact_id") @db.Uuid
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  document         Document          @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  emergencyContact EmergencyContact? @relation(fields: [emergencyContactId], references: [id])
+
+  @@unique([documentId, emergencyContactId])
+  @@map("emergency_document_sets")
+}
+
+model EmergencyAccessLog {
+  id                 String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String                @map("user_id") @db.Uuid
+  emergencyContactId String                @map("emergency_contact_id") @db.Uuid
+  status             EmergencyAccessStatus
+  requestedAt        DateTime              @map("requested_at")
+  waitingUntil       DateTime              @map("waiting_until")
+  resolvedAt         DateTime?             @map("resolved_at")
+  resolvedBy         EmergencyResolvedBy?  @map("resolved_by")
+  expiresAt          DateTime?             @map("expires_at")
+  ipAddress          String?               @map("ip_address") @db.VarChar(45)
+  userAgent          String?               @map("user_agent") @db.Text
+
+  emergencyContact EmergencyContact @relation(fields: [emergencyContactId], references: [id])
+
+  @@index([userId, status])
+  @@map("emergency_access_logs")
+}
+
+// ═══════════════════════════════════════════════════
+// LEGACY
+// ═══════════════════════════════════════════════════
+
+model LegacyVault {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String    @unique @map("user_id") @db.Uuid
+  isActive     Boolean   @default(false) @map("is_active")
+  lastReviewed DateTime? @map("last_reviewed") @db.Date
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user       User              @relation(fields: [userId], references: [id])
+  nominees   LegacyNominee[]
+  directives LegacyDirective[]
+  assets     DigitalAsset[]
+
+  @@map("legacy_vaults")
+}
+
+model LegacyNominee {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  legacyVaultId String   @map("legacy_vault_id") @db.Uuid
+  nomineeName   String   @map("nominee_name") @db.VarChar(255)
+  nomineeEmail  String   @map("nominee_email") @db.VarChar(255)
+  nomineePhone  String   @map("nominee_phone") @db.VarChar(20)
+  relationship  String   @db.VarChar(50)
+  accessScope   Json     @map("access_scope") @db.JsonB
+  priority      Int      @default(1)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  legacyVault LegacyVault       @relation(fields: [legacyVaultId], references: [id], onDelete: Cascade)
+  directives  LegacyDirective[]
+  assets      DigitalAsset[]
+
+  @@map("legacy_nominees")
+}
+
+model LegacyDirective {
+  id              String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  legacyVaultId   String              @map("legacy_vault_id") @db.Uuid
+  type            LegacyDirectiveType
+  title           String              @db.VarChar(255)
+  content         String              @db.Text
+  targetNomineeId String?             @map("target_nominee_id") @db.Uuid
+  createdAt       DateTime            @default(now()) @map("created_at")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  legacyVault   LegacyVault    @relation(fields: [legacyVaultId], references: [id], onDelete: Cascade)
+  targetNominee LegacyNominee? @relation(fields: [targetNomineeId], references: [id])
+
+  @@map("legacy_directives")
+}
+
+model DigitalAsset {
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  legacyVaultId     String           @map("legacy_vault_id") @db.Uuid
+  assetType         DigitalAssetType @map("asset_type")
+  serviceName       String           @map("service_name") @db.VarChar(255)
+  username          String?          @db.VarChar(255)
+  notes             String?          @db.Text
+  assignedNomineeId String?          @map("assigned_nominee_id") @db.Uuid
+  createdAt         DateTime         @default(now()) @map("created_at")
+
+  legacyVault     LegacyVault    @relation(fields: [legacyVaultId], references: [id], onDelete: Cascade)
+  assignedNominee LegacyNominee? @relation(fields: [assignedNomineeId], references: [id])
+
+  @@map("digital_assets")
+}
+
+// ═══════════════════════════════════════════════════
+// BILLING
+// ═══════════════════════════════════════════════════
+
+model Plan {
+  id                String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String  @unique @db.VarChar(50)
+  displayName       String  @map("display_name") @db.VarChar(100)
+  priceMonthly      Decimal @map("price_monthly") @db.Decimal(10, 2)
+  priceYearly       Decimal @map("price_yearly") @db.Decimal(10, 2)
+  storageLimitGb    Int     @map("storage_limit_gb")
+  maxDocuments      Int     @map("max_documents")
+  maxFamilyMembers  Int     @default(1) @map("max_family_members")
+  ocrCreditsMonthly Int     @map("ocr_credits_monthly")
+  aiQueriesMonthly  Int     @map("ai_queries_monthly")
+  features          Json    @db.JsonB
+  isActive          Boolean @default(true) @map("is_active")
+
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+model Subscription {
+  id                 String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String             @unique @map("user_id") @db.Uuid
+  planId             String             @map("plan_id") @db.Uuid
+  status             SubscriptionStatus
+  billingCycle       BillingCycle       @map("billing_cycle")
+  currentPeriodStart DateTime           @map("current_period_start")
+  currentPeriodEnd   DateTime           @map("current_period_end")
+  paymentGatewayId   String?            @map("payment_gateway_id") @db.VarChar(255)
+  trialEndsAt        DateTime?          @map("trial_ends_at")
+  cancelledAt        DateTime?          @map("cancelled_at")
+  createdAt          DateTime           @default(now()) @map("created_at")
+  updatedAt          DateTime           @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id])
+  plan     Plan      @relation(fields: [planId], references: [id])
+  payments Payment[]
+
+  @@map("subscriptions")
+}
+
+model Payment {
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subscriptionId   String        @map("subscription_id") @db.Uuid
+  amount           Decimal       @db.Decimal(10, 2)
+  currency         String        @default("INR") @db.VarChar(3)
+  status           PaymentStatus
+  gatewayPaymentId String        @map("gateway_payment_id") @db.VarChar(255)
+  gatewayOrderId   String        @map("gateway_order_id") @db.VarChar(255)
+  invoiceUrl       String?       @map("invoice_url") @db.VarChar(500)
+  paidAt           DateTime?     @map("paid_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+
+  @@map("payments")
+}
+
+// ═══════════════════════════════════════════════════
+// NOTIFICATIONS & AUDIT
+// ═══════════════════════════════════════════════════
+
+model Notification {
+  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  type      NotificationType
+  title     String           @db.VarChar(255)
+  body      String           @db.Text
+  data      Json             @default("{}") @db.JsonB
+  readAt    DateTime?        @map("read_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  type      NotificationType
+  email     Boolean          @default(true)
+  push      Boolean          @default(true)
+  sms       Boolean          @default(false)
+  whatsapp  Boolean          @default(false)
+  inApp     Boolean          @default(true) @map("in_app")
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime         @updatedAt @map("updated_at")
+
+  @@unique([userId, type])
+  @@map("notification_preferences")
+}
+
+model AuditLog {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String?     @map("user_id") @db.Uuid
+  action       AuditAction
+  resourceType String      @map("resource_type") @db.VarChar(50)
+  resourceId   String?     @map("resource_id") @db.Uuid
+  details      Json        @default("{}") @db.JsonB
+  ipAddress    String?     @map("ip_address") @db.VarChar(45)
+  userAgent    String?     @map("user_agent") @db.Text
+  createdAt    DateTime    @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId, action, createdAt(sort: Desc)])
+  @@index([resourceType, resourceId])
+  @@map("audit_logs")
+}

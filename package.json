@@ -1,0 +1,49 @@
+{
+  "name": "lifeledger",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI-powered Digital Life Management Platform",
+  "author": "LifeLedger Team",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=@lifeledger/web",
+    "dev:api": "turbo run dev --filter=@lifeledger/api",
+    "build": "turbo run build",
+    "build:web": "turbo run build --filter=@lifeledger/web",
+    "build:api": "turbo run build --filter=@lifeledger/api",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "clean": "turbo run clean && rimraf node_modules",
+    "db:generate": "turbo run db:generate --filter=@lifeledger/database",
+    "db:push": "turbo run db:push --filter=@lifeledger/database",
+    "db:migrate": "turbo run db:migrate --filter=@lifeledger/database",
+    "db:seed": "turbo run db:seed --filter=@lifeledger/database",
+    "db:studio": "turbo run db:studio --filter=@lifeledger/database",
+    "db:reset": "turbo run db:reset --filter=@lifeledger/database",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.4.2",
+    "rimraf": "^6.0.1",
+    "turbo": "^2.3.4",
+    "typescript": "^5.7.3"
+  }
+}
