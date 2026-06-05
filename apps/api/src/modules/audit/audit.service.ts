@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AuditAction } from '@lifeledger/database';
+import { AuditAction, AuditLog } from '@lifeledger/database';
 
 export interface AuditLogParams {
   userId?: string;
@@ -37,7 +37,7 @@ export class AuditService {
     }
   }
 
-  async getByUser(userId: string, page = 1, limit = 20) {
+  async getByUser(userId: string, page = 1, limit = 20): Promise<{ logs: AuditLog[]; total: number; page: number; limit: number }> {
     const [logs, total] = await Promise.all([
       this.prisma.auditLog.findMany({
         where: { userId },

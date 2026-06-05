@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../mail/mail.service';
 import { AuditService } from '../audit/audit.service';
-import { UserRole, AuditAction } from '@prisma/client';
+import { UserRole, AuditAction } from '@lifeledger/database';
 import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
