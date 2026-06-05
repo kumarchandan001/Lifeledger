@@ -2,7 +2,12 @@
   "extends": "../../packages/config/typescript/base.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "noEmit": false,
+    "outDir": "./dist",
+    "declaration": true,
+    "module": "CommonJS",
+    "moduleResolution": "node"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
