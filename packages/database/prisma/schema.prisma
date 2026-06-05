@@ -22,6 +22,12 @@ enum UserStatus {
   DELETED
 }
 
+enum UserRole {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
 enum Gender {
   MALE
   FEMALE
@@ -127,8 +133,16 @@ enum TagSource {
 enum AuditAction {
   AUTH_REGISTER
   AUTH_LOGIN
+  AUTH_LOGIN_FAILED
   AUTH_LOGOUT
+  AUTH_LOCKOUT
   AUTH_PASSWORD_CHANGE
+  AUTH_PASSWORD_RESET_REQUEST
+  AUTH_PASSWORD_RESET_SUCCESS
+  AUTH_EMAIL_VERIFIED
+  AUTH_SESSION_REVOKED
+  AUTH_TOKEN_REFRESH
+  AUTH_GOOGLE_LOGIN
   AUTH_MFA_ENABLE
   AUTH_MFA_DISABLE
   DOCUMENT_UPLOAD
@@ -160,11 +174,12 @@ model User {
   emailVerified       Boolean    @default(false) @map("email_verified")
   phone               String?    @unique @db.VarChar(20)
   phoneVerified       Boolean    @default(false) @map("phone_verified")
-  passwordHash        String     @map("password_hash") @db.VarChar(255)
+  passwordHash        String?    @map("password_hash") @db.VarChar(255)
   fullName            String     @map("full_name") @db.VarChar(255)
   avatarUrl           String?    @map("avatar_url") @db.VarChar(500)
   dateOfBirth         DateTime?  @map("date_of_birth") @db.Date
   gender              Gender?
+  role                UserRole   @default(USER)
   mfaEnabled          Boolean    @default(false) @map("mfa_enabled")
   mfaSecret           String?    @map("mfa_secret") @db.VarChar(255)
   status              UserStatus @default(ACTIVE)
@@ -172,6 +187,10 @@ model User {
   preferredLanguage   String     @default("en") @map("preferred_language") @db.VarChar(10)
   timezone            String     @default("Asia/Kolkata") @db.VarChar(50)
   isAdmin             Boolean    @default(false) @map("is_admin")
+  authProvider        String     @default("email") @map("auth_provider") @db.VarChar(50)
+  googleId            String?    @unique @map("google_id") @db.VarChar(255)
+  failedLoginAttempts Int        @default(0) @map("failed_login_attempts")
+  lockoutExpiresAt    DateTime?  @map("lockout_expires_at")
   lastLoginAt         DateTime?  @map("last_login_at")
   createdAt           DateTime   @default(now()) @map("created_at")
   updatedAt           DateTime   @updatedAt @map("updated_at")
@@ -209,6 +228,28 @@ model UserSession {
 
   @@index([userId])
   @@map("user_sessions")
+}
+
+model VerificationToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String   @db.VarChar(255)
+  token     String   @unique @db.VarChar(255)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([email, token])
+  @@map("verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String   @db.VarChar(255)
+  token     String   @unique @db.VarChar(255)
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([email, token])
+  @@map("password_reset_tokens")
 }
 
 // ═══════════════════════════════════════════════════

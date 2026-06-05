@@ -20,6 +20,13 @@ export const registerSchema = z.object({
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 
+// ─── Verify Email ───
+export const verifyEmailSchema = z.object({
+  token: z.string().min(1, 'Verification token is required'),
+});
+
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+
 // ─── Login ───
 export const loginSchema = z.object({
   email: z.string().email('Invalid email address'),

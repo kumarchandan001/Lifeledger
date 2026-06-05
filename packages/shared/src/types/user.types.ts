@@ -2,6 +2,8 @@
 // User Types
 // ═══════════════════════════════════════════════════
 
+import type { UserRole, AuthProvider } from './auth.types';
+
 export type UserStatus = 'ACTIVE' | 'SUSPENDED' | 'DEACTIVATED' | 'DELETED';
 export type Gender = 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY';
 
@@ -15,12 +17,14 @@ export interface User {
   avatarUrl: string | null;
   dateOfBirth: string | null;
   gender: Gender | null;
+  role: UserRole;
   mfaEnabled: boolean;
   status: UserStatus;
   onboardingCompleted: boolean;
   preferredLanguage: string;
   timezone: string;
   isAdmin: boolean;
+  authProvider: AuthProvider;
   lastLoginAt: string | null;
   createdAt: string;
   updatedAt: string;

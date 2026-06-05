@@ -6,6 +6,9 @@ import { APP_GUARD } from '@nestjs/core';
 import { HealthModule } from './modules/health/health.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 import { RedisModule } from './modules/redis/redis.module';
+import { AuditModule } from './modules/audit/audit.module';
+import { MailModule } from './modules/mail/mail.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -37,11 +40,12 @@ import { RedisModule } from './modules/redis/redis.module';
     // ─── Infrastructure Modules ───
     PrismaModule,
     RedisModule,
+    AuditModule,
+    MailModule,
 
     // ─── Feature Modules ───
     HealthModule,
-
-    // Sprint 2+: AuthModule, UsersModule, DocumentsModule, etc.
+    AuthModule,
   ],
   providers: [
     {
