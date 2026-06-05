@@ -6,7 +6,6 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../mail/mail.service';
 import { AuditService } from '../audit/audit.service';
-import { UserRole, AuditAction } from '@lifeledger/database';
 import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
@@ -32,7 +31,7 @@ describe('AuthService', () => {
     phone: null,
     avatarUrl: null,
     emailVerified: false,
-    role: UserRole.USER,
+    role: 'USER' as any,
     status: 'ACTIVE',
     onboardingCompleted: false,
     failedLoginAttempts: 0,
@@ -160,7 +159,7 @@ describe('AuthService', () => {
       expect(mockPrisma.verificationToken.create).toHaveBeenCalled();
       expect(mockMailService.sendVerificationEmail).toHaveBeenCalledWith('test@example.com', expect.any(String));
       expect(mockAuditService.log).toHaveBeenCalledWith(
-        expect.objectContaining({ action: AuditAction.AUTH_REGISTER }),
+        expect.objectContaining({ action: 'AUTH_REGISTER' }),
       );
       expect(result.user.email).toBe('test@example.com');
     });
@@ -209,7 +208,7 @@ describe('AuthService', () => {
 
       expect(mockUsersService.lockAccount).toHaveBeenCalledWith(mockUser.id, 15);
       expect(mockAuditService.log).toHaveBeenCalledWith(
-        expect.objectContaining({ action: AuditAction.AUTH_LOCKOUT }),
+        expect.objectContaining({ action: 'AUTH_LOCKOUT' }),
       );
     });
   });
