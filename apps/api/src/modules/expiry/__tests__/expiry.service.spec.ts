@@ -254,8 +254,8 @@ describe('ExpiryService', () => {
       const result = await service.getExpiringDocuments('user-1', 90);
 
       expect(result).toHaveLength(1);
-      expect(result[0].title).toBe('Passport');
-      expect(result[0].daysRemaining).toBeGreaterThan(0);
+      expect(result[0]!.title).toBe('Passport');
+      expect(result[0]!.daysRemaining).toBeGreaterThan(0);
     });
   });
 
@@ -276,7 +276,7 @@ describe('ExpiryService', () => {
       const result = await service.getExpiredDocuments('user-1');
 
       expect(result).toHaveLength(1);
-      expect(result[0].title).toBe('License');
+      expect(result[0]!.title).toBe('License');
     });
   });
 

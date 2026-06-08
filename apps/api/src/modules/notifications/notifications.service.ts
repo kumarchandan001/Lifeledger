@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { NotificationType, NotificationStatus } from '@lifeledger/database';
+import { Notification, NotificationType, NotificationStatus } from '@lifeledger/database';
 import { QueryNotificationsDto } from './dto/notifications.dto';
 
 export interface CreateNotificationParams {
@@ -17,7 +17,7 @@ export class NotificationsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(params: CreateNotificationParams) {
+  async create(params: CreateNotificationParams): Promise<Notification> {
     try {
       const notification = await this.prisma.notification.create({
         data: {
@@ -38,7 +38,12 @@ export class NotificationsService {
     }
   }
 
-  async findAll(userId: string, query: QueryNotificationsDto) {
+  async findAll(userId: string, query: QueryNotificationsDto): Promise<{
+    notifications: Notification[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
     const { page, limit, status, type, sortOrder } = query;
 
     const whereClause: any = { userId };
@@ -80,7 +85,7 @@ export class NotificationsService {
     return { count };
   }
 
-  async markAsRead(id: string, userId: string) {
+  async markAsRead(id: string, userId: string): Promise<Notification> {
     const notification = await this.prisma.notification.findFirst({
       where: { id, userId },
     });
@@ -98,7 +103,7 @@ export class NotificationsService {
     });
   }
 
-  async markAllAsRead(userId: string) {
+  async markAllAsRead(userId: string): Promise<{ updated: number }> {
     const result = await this.prisma.notification.updateMany({
       where: {
         userId,
@@ -113,7 +118,7 @@ export class NotificationsService {
     return { updated: result.count };
   }
 
-  async deleteNotification(id: string, userId: string) {
+  async deleteNotification(id: string, userId: string): Promise<{ success: boolean; message: string }> {
     const notification = await this.prisma.notification.findFirst({
       where: { id, userId },
     });

@@ -28,14 +28,14 @@ export class NotificationsController {
   async findAll(
     @CurrentUser() user: CurrentUserPayload,
     @Query() query: QueryNotificationsDto,
-  ) {
+  ): Promise<any> {
     return this.notificationsService.findAll(user.userId, query);
   }
 
   @Get('unread-count')
   @ApiOperation({ summary: 'Get count of unread notifications' })
   @ApiResponse({ status: 200, description: 'Unread count retrieved' })
-  async getUnreadCount(@CurrentUser() user: CurrentUserPayload) {
+  async getUnreadCount(@CurrentUser() user: CurrentUserPayload): Promise<{ count: number }> {
     return this.notificationsService.getUnreadCount(user.userId);
   }
 
@@ -47,7 +47,7 @@ export class NotificationsController {
   async markAsRead(
     @Param('id') id: string,
     @CurrentUser() user: CurrentUserPayload,
-  ) {
+  ): Promise<any> {
     return this.notificationsService.markAsRead(id, user.userId);
   }
 
@@ -55,7 +55,7 @@ export class NotificationsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Mark all notifications as read' })
   @ApiResponse({ status: 200, description: 'All notifications marked as read' })
-  async markAllAsRead(@CurrentUser() user: CurrentUserPayload) {
+  async markAllAsRead(@CurrentUser() user: CurrentUserPayload): Promise<{ updated: number }> {
     return this.notificationsService.markAllAsRead(user.userId);
   }
 
@@ -67,7 +67,7 @@ export class NotificationsController {
   async deleteNotification(
     @Param('id') id: string,
     @CurrentUser() user: CurrentUserPayload,
-  ) {
+  ): Promise<{ success: boolean; message: string }> {
     return this.notificationsService.deleteNotification(id, user.userId);
   }
 }
