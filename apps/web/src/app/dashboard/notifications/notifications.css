@@ -1,0 +1,269 @@
+/* ═══════════════════════════════════════════════════
+   Notifications Page Styles
+   ═══════════════════════════════════════════════════ */
+
+.notifications-page {
+  max-width: 800px;
+}
+
+/* ─── Header ─── */
+.notifications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.notifications-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+}
+
+.mark-all-btn {
+  background: none;
+  border: 1px solid hsl(var(--border));
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(var(--primary));
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mark-all-btn:hover {
+  background: hsl(var(--primary) / 0.05);
+  border-color: hsl(var(--primary) / 0.3);
+}
+
+.mark-all-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Filter Tabs ─── */
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding: 4px;
+  background: hsl(var(--muted));
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.filter-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.filter-tab:hover {
+  color: hsl(var(--foreground));
+}
+
+.filter-tab.active {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  box-shadow: 0 1px 3px hsl(0 0% 0% / 0.08);
+  font-weight: 600;
+}
+
+/* ─── Notification List ─── */
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.notification-card {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.notification-card:hover {
+  box-shadow: 0 2px 8px hsl(0 0% 0% / 0.04);
+  border-color: hsl(var(--border));
+}
+
+.notification-card.unread {
+  background: hsl(var(--primary) / 0.03);
+  border-color: hsl(var(--primary) / 0.15);
+}
+
+.notification-card.unread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  background: hsl(var(--primary));
+  border-radius: 0 2px 2px 0;
+}
+
+.notif-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.notif-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin-bottom: 4px;
+}
+
+.notif-message {
+  font-size: 13px;
+  color: hsl(var(--muted-foreground));
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.notif-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notif-time {
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+}
+
+.notif-type-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.notif-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.notif-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.notif-action-btn:hover {
+  background: hsl(var(--accent));
+  color: hsl(var(--foreground));
+}
+
+.notif-action-btn.read-btn:hover {
+  color: hsl(var(--primary));
+}
+
+.notif-action-btn.delete-btn:hover {
+  color: hsl(var(--destructive));
+}
+
+/* ─── Empty State ─── */
+.notifications-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: hsl(var(--muted-foreground));
+}
+
+.notifications-empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.notifications-empty h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin-bottom: 8px;
+}
+
+.notifications-empty p {
+  font-size: 14px;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+/* ─── Pagination ─── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  background: hsl(var(--background));
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: hsl(var(--accent));
+  border-color: hsl(var(--primary) / 0.3);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: hsl(var(--muted-foreground));
+  padding: 0 12px;
+}
+
+/* ─── Loading ─── */
+.notifications-loading {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 14px;
+  color: hsl(var(--muted-foreground));
+}
