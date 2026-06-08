@@ -11,6 +11,7 @@ export * from './constants/categories';
 export * from './constants/roles';
 export * from './constants/document-status';
 export * from './constants/limits';
+export * from './constants/notification.constants';
 
 // ─── Utils ───
 export * from './utils/date.utils';

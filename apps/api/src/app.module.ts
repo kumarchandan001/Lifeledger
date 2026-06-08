@@ -13,6 +13,10 @@ import { StorageModule } from './modules/storage/storage.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { SearchModule } from './modules/search/search.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { NotificationPreferencesModule } from './modules/notification-preferences/notification-preferences.module';
+import { ExpiryModule } from './modules/expiry/expiry.module';
+import { SchedulerModule } from './modules/scheduler/scheduler.module';
 
 @Module({
   imports: [
@@ -54,6 +58,12 @@ import { SearchModule } from './modules/search/search.module';
     CategoriesModule,
     DocumentsModule,
     SearchModule,
+
+    // ─── Sprint 4: Notifications & Expiry ───
+    NotificationsModule,
+    NotificationPreferencesModule,
+    ExpiryModule,
+    SchedulerModule,
   ],
   providers: [
     {

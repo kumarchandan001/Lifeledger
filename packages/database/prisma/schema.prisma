@@ -117,12 +117,19 @@ enum PaymentStatus {
 
 enum NotificationType {
   EXPIRY_WARNING
+  DOCUMENT_EXPIRED
   SECURITY_ALERT
-  ACTIVITY
-  SYSTEM
+  SYSTEM_NOTIFICATION
+  ACCOUNT_ACTIVITY
   EMERGENCY
   FAMILY
   BILLING
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+  ARCHIVED
 }
 
 enum TagSource {
@@ -196,18 +203,19 @@ model User {
   updatedAt           DateTime   @updatedAt @map("updated_at")
   deletedAt           DateTime?  @map("deleted_at")
 
-  documents         Document[]
-  sessions          UserSession[]
-  familyMemberships FamilyMembership[]
-  emergencyContacts EmergencyContact[]
-  notifications     Notification[]
-  subscription      Subscription?
-  legacyVault       LegacyVault?
-  auditLogs         AuditLog[]
-  createdFamilies   Family[]           @relation("FamilyCreator")
-  invitedMembers    FamilyMembership[] @relation("InvitedBy")
-  documentTags      DocumentTag[]
-  shareLinks        ShareLink[]
+  documents                Document[]
+  sessions                 UserSession[]
+  familyMemberships        FamilyMembership[]
+  emergencyContacts        EmergencyContact[]
+  notifications            Notification[]
+  notificationPreference   NotificationPreference?
+  subscription             Subscription?
+  legacyVault              LegacyVault?
+  auditLogs                AuditLog[]
+  createdFamilies          Family[]           @relation("FamilyCreator")
+  invitedMembers           FamilyMembership[] @relation("InvitedBy")
+  documentTags             DocumentTag[]
+  shareLinks               ShareLink[]
 
   @@map("users")
 }
@@ -623,35 +631,39 @@ model Payment {
 // ═══════════════════════════════════════════════════
 
 model Notification {
-  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId    String           @map("user_id") @db.Uuid
-  type      NotificationType
-  title     String           @db.VarChar(255)
-  body      String           @db.Text
-  data      Json             @default("{}") @db.JsonB
-  readAt    DateTime?        @map("read_at")
-  createdAt DateTime         @default(now()) @map("created_at")
+  id         String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String             @map("user_id") @db.Uuid
+  type       NotificationType
+  title      String             @db.VarChar(255)
+  message    String             @db.Text
+  metadata   Json               @default("{}") @db.JsonB
+  status     NotificationStatus @default(UNREAD)
+  readAt     DateTime?          @map("read_at")
+  archivedAt DateTime?          @map("archived_at")
+  createdAt  DateTime           @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id])
 
-  @@index([userId, readAt])
+  @@index([userId, status])
   @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, type])
   @@map("notifications")
 }
 
 model NotificationPreference {
-  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId    String           @map("user_id") @db.Uuid
-  type      NotificationType
-  email     Boolean          @default(true)
-  push      Boolean          @default(true)
-  sms       Boolean          @default(false)
-  whatsapp  Boolean          @default(false)
-  inApp     Boolean          @default(true) @map("in_app")
-  createdAt DateTime         @default(now()) @map("created_at")
-  updatedAt DateTime         @updatedAt @map("updated_at")
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String   @unique @map("user_id") @db.Uuid
+  notify90Days Boolean  @default(true) @map("notify_90_days")
+  notify60Days Boolean  @default(true) @map("notify_60_days")
+  notify30Days Boolean  @default(true) @map("notify_30_days")
+  notify7Days  Boolean  @default(true) @map("notify_7_days")
+  emailEnabled Boolean  @default(true) @map("email_enabled")
+  inAppEnabled Boolean  @default(true) @map("in_app_enabled")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
-  @@unique([userId, type])
+  user User @relation(fields: [userId], references: [id])
+
   @@map("notification_preferences")
 }
 
