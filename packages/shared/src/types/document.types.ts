@@ -94,6 +94,7 @@ export interface UploadUrlResponse {
   uploadUrl: string;
   documentId: string;
   key: string;
+  fields?: Record<string, string>;
 }
 
 import type { Category, SubCategory } from './category.types';

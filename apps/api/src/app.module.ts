@@ -9,6 +9,10 @@ import { RedisModule } from './modules/redis/redis.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { MailModule } from './modules/mail/mail.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { StorageModule } from './modules/storage/storage.module';
+import { CategoriesModule } from './modules/categories/categories.module';
+import { DocumentsModule } from './modules/documents/documents.module';
+import { SearchModule } from './modules/search/search.module';
 
 @Module({
   imports: [
@@ -42,10 +46,14 @@ import { AuthModule } from './modules/auth/auth.module';
     RedisModule,
     AuditModule,
     MailModule,
+    StorageModule,
 
     // ─── Feature Modules ───
     HealthModule,
     AuthModule,
+    CategoriesModule,
+    DocumentsModule,
+    SearchModule,
   ],
   providers: [
     {
