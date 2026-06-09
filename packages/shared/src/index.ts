@@ -5,6 +5,7 @@ export * from './types/user.types';
 export * from './types/document.types';
 export * from './types/category.types';
 export * from './types/notification.types';
+export * from './types/ai.types';
 
 // ─── Constants ───
 export * from './constants/categories';
@@ -12,6 +13,7 @@ export * from './constants/roles';
 export * from './constants/document-status';
 export * from './constants/limits';
 export * from './constants/notification.constants';
+export * from './constants/ai.constants';
 
 // ─── Utils ───
 export * from './utils/date.utils';

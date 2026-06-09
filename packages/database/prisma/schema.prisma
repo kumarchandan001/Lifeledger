@@ -50,6 +50,32 @@ enum OcrStatus {
   SKIPPED
 }
 
+enum AIAnalysisStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  NEEDS_REVIEW
+  APPROVED
+  REJECTED
+  FAILED
+}
+
+enum ProcessingJobType {
+  OCR_EXTRACTION
+  AI_CLASSIFICATION
+  AI_METADATA_EXTRACTION
+  AI_TAG_GENERATION
+  FULL_PIPELINE
+}
+
+enum ProcessingJobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
 enum FamilyRole {
   ADMIN
   MEMBER
@@ -158,6 +184,10 @@ enum AuditAction {
   DOCUMENT_DELETE
   DOCUMENT_SHARE
   DOCUMENT_DOWNLOAD
+  AI_PROCESSING_START
+  AI_PROCESSING_COMPLETE
+  AI_SUGGESTION_APPROVED
+  AI_SUGGESTION_REJECTED
   FAMILY_CREATE
   FAMILY_INVITE
   FAMILY_REMOVE
@@ -216,6 +246,7 @@ model User {
   invitedMembers           FamilyMembership[] @relation("InvitedBy")
   documentTags             DocumentTag[]
   shareLinks               ShareLink[]
+  processingJobs           ProcessingJob[]
 
   @@map("users")
 }
@@ -331,11 +362,15 @@ model Document {
   tags          DocumentTag[]
   shareLinks    ShareLink[]
   emergencyDocs EmergencyDocumentSet[]
+  ocrResult     OCRResult?
+  aiAnalysis    AIAnalysis?
+  processingJobs ProcessingJob[]
 
   @@index([userId])
   @@index([userId, categoryId])
   @@index([expiryDate])
   @@index([userId, status])
+  @@index([ocrStatus])
   @@index([userId, deletedAt])
   @@map("documents")
 }
@@ -683,4 +718,73 @@ model AuditLog {
   @@index([userId, action, createdAt(sort: Desc)])
   @@index([resourceType, resourceId])
   @@map("audit_logs")
+}
+
+// ═══════════════════════════════════════════════════
+// AI DOCUMENT INTELLIGENCE
+// ═══════════════════════════════════════════════════
+
+model OCRResult {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  documentId     String   @unique @map("document_id") @db.Uuid
+  extractedText  String   @map("extracted_text") @db.Text
+  textBlocks     Json     @default("[]") @map("text_blocks") @db.JsonB
+  tables         Json     @default("[]") @db.JsonB
+  confidence     Float    @default(0)
+  pageCount      Int      @default(1) @map("page_count")
+  language       String   @default("eng") @db.VarChar(10)
+  processingTime Int      @default(0) @map("processing_time")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("ocr_results")
+}
+
+model AIAnalysis {
+  id                   String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  documentId           String           @unique @map("document_id") @db.Uuid
+  suggestedCategory    String?          @map("suggested_category") @db.VarChar(100)
+  suggestedSubCategory String?          @map("suggested_sub_category") @db.VarChar(100)
+  categoryConfidence   Float            @default(0) @map("category_confidence")
+  extractedMetadata    Json             @default("{}") @map("extracted_metadata") @db.JsonB
+  generatedTags        Json             @default("[]") @map("generated_tags") @db.JsonB
+  aiSummary            String?          @map("ai_summary") @db.Text
+  status               AIAnalysisStatus @default(PENDING)
+  reviewedAt           DateTime?        @map("reviewed_at")
+  reviewNotes          String?          @map("review_notes") @db.Text
+  processingTime       Int              @default(0) @map("processing_time")
+  modelVersion         String           @default("gemini-2.0-flash") @map("model_version") @db.VarChar(50)
+  createdAt            DateTime         @default(now()) @map("created_at")
+  updatedAt            DateTime         @updatedAt @map("updated_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("ai_analyses")
+}
+
+model ProcessingJob {
+  id          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  documentId  String              @map("document_id") @db.Uuid
+  userId      String              @map("user_id") @db.Uuid
+  type        ProcessingJobType
+  status      ProcessingJobStatus @default(QUEUED)
+  priority    Int                 @default(0)
+  attempts    Int                 @default(0)
+  maxAttempts Int                 @default(3) @map("max_attempts")
+  error       String?             @db.Text
+  result      Json?               @db.JsonB
+  startedAt   DateTime?           @map("started_at")
+  completedAt DateTime?           @map("completed_at")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@index([documentId, type])
+  @@index([status, createdAt])
+  @@index([userId, status])
+  @@map("processing_jobs")
 }
