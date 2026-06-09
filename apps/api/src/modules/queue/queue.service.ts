@@ -108,7 +108,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
   /**
    * Get the status of a processing job.
    */
-  async getJobStatus(jobId: string) {
+  async getJobStatus(jobId: string): Promise<any> {
     return this.prisma.processingJob.findUnique({
       where: { id: jobId },
     });
@@ -127,7 +127,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       sortBy?: string;
       sortOrder?: 'asc' | 'desc';
     } = {},
-  ) {
+  ): Promise<any> {
     const {
       page = 1,
       limit = 20,
@@ -198,7 +198,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
   /**
    * Get documents that need human review.
    */
-  async getReviewQueue(userId: string, page = 1, limit = 20) {
+  async getReviewQueue(userId: string, page = 1, limit = 20): Promise<any> {
     const [items, total] = await Promise.all([
       this.prisma.aIAnalysis.findMany({
         where: {

@@ -18,6 +18,12 @@ import { NotificationPreferencesModule } from './modules/notification-preference
 import { ExpiryModule } from './modules/expiry/expiry.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
 
+// Sprint 5: AI Document Intelligence
+import { OcrModule } from './modules/ocr/ocr.module';
+import { AiModule } from './modules/ai/ai.module';
+import { QueueModule } from './modules/queue/queue.module';
+import { DocumentIntelligenceModule } from './modules/document-intelligence/document-intelligence.module';
+
 @Module({
   imports: [
     // ─── Global Config ───
@@ -64,6 +70,12 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module';
     NotificationPreferencesModule,
     ExpiryModule,
     SchedulerModule,
+
+    // ─── Sprint 5: AI Document Intelligence ───
+    OcrModule,
+    AiModule,
+    QueueModule,
+    DocumentIntelligenceModule,
   ],
   providers: [
     {
@@ -73,3 +85,4 @@ import { SchedulerModule } from './modules/scheduler/scheduler.module';
   ],
 })
 export class AppModule {}
+

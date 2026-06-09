@@ -286,7 +286,7 @@ export class AiService implements OnModuleInit {
   /**
    * Get stored AI analysis for a document.
    */
-  async getAIAnalysis(documentId: string) {
+  async getAIAnalysis(documentId: string): Promise<any> {
     return this.prisma.aIAnalysis.findUnique({
       where: { documentId },
     });

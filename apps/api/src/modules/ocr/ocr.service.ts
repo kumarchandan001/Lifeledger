@@ -88,7 +88,8 @@ export class OcrService {
     startTime: number,
   ): Promise<OCRExtractionResult> {
     // Dynamic import to avoid loading at startup
-    const pdfParse = (await import('pdf-parse')).default;
+    const pdfParseModule = (await import('pdf-parse')) as any;
+    const pdfParse = typeof pdfParseModule === 'function' ? pdfParseModule : pdfParseModule.default;
 
     const pdfData = await pdfParse(buffer);
     const extractedText = (pdfData.text || '').trim();
@@ -124,7 +125,7 @@ export class OcrService {
     const worker = await Tesseract.createWorker('eng');
 
     try {
-      const { data } = await worker.recognize(buffer);
+      const { data } = (await worker.recognize(buffer)) as any;
 
       const textBlocks = data.paragraphs?.map((p: any, idx: number) => ({
         text: p.text?.trim() || '',
@@ -196,7 +197,7 @@ export class OcrService {
   /**
    * Get stored OCR result for a document.
    */
-  async getOCRResult(documentId: string) {
+  async getOCRResult(documentId: string): Promise<any> {
     return this.prisma.oCRResult.findUnique({
       where: { documentId },
     });

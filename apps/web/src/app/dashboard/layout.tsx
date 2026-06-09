@@ -19,6 +19,7 @@ const NAV_ITEMS = [
     items: [
       { label: 'All Documents', href: '/dashboard/documents', icon: '📄' },
       { label: 'Categories', href: '/dashboard/categories', icon: '📁' },
+      { label: 'Intelligence', href: '/dashboard/intelligence', icon: '🧠' },
     ],
   },
   {

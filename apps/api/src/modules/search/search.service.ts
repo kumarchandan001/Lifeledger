@@ -30,6 +30,10 @@ export class SearchService {
         { tags: { some: { tag: { contains: cleanQuery, mode: 'insensitive' as const } } } },
         { documentNumber: { contains: cleanQuery, mode: 'insensitive' as const } },
         { issuer: { contains: cleanQuery, mode: 'insensitive' as const } },
+        // Sprint 5: Search OCR extracted text
+        { ocrText: { contains: cleanQuery, mode: 'insensitive' as const } },
+        // Sprint 5: Search AI summary
+        { aiSummary: { contains: cleanQuery, mode: 'insensitive' as const } },
       ],
     };
 
@@ -40,6 +44,14 @@ export class SearchService {
           category: true,
           subCategory: true,
           tags: true,
+          aiAnalysis: {
+            select: {
+              suggestedCategory: true,
+              suggestedSubCategory: true,
+              categoryConfidence: true,
+              status: true,
+            },
+          },
         },
         skip: (page - 1) * limit,
         take: limit,
@@ -70,3 +82,4 @@ export class SearchService {
     };
   }
 }
+
