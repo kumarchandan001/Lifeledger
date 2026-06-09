@@ -34,6 +34,15 @@ export class UsersService {
       throw new ConflictException('An account with this email already exists');
     }
 
+    if (data.phone) {
+      const existingPhone = await this.prisma.user.findFirst({
+        where: { phone: data.phone },
+      });
+      if (existingPhone) {
+        throw new ConflictException('An account with this phone number already exists');
+      }
+    }
+
     return this.prisma.user.create({
       data: {
         email: data.email.toLowerCase(),
