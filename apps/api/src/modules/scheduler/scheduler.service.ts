@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ExpiryService } from '../expiry/expiry.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { EscalationService } from '../emergency/escalation.service';
 
 @Injectable()
 export class SchedulerService {
@@ -10,6 +11,7 @@ export class SchedulerService {
   constructor(
     private readonly expiryService: ExpiryService,
     private readonly notificationsService: NotificationsService,
+    private readonly escalationService: EscalationService,
   ) {}
 
   /**
@@ -52,6 +54,22 @@ export class SchedulerService {
       );
     } catch (error) {
       this.logger.error('❌ Weekly notification cleanup failed', error);
+    }
+  }
+
+  /**
+   * Emergency Access Request Escalation and Reminders job.
+   * Runs hourly to check for expired waiting periods and send reminders.
+   */
+  @Cron(CronExpression.EVERY_HOUR, { name: 'emergency-access-workflow-checks' })
+  async handleEmergencyWorkflows(): Promise<void> {
+    this.logger.log('🚨 Emergency access workflow checks started');
+
+    try {
+      await this.escalationService.processEscalationAndReminders();
+      this.logger.log('✅ Emergency access workflow checks completed successfully');
+    } catch (error) {
+      this.logger.error('❌ Emergency access workflow checks failed', error);
     }
   }
 }

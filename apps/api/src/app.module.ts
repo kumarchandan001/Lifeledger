@@ -24,6 +24,9 @@ import { AiModule } from './modules/ai/ai.module';
 import { QueueModule } from './modules/queue/queue.module';
 import { DocumentIntelligenceModule } from './modules/document-intelligence/document-intelligence.module';
 
+// Sprint 7: Emergency Access
+import { EmergencyModule } from './modules/emergency/emergency.module';
+
 @Module({
   imports: [
     // ─── Global Config ───
@@ -76,6 +79,7 @@ import { DocumentIntelligenceModule } from './modules/document-intelligence/docu
     AiModule,
     QueueModule,
     DocumentIntelligenceModule,
+    EmergencyModule,
   ],
   providers: [
     {
