@@ -59,7 +59,7 @@ export class CloudinaryStorageService extends StorageService implements OnModule
     };
 
     const signature = cloudinary.utils.api_sign_request(paramsToSign, apiSecret);
-    
+
     const resourceType = mimeType.startsWith('image/') ? 'image' : 'raw';
     const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
 

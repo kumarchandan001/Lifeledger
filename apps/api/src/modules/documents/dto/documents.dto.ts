@@ -179,7 +179,10 @@ export class QueryDocumentsDto {
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ enum: ['createdAt', 'updatedAt', 'title', 'expiryDate'], default: 'createdAt' })
+  @ApiPropertyOptional({
+    enum: ['createdAt', 'updatedAt', 'title', 'expiryDate'],
+    default: 'createdAt',
+  })
   @IsOptional()
   @IsEnum(['createdAt', 'updatedAt', 'title', 'expiryDate'])
   sortBy: 'createdAt' | 'updatedAt' | 'title' | 'expiryDate' = 'createdAt';

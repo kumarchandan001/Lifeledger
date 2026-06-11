@@ -28,8 +28,8 @@ function VerifyEmailContent() {
         setStatus('error');
         setMessage(
           error.response?.data?.message ||
-          error.response?.data?.error?.message ||
-          'Verification failed. The token may be invalid or expired.'
+            error.response?.data?.error?.message ||
+            'Verification failed. The token may be invalid or expired.',
         );
       }
     };
@@ -43,7 +43,15 @@ function VerifyEmailContent() {
         {status === 'loading' && (
           <>
             <div className="auth-status-icon auth-status-icon-loading">
-              <span className="auth-spinner" style={{ borderColor: 'rgba(99, 102, 241, 0.3)', borderTopColor: '#6366f1', width: 28, height: 28 }} />
+              <span
+                className="auth-spinner"
+                style={{
+                  borderColor: 'rgba(99, 102, 241, 0.3)',
+                  borderTopColor: '#6366f1',
+                  width: 28,
+                  height: 28,
+                }}
+              />
             </div>
             <h3 className="auth-status-title">Verifying your email...</h3>
             <p className="auth-status-message">Please wait while we verify your email address.</p>
@@ -56,7 +64,11 @@ function VerifyEmailContent() {
             <h3 className="auth-status-title">Email verified!</h3>
             <p className="auth-status-message">{message}</p>
             <div style={{ marginTop: '1.5rem' }}>
-              <Link href="/login" className="auth-btn auth-btn-primary" style={{ textDecoration: 'none' }}>
+              <Link
+                href="/login"
+                className="auth-btn auth-btn-primary"
+                style={{ textDecoration: 'none' }}
+              >
                 Sign in to your account
               </Link>
             </div>
@@ -69,7 +81,11 @@ function VerifyEmailContent() {
             <h3 className="auth-status-title">Verification failed</h3>
             <p className="auth-status-message">{message}</p>
             <div style={{ marginTop: '1.5rem' }}>
-              <Link href="/login" className="auth-btn auth-btn-primary" style={{ textDecoration: 'none' }}>
+              <Link
+                href="/login"
+                className="auth-btn auth-btn-primary"
+                style={{ textDecoration: 'none' }}
+              >
                 Back to Sign In
               </Link>
             </div>
@@ -82,16 +98,26 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={
-      <div className="auth-card">
-        <div className="auth-status">
-          <div className="auth-status-icon auth-status-icon-loading">
-            <span className="auth-spinner" style={{ borderColor: 'rgba(99, 102, 241, 0.3)', borderTopColor: '#6366f1', width: 28, height: 28 }} />
+    <Suspense
+      fallback={
+        <div className="auth-card">
+          <div className="auth-status">
+            <div className="auth-status-icon auth-status-icon-loading">
+              <span
+                className="auth-spinner"
+                style={{
+                  borderColor: 'rgba(99, 102, 241, 0.3)',
+                  borderTopColor: '#6366f1',
+                  width: 28,
+                  height: 28,
+                }}
+              />
+            </div>
+            <h3 className="auth-status-title">Loading...</h3>
           </div>
-          <h3 className="auth-status-title">Loading...</h3>
         </div>
-      </div>
-    }>
+      }
+    >
       <VerifyEmailContent />
     </Suspense>
   );

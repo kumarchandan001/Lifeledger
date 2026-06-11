@@ -14,13 +14,7 @@ import { EmergencyActivityService } from './emergency-activity.service';
 import { EscalationService } from './escalation.service';
 
 @Module({
-  imports: [
-    PrismaModule,
-    NotificationsModule,
-    MailModule,
-    AiModule,
-    StorageModule,
-  ],
+  imports: [PrismaModule, NotificationsModule, MailModule, AiModule, StorageModule],
   controllers: [EmergencyController],
   providers: [
     TrustedContactsService,

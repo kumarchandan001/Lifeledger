@@ -44,10 +44,7 @@ export class NotificationsController {
   @ApiOperation({ summary: 'Mark a single notification as read' })
   @ApiResponse({ status: 200, description: 'Notification marked as read' })
   @ApiResponse({ status: 404, description: 'Notification not found' })
-  async markAsRead(
-    @Param('id') id: string,
-    @CurrentUser() user: CurrentUserPayload,
-  ): Promise<any> {
+  async markAsRead(@Param('id') id: string, @CurrentUser() user: CurrentUserPayload): Promise<any> {
     return this.notificationsService.markAsRead(id, user.userId);
   }
 

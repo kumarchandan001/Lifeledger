@@ -99,9 +99,9 @@ describe('DocumentIntelligenceService', () => {
     it('should throw NotFoundException if document not found', async () => {
       mockPrisma.document.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.startProcessing('doc-uuid', 'user-uuid'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.startProcessing('doc-uuid', 'user-uuid')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw BadRequestException for unsupported file types', async () => {
@@ -110,9 +110,9 @@ describe('DocumentIntelligenceService', () => {
         mimeType: 'text/plain',
       });
 
-      await expect(
-        service.startProcessing('doc-uuid', 'user-uuid'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.startProcessing('doc-uuid', 'user-uuid')).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should enqueue pipeline and return status', async () => {

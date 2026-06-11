@@ -34,7 +34,7 @@ export default function HistoryPage() {
 
   const getActionDetails = (act: Activity) => {
     const meta = act.metadata || {};
-    
+
     switch (act.action) {
       case 'CONTACT_ADDED':
         return {
@@ -156,41 +156,44 @@ export default function HistoryPage() {
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold">Emergency Activity Feed</h3>
-        <p className="text-sm text-muted-foreground mt-0.5 font-normal">
+        <p className="text-muted-foreground mt-0.5 text-sm font-normal">
           Audit logs of all emergency-related changes, contact status, and session views.
         </p>
       </div>
 
       {activities.length === 0 ? (
-        <div className="bg-card border border-border rounded-xl p-12 text-center flex flex-col items-center justify-center shadow-sm">
-          <div className="h-12 w-12 bg-muted rounded-full flex items-center justify-center text-muted-foreground mb-4">
+        <div className="bg-card border-border flex flex-col items-center justify-center rounded-xl border p-12 text-center shadow-sm">
+          <div className="bg-muted text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full">
             <History className="h-6 w-6" />
           </div>
-          <h4 className="font-semibold text-lg text-foreground font-sans">No Activity Logged</h4>
-          <p className="text-sm text-muted-foreground max-w-sm mt-1 font-normal leading-normal">
-            All emergency dashboard events, settings changes, and contact actions will be logged here for full auditability.
+          <h4 className="text-foreground font-sans text-lg font-semibold">No Activity Logged</h4>
+          <p className="text-muted-foreground mt-1 max-w-sm text-sm leading-normal font-normal">
+            All emergency dashboard events, settings changes, and contact actions will be logged
+            here for full auditability.
           </p>
         </div>
       ) : (
-        <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-          <div className="relative border-l-2 border-border pl-6 space-y-6">
+        <div className="bg-card border-border rounded-xl border p-6 shadow-sm">
+          <div className="border-border relative space-y-6 border-l-2 pl-6">
             {activities.map((act) => {
               const details = getActionDetails(act);
               return (
                 <div key={act.id} className="relative">
                   {/* Timeline icon */}
-                  <span className={`absolute -left-[35px] top-0.5 h-6.5 w-6.5 rounded-full border flex items-center justify-center text-xs shadow-sm ${details.color}`}>
+                  <span
+                    className={`absolute top-0.5 -left-[35px] flex h-6.5 w-6.5 items-center justify-center rounded-full border text-xs shadow-sm ${details.color}`}
+                  >
                     {details.icon}
                   </span>
-                  
+
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-foreground text-sm">{details.title}</h4>
-                      <span className="text-[10px] text-muted-foreground font-semibold">
+                      <h4 className="text-foreground text-sm font-bold">{details.title}</h4>
+                      <span className="text-muted-foreground text-[10px] font-semibold">
                         {new Date(act.createdAt).toLocaleString()}
                       </span>
                     </div>
-                    <p className="text-xs text-muted-foreground font-normal leading-relaxed">
+                    <p className="text-muted-foreground text-xs leading-relaxed font-normal">
                       {details.description}
                     </p>
                   </div>

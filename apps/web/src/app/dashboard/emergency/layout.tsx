@@ -17,25 +17,26 @@ export default function EmergencyLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-border bg-card rounded-lg p-6 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="border-border bg-card rounded-lg border-b p-6 shadow-sm">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Emergency Access Platform</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              Securely designate trusted contacts who can request controlled access to your vault in case of emergency.
+            <p className="text-muted-foreground mt-1 text-sm">
+              Securely designate trusted contacts who can request controlled access to your vault in
+              case of emergency.
             </p>
           </div>
         </div>
-        <nav className="flex flex-wrap gap-2 mt-6">
+        <nav className="mt-6 flex flex-wrap gap-2">
           {TABS.map((tab) => {
             const isActive = pathname === tab.href;
             return (
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
+                className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]'
+                    ? 'bg-primary text-primary-foreground scale-[1.02] shadow-md'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >

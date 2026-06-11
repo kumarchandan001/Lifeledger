@@ -19,7 +19,9 @@ export default function ForgotPasswordPage() {
       await api.post('/auth/forgot-password', { email });
       setSubmitted(true);
     } catch (err: any) {
-      setError(err.response?.data?.message || err.response?.data?.error?.message || 'Something went wrong');
+      setError(
+        err.response?.data?.message || err.response?.data?.error?.message || 'Something went wrong',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -32,11 +34,15 @@ export default function ForgotPasswordPage() {
           <div className="auth-status-icon auth-status-icon-success">📧</div>
           <h3 className="auth-status-title">Check your email</h3>
           <p className="auth-status-message">
-            If an account with <strong>{email}</strong> exists, we&apos;ve sent a password reset link.
-            The link expires in 15 minutes.
+            If an account with <strong>{email}</strong> exists, we&apos;ve sent a password reset
+            link. The link expires in 15 minutes.
           </p>
           <div style={{ marginTop: '1.5rem' }}>
-            <Link href="/login" className="auth-btn auth-btn-primary" style={{ textDecoration: 'none' }}>
+            <Link
+              href="/login"
+              className="auth-btn auth-btn-primary"
+              style={{ textDecoration: 'none' }}
+            >
               Back to Sign In
             </Link>
           </div>
@@ -49,9 +55,7 @@ export default function ForgotPasswordPage() {
     <div className="auth-card">
       <div className="auth-card-header">
         <h2 className="auth-card-title">Forgot password?</h2>
-        <p className="auth-card-subtitle">
-          Enter your email and we&apos;ll send you a reset link
-        </p>
+        <p className="auth-card-subtitle">Enter your email and we&apos;ll send you a reset link</p>
       </div>
 
       {error && (
@@ -63,7 +67,9 @@ export default function ForgotPasswordPage() {
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="auth-field">
-          <label className="auth-label" htmlFor="forgot-email">Email address</label>
+          <label className="auth-label" htmlFor="forgot-email">
+            Email address
+          </label>
           <input
             id="forgot-email"
             className="auth-input"
@@ -77,18 +83,16 @@ export default function ForgotPasswordPage() {
           />
         </div>
 
-        <button
-          type="submit"
-          className="auth-btn auth-btn-primary"
-          disabled={isLoading || !email}
-        >
+        <button type="submit" className="auth-btn auth-btn-primary" disabled={isLoading || !email}>
           {isLoading ? <span className="auth-spinner" /> : 'Send reset link'}
         </button>
       </form>
 
       <div className="auth-footer">
         Remember your password?{' '}
-        <Link href="/login" className="auth-link">Sign in</Link>
+        <Link href="/login" className="auth-link">
+          Sign in
+        </Link>
       </div>
     </div>
   );

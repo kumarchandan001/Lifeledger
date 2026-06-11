@@ -13,7 +13,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="auth-brand-panel">
         <div className="auth-brand-content">
           <div className="auth-logo">
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <rect width="40" height="40" rx="10" fill="url(#logo-grad)" />
               <path d="M12 28V12h4v12h8v4H12z" fill="white" />
               <defs>
@@ -27,13 +33,14 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
 
           <h1 className="auth-brand-heading">
-            Your Digital Life,<br />
+            Your Digital Life,
+            <br />
             <span className="auth-brand-accent">Organized & Secure</span>
           </h1>
 
           <p className="auth-brand-description">
-            Store, manage, and protect all your important documents in one secure, 
-            AI-powered vault. From Aadhaar to insurance — never lose a document again.
+            Store, manage, and protect all your important documents in one secure, AI-powered vault.
+            From Aadhaar to insurance — never lose a document again.
           </p>
 
           <div className="auth-brand-features">
@@ -69,9 +76,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
 
       {/* Right Panel — Form */}
       <div className="auth-form-panel">
-        <div className="auth-form-container">
-          {children}
-        </div>
+        <div className="auth-form-container">{children}</div>
       </div>
     </div>
   );

@@ -16,7 +16,13 @@ interface Notification {
   createdAt: string;
 }
 
-type FilterTab = 'all' | 'UNREAD' | 'EXPIRY_WARNING' | 'DOCUMENT_EXPIRED' | 'SECURITY_ALERT' | 'SYSTEM_NOTIFICATION';
+type FilterTab =
+  | 'all'
+  | 'UNREAD'
+  | 'EXPIRY_WARNING'
+  | 'DOCUMENT_EXPIRED'
+  | 'SECURITY_ALERT'
+  | 'SYSTEM_NOTIFICATION';
 
 const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: 'all', label: 'All' },
@@ -105,12 +111,18 @@ export default function NotificationsPage() {
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'EXPIRY_WARNING': return '⏰';
-      case 'DOCUMENT_EXPIRED': return '🚨';
-      case 'SECURITY_ALERT': return '🔒';
-      case 'ACCOUNT_ACTIVITY': return '👤';
-      case 'SYSTEM_NOTIFICATION': return '📢';
-      default: return '🔔';
+      case 'EXPIRY_WARNING':
+        return '⏰';
+      case 'DOCUMENT_EXPIRED':
+        return '🚨';
+      case 'SECURITY_ALERT':
+        return '🔒';
+      case 'ACCOUNT_ACTIVITY':
+        return '👤';
+      case 'SYSTEM_NOTIFICATION':
+        return '📢';
+      default:
+        return '🔔';
     }
   };
 

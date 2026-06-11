@@ -49,9 +49,7 @@ export class SchedulerService {
       // Hard-delete ARCHIVED notifications older than 180 days
       const deleted = await this.notificationsService.deleteArchivedNotifications(180);
 
-      this.logger.log(
-        `✅ Weekly cleanup completed: ${archived} archived, ${deleted} deleted`,
-      );
+      this.logger.log(`✅ Weekly cleanup completed: ${archived} archived, ${deleted} deleted`);
     } catch (error) {
       this.logger.error('❌ Weekly notification cleanup failed', error);
     }

@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAccessRequestDto, ResolveAccessRequestDto } from './dto/emergency-request.dto';
 import { EmergencyActivityService } from './emergency-activity.service';
@@ -17,7 +23,7 @@ export class EmergencyRequestsService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
-  async create(dto: CreateAccessRequestDto) {
+  async create(dto: CreateAccessRequestDto): Promise<any> {
     // Look up owner
     const owner = await this.prisma.user.findUnique({
       where: { email: dto.ownerEmail },
@@ -111,7 +117,7 @@ export class EmergencyRequestsService {
     return request;
   }
 
-  async resolve(id: string, userId: string, dto: ResolveAccessRequestDto) {
+  async resolve(id: string, userId: string, dto: ResolveAccessRequestDto): Promise<any> {
     const request = await this.prisma.emergencyAccessRequest.findUnique({
       where: { id },
       include: {
@@ -223,7 +229,7 @@ export class EmergencyRequestsService {
     return updatedRequest;
   }
 
-  async cancel(id: string, requesterEmail: string) {
+  async cancel(id: string, requesterEmail: string): Promise<any> {
     const request = await this.prisma.emergencyAccessRequest.findUnique({
       where: { id },
       include: {
@@ -250,14 +256,19 @@ export class EmergencyRequestsService {
       },
     });
 
-    await this.activityService.logActivity(request.trustedContact.userId, 'REQUEST_CANCELLED', request.trustedContactId, {
-      requestId: id,
-    });
+    await this.activityService.logActivity(
+      request.trustedContact.userId,
+      'REQUEST_CANCELLED',
+      request.trustedContactId,
+      {
+        requestId: id,
+      },
+    );
 
     return updated;
   }
 
-  async findAllIncoming(userId: string) {
+  async findAllIncoming(userId: string): Promise<any> {
     return this.prisma.emergencyAccessRequest.findMany({
       where: {
         trustedContact: {
@@ -271,7 +282,7 @@ export class EmergencyRequestsService {
     });
   }
 
-  async getRequestStatus(id: string) {
+  async getRequestStatus(id: string): Promise<any> {
     const request = await this.prisma.emergencyAccessRequest.findUnique({
       where: { id },
       include: {

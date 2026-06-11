@@ -6,12 +6,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { EmergencyModule } from '../emergency/emergency.module';
 
 @Module({
-  imports: [
-    ScheduleModule.forRoot(),
-    ExpiryModule,
-    NotificationsModule,
-    EmergencyModule,
-  ],
+  imports: [ScheduleModule.forRoot(), ExpiryModule, NotificationsModule, EmergencyModule],
   providers: [SchedulerService],
 })
 export class SchedulerModule {}

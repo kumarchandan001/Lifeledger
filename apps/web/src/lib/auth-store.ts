@@ -11,7 +11,12 @@ interface AuthState {
   error: string | null;
 
   login: (email: string, password: string) => Promise<void>;
-  register: (data: { email: string; password: string; fullName: string; phone?: string }) => Promise<string>;
+  register: (data: {
+    email: string;
+    password: string;
+    fullName: string;
+    phone?: string;
+  }) => Promise<string>;
   logout: () => Promise<void>;
   setUser: (user: AuthUser | null) => void;
   clearError: () => void;
@@ -33,7 +38,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       localStorage.setItem('lifeledger_access_token', accessToken);
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (error: any) {
-      const message = error.response?.data?.message || error.response?.data?.error?.message || 'Login failed';
+      const message =
+        error.response?.data?.message || error.response?.data?.error?.message || 'Login failed';
       set({ error: message, isLoading: false });
       throw new Error(message);
     }
@@ -46,7 +52,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isLoading: false });
       return response.data.data.message;
     } catch (error: any) {
-      const message = error.response?.data?.message || error.response?.data?.error?.message || 'Registration failed';
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error?.message ||
+        'Registration failed';
       set({ error: message, isLoading: false });
       throw new Error(message);
     }

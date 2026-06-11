@@ -40,7 +40,9 @@
   font-size: 13px;
   background: hsl(var(--card));
   color: hsl(var(--foreground));
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .docs-search input:focus {
@@ -217,7 +219,9 @@
   font-size: 18px;
   padding: 4px;
   opacity: 0.4;
-  transition: opacity 0.15s, transform 0.15s;
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
 }
 
 .doc-card-fav:hover,
@@ -262,10 +266,22 @@
   letter-spacing: 0.3px;
 }
 
-.doc-status-active { background: #ecfdf5; color: #059669; }
-.doc-status-expiring_soon { background: #fffbeb; color: #d97706; }
-.doc-status-expired { background: #fef2f2; color: #dc2626; }
-.doc-status-archived { background: #f1f5f9; color: #64748b; }
+.doc-status-active {
+  background: #ecfdf5;
+  color: #059669;
+}
+.doc-status-expiring_soon {
+  background: #fffbeb;
+  color: #d97706;
+}
+.doc-status-expired {
+  background: #fef2f2;
+  color: #dc2626;
+}
+.doc-status-archived {
+  background: #f1f5f9;
+  color: #64748b;
+}
 
 /* ─── Document List ─── */
 .docs-list {
@@ -410,8 +426,12 @@
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .upload-modal {
@@ -427,8 +447,14 @@
 }
 
 @keyframes modal-in {
-  from { opacity: 0; transform: translateY(16px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .upload-modal-header {
@@ -695,8 +721,12 @@
 }
 
 @keyframes drawer-in {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 .drawer-header {

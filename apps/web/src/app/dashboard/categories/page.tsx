@@ -41,14 +41,17 @@ export default function CategoriesPage() {
         const res = await api.get('/categories');
         // Let's also get document stats to fill the header
         const docRes = await api.get('/documents', { params: { limit: 1 } });
-        
+
         // Count total docs per category from the list if _count is returned or construct from response
         const categoriesData = res.data ?? [];
-        
+
         setData({
           categories: categoriesData,
           totalDocuments: docRes.data?.total ?? 0,
-          totalStorageBytes: categoriesData.reduce((acc: number, curr: any) => acc + (curr.totalSize ?? 0), 0)
+          totalStorageBytes: categoriesData.reduce(
+            (acc: number, curr: any) => acc + (curr.totalSize ?? 0),
+            0,
+          ),
         });
       } catch (err) {
         console.error('Failed to load categories', err);
@@ -74,16 +77,24 @@ export default function CategoriesPage() {
         <div className="categories-hero-content">
           <h1 className="categories-hero-title">Browse by Category</h1>
           <p className="categories-hero-desc">
-            Organize, retrieve, and analyze your life documents by category. Click a category to view items or manage subcategories.
+            Organize, retrieve, and analyze your life documents by category. Click a category to
+            view items or manage subcategories.
           </p>
         </div>
         <div className="categories-hero-stats">
           <div className="categories-stat-item">
-            <span className="categories-stat-val" id="cat-total-docs">{data?.totalDocuments ?? 0}</span>
+            <span className="categories-stat-val" id="cat-total-docs">
+              {data?.totalDocuments ?? 0}
+            </span>
             <span className="categories-stat-lbl">Total Documents</span>
           </div>
-          <div className="categories-stat-item" style={{ borderLeft: '1px solid hsl(var(--border))', paddingLeft: 24 }}>
-            <span className="categories-stat-val" id="cat-total-storage">{formatStorage(data?.totalStorageBytes ?? 0)}</span>
+          <div
+            className="categories-stat-item"
+            style={{ borderLeft: '1px solid hsl(var(--border))', paddingLeft: 24 }}
+          >
+            <span className="categories-stat-val" id="cat-total-storage">
+              {formatStorage(data?.totalStorageBytes ?? 0)}
+            </span>
             <span className="categories-stat-lbl">Storage Used</span>
           </div>
         </div>
@@ -92,10 +103,22 @@ export default function CategoriesPage() {
       {/* ─── Categories Grid ─── */}
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
-          <div className="spinner" style={{ width: 32, height: 32, border: '3px solid hsl(var(--border))', borderTopColor: 'hsl(var(--primary))', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <div
+            className="spinner"
+            style={{
+              width: 32,
+              height: 32,
+              border: '3px solid hsl(var(--border))',
+              borderTopColor: 'hsl(var(--primary))',
+              borderRadius: '50%',
+              animation: 'spin 0.8s linear infinite',
+            }}
+          />
         </div>
       ) : data?.categories.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '48px 0', color: 'hsl(var(--muted-foreground))' }}>
+        <div
+          style={{ textAlign: 'center', padding: '48px 0', color: 'hsl(var(--muted-foreground))' }}
+        >
           No categories setup found.
         </div>
       ) : (
@@ -106,11 +129,13 @@ export default function CategoriesPage() {
               <div
                 key={cat.id}
                 className="category-card"
-                style={{
-                  '--cat-color': cat.color,
-                  '--cat-color-light': `${cat.color}14`,
-                  '--cat-header-bg': `${cat.color}0a`
-                } as React.CSSProperties}
+                style={
+                  {
+                    '--cat-color': cat.color,
+                    '--cat-color-light': `${cat.color}14`,
+                    '--cat-header-bg': `${cat.color}0a`,
+                  } as React.CSSProperties
+                }
                 onClick={() => router.push(`/dashboard/categories/${cat.slug}`)}
                 id={`cat-card-${cat.slug}`}
               >
@@ -120,7 +145,9 @@ export default function CategoriesPage() {
                   </div>
                   <div className="category-card-title-wrap">
                     <h3 className="category-card-title">{cat.name}</h3>
-                    <p className="category-card-subtitle">{cat.description || 'Secure personal vault'}</p>
+                    <p className="category-card-subtitle">
+                      {cat.description || 'Secure personal vault'}
+                    </p>
                   </div>
                 </div>
 

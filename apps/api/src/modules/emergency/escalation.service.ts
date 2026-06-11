@@ -161,7 +161,7 @@ export class EscalationService {
 
       const metadata = (req.metadata as Record<string, any>) || {};
       const reminders = metadata.reminders || [];
-      let updatedReminders = [...reminders];
+      const updatedReminders = [...reminders];
       let shouldUpdateMetadata = false;
 
       // Halfway reminder

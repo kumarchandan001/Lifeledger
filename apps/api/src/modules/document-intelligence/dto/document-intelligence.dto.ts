@@ -125,10 +125,22 @@ export class QueryProcessingJobsDto {
   status?: 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
 
   @ApiPropertyOptional({
-    enum: ['OCR_EXTRACTION', 'AI_CLASSIFICATION', 'AI_METADATA_EXTRACTION', 'AI_TAG_GENERATION', 'FULL_PIPELINE'],
+    enum: [
+      'OCR_EXTRACTION',
+      'AI_CLASSIFICATION',
+      'AI_METADATA_EXTRACTION',
+      'AI_TAG_GENERATION',
+      'FULL_PIPELINE',
+    ],
   })
   @IsOptional()
-  @IsEnum(['OCR_EXTRACTION', 'AI_CLASSIFICATION', 'AI_METADATA_EXTRACTION', 'AI_TAG_GENERATION', 'FULL_PIPELINE'])
+  @IsEnum([
+    'OCR_EXTRACTION',
+    'AI_CLASSIFICATION',
+    'AI_METADATA_EXTRACTION',
+    'AI_TAG_GENERATION',
+    'FULL_PIPELINE',
+  ])
   type?: string;
 
   @ApiPropertyOptional({ enum: ['createdAt', 'updatedAt', 'completedAt'], default: 'createdAt' })

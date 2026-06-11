@@ -37,9 +37,7 @@ describe('DocumentIntelligenceController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [DocumentIntelligenceController],
-      providers: [
-        { provide: DocumentIntelligenceService, useValue: mockService },
-      ],
+      providers: [{ provide: DocumentIntelligenceService, useValue: mockService }],
     }).compile();
 
     controller = module.get<DocumentIntelligenceController>(DocumentIntelligenceController);

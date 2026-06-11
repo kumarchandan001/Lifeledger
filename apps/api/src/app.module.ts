@@ -89,4 +89,3 @@ import { EmergencyModule } from './modules/emergency/emergency.module';
   ],
 })
 export class AppModule {}
-

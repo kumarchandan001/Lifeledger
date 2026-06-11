@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, ConflictException, ForbiddenException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  ForbiddenException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmergencyActivityService } from './emergency-activity.service';
 import { AiService } from '../ai/ai.service';
@@ -75,7 +81,7 @@ export class EmergencyVaultService {
     return { success: true, message: 'Document removed from emergency vault' };
   }
 
-  async findAll(userId: string) {
+  async findAll(userId: string): Promise<any> {
     return this.prisma.emergencyVaultDocument.findMany({
       where: { userId },
       include: {

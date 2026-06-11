@@ -22,7 +22,11 @@ const EXPIRY_TOGGLES: { key: keyof Preferences; title: string; desc: string }[] 
 
 const CHANNEL_TOGGLES: { key: keyof Preferences; title: string; desc: string }[] = [
   { key: 'emailEnabled', title: 'Email Notifications', desc: 'Receive notifications via email' },
-  { key: 'inAppEnabled', title: 'In-App Notifications', desc: 'Show notifications in the dashboard' },
+  {
+    key: 'inAppEnabled',
+    title: 'In-App Notifications',
+    desc: 'Show notifications in the dashboard',
+  },
 ];
 
 export default function PreferencesPage() {
@@ -123,9 +127,7 @@ export default function PreferencesPage() {
       {/* Notification Channels */}
       <div className="pref-section">
         <div className="pref-section-title">📨 Notification Channels</div>
-        <div className="pref-section-desc">
-          Control how notifications are delivered to you.
-        </div>
+        <div className="pref-section-desc">Control how notifications are delivered to you.</div>
 
         {CHANNEL_TOGGLES.map((toggle) => (
           <div key={toggle.key} className="pref-row">
@@ -147,12 +149,8 @@ export default function PreferencesPage() {
       </div>
 
       {/* Save Status */}
-      {saveStatus === 'saving' && (
-        <div className="save-indicator success">Saving...</div>
-      )}
-      {saveStatus === 'saved' && (
-        <div className="save-indicator success">✓ Preferences saved</div>
-      )}
+      {saveStatus === 'saving' && <div className="save-indicator success">Saving...</div>}
+      {saveStatus === 'saved' && <div className="save-indicator success">✓ Preferences saved</div>}
       {saveStatus === 'error' && (
         <div className="save-indicator error">✕ Failed to save. Please try again.</div>
       )}

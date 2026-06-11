@@ -6,6 +6,8 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType, RequestStatus } from '@lifeledger/database';
 import { StorageService } from '../storage/storage.service';
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 @Injectable()
 export class EmergencyAccessService {
   private readonly logger = new Logger(EmergencyAccessService.name);
@@ -19,6 +21,10 @@ export class EmergencyAccessService {
   ) {}
 
   async startSession(grantId: string) {
+    if (!UUID_REGEX.test(grantId)) {
+      throw new NotFoundException('Invalid session token');
+    }
+
     const grant = await this.prisma.emergencyAccessGrant.findUnique({
       where: { id: grantId },
       include: {
@@ -49,10 +55,15 @@ export class EmergencyAccessService {
     const ownerId = grant.request.trustedContact.userId;
 
     // Log activity
-    await this.activityService.logActivity(ownerId, 'SESSION_STARTED', grant.request.trustedContactId, {
-      grantId: grant.id,
-      requestId: grant.requestId,
-    });
+    await this.activityService.logActivity(
+      ownerId,
+      'SESSION_STARTED',
+      grant.request.trustedContactId,
+      {
+        grantId: grant.id,
+        requestId: grant.requestId,
+      },
+    );
 
     // Send notifications
     await this.notificationsService.create({
@@ -82,6 +93,10 @@ export class EmergencyAccessService {
   }
 
   async endSession(grantId: string) {
+    if (!UUID_REGEX.test(grantId)) {
+      throw new NotFoundException('Invalid session token');
+    }
+
     const grant = await this.prisma.emergencyAccessGrant.findUnique({
       where: { id: grantId },
       include: {
@@ -106,9 +121,14 @@ export class EmergencyAccessService {
     });
 
     // Log activity
-    await this.activityService.logActivity(ownerId, 'SESSION_ENDED', grant.request.trustedContactId, {
-      grantId: grant.id,
-    });
+    await this.activityService.logActivity(
+      ownerId,
+      'SESSION_ENDED',
+      grant.request.trustedContactId,
+      {
+        grantId: grant.id,
+      },
+    );
 
     // Send notifications
     await this.notificationsService.create({
@@ -123,6 +143,10 @@ export class EmergencyAccessService {
   }
 
   async viewDocuments(grantId: string) {
+    if (!UUID_REGEX.test(grantId)) {
+      throw new NotFoundException('Invalid session token');
+    }
+
     const grant = await this.prisma.emergencyAccessGrant.findUnique({
       where: { id: grantId },
       include: {
@@ -221,10 +245,15 @@ export class EmergencyAccessService {
     );
 
     // Log viewed activity
-    await this.activityService.logActivity(ownerId, 'DOCUMENTS_VIEWED', grant.request.trustedContactId, {
-      grantId: grant.id,
-      documentCount: resolvedDocs.length,
-    });
+    await this.activityService.logActivity(
+      ownerId,
+      'DOCUMENTS_VIEWED',
+      grant.request.trustedContactId,
+      {
+        grantId: grant.id,
+        documentCount: resolvedDocs.length,
+      },
+    );
 
     return resolvedDocs;
   }

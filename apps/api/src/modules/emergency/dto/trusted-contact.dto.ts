@@ -15,8 +15,31 @@ export class CreateTrustedContactDto {
   @IsString()
   phone?: string;
 
-  @ApiProperty({ example: 'Spouse', enum: ['Spouse', 'Parent', 'Child', 'Sibling', 'Lawyer', 'Doctor', 'Executor', 'Friend', 'Other'] })
-  @IsEnum(['Spouse', 'Parent', 'Child', 'Sibling', 'Lawyer', 'Doctor', 'Executor', 'Friend', 'Other'])
+  @ApiProperty({
+    example: 'Spouse',
+    enum: [
+      'Spouse',
+      'Parent',
+      'Child',
+      'Sibling',
+      'Lawyer',
+      'Doctor',
+      'Executor',
+      'Friend',
+      'Other',
+    ],
+  })
+  @IsEnum([
+    'Spouse',
+    'Parent',
+    'Child',
+    'Sibling',
+    'Lawyer',
+    'Doctor',
+    'Executor',
+    'Friend',
+    'Other',
+  ])
   relationship!: string;
 }
 
@@ -36,8 +59,31 @@ export class UpdateTrustedContactDto {
   @IsString()
   phone?: string;
 
-  @ApiPropertyOptional({ example: 'Spouse', enum: ['Spouse', 'Parent', 'Child', 'Sibling', 'Lawyer', 'Doctor', 'Executor', 'Friend', 'Other'] })
+  @ApiPropertyOptional({
+    example: 'Spouse',
+    enum: [
+      'Spouse',
+      'Parent',
+      'Child',
+      'Sibling',
+      'Lawyer',
+      'Doctor',
+      'Executor',
+      'Friend',
+      'Other',
+    ],
+  })
   @IsOptional()
-  @IsEnum(['Spouse', 'Parent', 'Child', 'Sibling', 'Lawyer', 'Doctor', 'Executor', 'Friend', 'Other'])
+  @IsEnum([
+    'Spouse',
+    'Parent',
+    'Child',
+    'Sibling',
+    'Lawyer',
+    'Doctor',
+    'Executor',
+    'Friend',
+    'Other',
+  ])
   relationship?: string;
 }

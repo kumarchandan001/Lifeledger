@@ -12,11 +12,12 @@ export const AI_CONFIDENCE_THRESHOLDS = {
   LOW: 50,
 } as const;
 
-export const AI_CONFIDENCE_LABELS: Record<string, { label: string; color: string; icon: string }> = {
-  HIGH: { label: 'High Confidence', color: '#10b981', icon: '✅' },
-  MEDIUM: { label: 'Medium Confidence', color: '#f59e0b', icon: '⚠️' },
-  LOW: { label: 'Low Confidence', color: '#ef4444', icon: '❌' },
-};
+export const AI_CONFIDENCE_LABELS: Record<string, { label: string; color: string; icon: string }> =
+  {
+    HIGH: { label: 'High Confidence', color: '#10b981', icon: '✅' },
+    MEDIUM: { label: 'Medium Confidence', color: '#f59e0b', icon: '⚠️' },
+    LOW: { label: 'Low Confidence', color: '#ef4444', icon: '❌' },
+  };
 
 export const getConfidenceLevel = (confidence: number): 'HIGH' | 'MEDIUM' | 'LOW' => {
   if (confidence >= AI_CONFIDENCE_THRESHOLDS.HIGH) return 'HIGH';

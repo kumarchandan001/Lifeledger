@@ -10,7 +10,10 @@ jest.mock('pdf-parse', () => {
     if (buffer.toString() === 'empty-pdf') {
       return Promise.resolve({ text: '', numpages: 1 });
     }
-    return Promise.resolve({ text: 'extracted pdf content that is long enough to bypass scanned fallback check', numpages: 2 });
+    return Promise.resolve({
+      text: 'extracted pdf content that is long enough to bypass scanned fallback check',
+      numpages: 2,
+    });
   });
 });
 
@@ -19,10 +22,8 @@ const mockRecognize = jest.fn().mockResolvedValue({
   data: {
     text: 'extracted image text',
     confidence: 88,
-    paragraphs: [
-      { text: 'extracted image text', confidence: 88 }
-    ]
-  }
+    paragraphs: [{ text: 'extracted image text', confidence: 88 }],
+  },
 });
 const mockTerminate = jest.fn().mockResolvedValue(undefined);
 jest.mock('tesseract.js', () => {
@@ -81,7 +82,7 @@ describe('OcrService', () => {
   describe('extractText', () => {
     it('should extract text from a native PDF and save the result', async () => {
       mockStorageService.generateDownloadUrl.mockResolvedValue('http://mockurl.com/doc.pdf');
-      
+
       const mockBuffer = Buffer.from('hello pdf');
       mockFetch.mockResolvedValue({
         ok: true,
@@ -95,7 +96,9 @@ describe('OcrService', () => {
         where: { id: 'doc-uuid' },
         data: { ocrStatus: OcrStatus.PROCESSING },
       });
-      expect(result.extractedText).toBe('extracted pdf content that is long enough to bypass scanned fallback check');
+      expect(result.extractedText).toBe(
+        'extracted pdf content that is long enough to bypass scanned fallback check',
+      );
       expect(result.pageCount).toBe(2);
       expect(result.confidence).toBe(95); // native is 95
       expect(mockPrisma.oCRResult.upsert).toHaveBeenCalled();
@@ -103,14 +106,18 @@ describe('OcrService', () => {
 
     it('should fallback to image OCR when PDF has no native text', async () => {
       mockStorageService.generateDownloadUrl.mockResolvedValue('http://mockurl.com/scanned.pdf');
-      
+
       const mockBuffer = Buffer.from('empty-pdf');
       mockFetch.mockResolvedValue({
         ok: true,
         arrayBuffer: jest.fn().mockResolvedValue(mockBuffer),
       });
 
-      const result = await service.extractText('doc-uuid', 'lifeledger/scanned.pdf', 'application/pdf');
+      const result = await service.extractText(
+        'doc-uuid',
+        'lifeledger/scanned.pdf',
+        'application/pdf',
+      );
 
       expect(result.extractedText).toBe('extracted image text');
       expect(result.confidence).toBe(88);
@@ -120,7 +127,7 @@ describe('OcrService', () => {
 
     it('should extract text from an image using Tesseract', async () => {
       mockStorageService.generateDownloadUrl.mockResolvedValue('http://mockurl.com/image.png');
-      
+
       const mockBuffer = Buffer.from('image bytes');
       mockFetch.mockResolvedValue({
         ok: true,

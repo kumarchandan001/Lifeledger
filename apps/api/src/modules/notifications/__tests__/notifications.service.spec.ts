@@ -22,10 +22,7 @@ describe('NotificationsService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        NotificationsService,
-        { provide: PrismaService, useValue: mockPrisma },
-      ],
+      providers: [NotificationsService, { provide: PrismaService, useValue: mockPrisma }],
     }).compile();
 
     service = module.get<NotificationsService>(NotificationsService);
@@ -150,17 +147,17 @@ describe('NotificationsService', () => {
     it('should throw NotFoundException if notification does not exist', async () => {
       mockPrisma.notification.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.markAsRead('invalid-uuid', 'user-uuid'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.markAsRead('invalid-uuid', 'user-uuid')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw NotFoundException if notification belongs to different user', async () => {
       mockPrisma.notification.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.markAsRead('notif-uuid', 'other-user'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.markAsRead('notif-uuid', 'other-user')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -199,9 +196,9 @@ describe('NotificationsService', () => {
     it('should throw NotFoundException for non-existent notification', async () => {
       mockPrisma.notification.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.deleteNotification('invalid-uuid', 'user-uuid'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.deleteNotification('invalid-uuid', 'user-uuid')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

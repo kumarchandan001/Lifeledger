@@ -103,36 +103,41 @@ export default function EmergencyVaultPage() {
     <div className="space-y-8">
       {/* AI Intelligence Header */}
       {(suggestions.length > 0 || missing.length > 0) && (
-        <div className="bg-card border border-primary/20 rounded-xl p-6 shadow-sm space-y-4 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-            <Sparkles className="h-24 w-24 text-primary" />
+        <div className="bg-card border-primary/20 relative space-y-4 overflow-hidden rounded-xl border p-6 shadow-sm">
+          <div className="pointer-events-none absolute top-0 right-0 p-4 opacity-10">
+            <Sparkles className="text-primary h-24 w-24" />
           </div>
-          <div className="flex items-center gap-2 text-primary">
+          <div className="text-primary flex items-center gap-2">
             <Cpu className="h-5 w-5 animate-pulse" />
-            <h3 className="font-bold text-lg">AI Vault Recommendations</h3>
+            <h3 className="text-lg font-bold">AI Vault Recommendations</h3>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Our AI has scanned your documents and identified items that are highly recommended to add or upload for emergency situations.
+          <p className="text-muted-foreground text-sm">
+            Our AI has scanned your documents and identified items that are highly recommended to
+            add or upload for emergency situations.
           </p>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-2">
+          <div className="mt-2 grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Suggested documents to toggle */}
             {suggestions.length > 0 && (
               <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Suggested to Add</h4>
+                <h4 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+                  Suggested to Add
+                </h4>
                 <div className="space-y-2">
                   {suggestions.map((s) => (
                     <div
                       key={s.documentId}
-                      className="bg-muted/40 border border-border rounded-lg p-3 flex items-center justify-between gap-4"
+                      className="bg-muted/40 border-border flex items-center justify-between gap-4 rounded-lg border p-3"
                     >
                       <div>
-                        <p className="font-semibold text-sm text-foreground">{s.title}</p>
-                        <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{s.reason}</p>
+                        <p className="text-foreground text-sm font-semibold">{s.title}</p>
+                        <p className="text-muted-foreground mt-0.5 line-clamp-1 text-xs">
+                          {s.reason}
+                        </p>
                       </div>
                       <button
                         onClick={() => handleAddToVault(s.documentId)}
-                        className="flex items-center gap-1 px-2.5 py-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground rounded-lg text-xs font-semibold transition-all shrink-0"
+                        className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all"
                       >
                         <Plus className="h-3.5 w-3.5" />
                         <span>Add</span>
@@ -146,17 +151,21 @@ export default function EmergencyVaultPage() {
             {/* Missing items */}
             {missing.length > 0 && (
               <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Missing Critical Items</h4>
+                <h4 className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+                  Missing Critical Items
+                </h4>
                 <div className="space-y-2">
                   {missing.map((m) => (
                     <div
                       key={m.categorySlug}
-                      className="bg-red-500/5 border border-red-500/10 rounded-lg p-3 flex items-start gap-3"
+                      className="flex items-start gap-3 rounded-lg border border-red-500/10 bg-red-500/5 p-3"
                     >
-                      <span className="text-lg mt-0.5">⚠️</span>
+                      <span className="mt-0.5 text-lg">⚠️</span>
                       <div>
-                        <p className="font-semibold text-sm text-red-700 dark:text-red-400">Missing: {m.documentType}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{m.reason}</p>
+                        <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+                          Missing: {m.documentType}
+                        </p>
+                        <p className="text-muted-foreground mt-0.5 text-xs">{m.reason}</p>
                       </div>
                     </div>
                   ))}
@@ -168,41 +177,48 @@ export default function EmergencyVaultPage() {
       )}
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left 2/3: Vault Documents */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="space-y-4 lg:col-span-2">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold">Documents in Emergency Vault ({vaultItems.length})</h3>
-              <p className="text-sm text-muted-foreground mt-0.5 font-normal leading-normal">
-                Only these documents will be shared with your trusted contacts during an approved session.
+              <h3 className="text-lg font-semibold">
+                Documents in Emergency Vault ({vaultItems.length})
+              </h3>
+              <p className="text-muted-foreground mt-0.5 text-sm leading-normal font-normal">
+                Only these documents will be shared with your trusted contacts during an approved
+                session.
               </p>
             </div>
           </div>
 
           {vaultItems.length === 0 ? (
-            <div className="bg-card border border-border border-dashed rounded-xl p-12 text-center flex flex-col items-center justify-center shadow-sm">
-              <div className="h-12 w-12 bg-muted rounded-full flex items-center justify-center text-muted-foreground mb-4">
+            <div className="bg-card border-border flex flex-col items-center justify-center rounded-xl border border-dashed p-12 text-center shadow-sm">
+              <div className="bg-muted text-muted-foreground mb-4 flex h-12 w-12 items-center justify-center rounded-full">
                 <Lock className="h-6 w-6" />
               </div>
-              <h4 className="font-semibold text-lg text-foreground font-sans">Vault is Empty</h4>
-              <p className="text-sm text-muted-foreground max-w-sm mt-1 mb-6 font-normal">
-                You haven't designated any documents for emergency sharing yet. Use the selector on the right to add some.
+              <h4 className="text-foreground font-sans text-lg font-semibold">Vault is Empty</h4>
+              <p className="text-muted-foreground mt-1 mb-6 max-w-sm text-sm font-normal">
+                You haven't designated any documents for emergency sharing yet. Use the selector on
+                the right to add some.
               </p>
             </div>
           ) : (
-            <div className="bg-card border border-border rounded-xl divide-y divide-border overflow-hidden shadow-sm">
+            <div className="bg-card border-border divide-border divide-y overflow-hidden rounded-xl border shadow-sm">
               {vaultItems.map((item) => (
-                <div key={item.id} className="p-4 flex items-center justify-between hover:bg-muted/30 transition-colors">
+                <div
+                  key={item.id}
+                  className="hover:bg-muted/30 flex items-center justify-between p-4 transition-colors"
+                >
                   <div>
-                    <h4 className="font-bold text-foreground text-sm">{item.document.title}</h4>
-                    <span className="inline-block text-[10px] font-semibold px-2 py-0.5 bg-muted text-muted-foreground rounded-md mt-1">
+                    <h4 className="text-foreground text-sm font-bold">{item.document.title}</h4>
+                    <span className="bg-muted text-muted-foreground mt-1 inline-block rounded-md px-2 py-0.5 text-[10px] font-semibold">
                       {item.document.category.name}
                     </span>
                   </div>
                   <button
                     onClick={() => handleRemoveFromVault(item.documentId)}
-                    className="p-2 text-muted-foreground hover:text-destructive hover:bg-red-500/10 rounded-lg transition-colors"
+                    className="text-muted-foreground hover:text-destructive rounded-lg p-2 transition-colors hover:bg-red-500/10"
                     title="Remove from vault"
                   >
                     <Trash2 className="h-4.5 w-4.5" />
@@ -214,37 +230,45 @@ export default function EmergencyVaultPage() {
         </div>
 
         {/* Right 1/3: Document Selector */}
-        <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-4 h-fit">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Lock className="h-5 w-5 text-primary animate-pulse" /> Manage Vault Items
+        <div className="bg-card border-border h-fit space-y-4 rounded-xl border p-6 shadow-sm">
+          <h3 className="flex items-center gap-2 text-lg font-semibold">
+            <Lock className="text-primary h-5 w-5 animate-pulse" /> Manage Vault Items
           </h3>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Select from your uploaded documents to add them to your Emergency Vault. Checked documents are included.
+          <p className="text-muted-foreground text-xs leading-relaxed">
+            Select from your uploaded documents to add them to your Emergency Vault. Checked
+            documents are included.
           </p>
 
-          <div className="border-t border-border pt-4">
+          <div className="border-border border-t pt-4">
             {allDocs.length === 0 ? (
-              <div className="text-center py-6 text-sm text-muted-foreground">
-                No documents found in your LifeLedger account. Upload documents in your main dashboard first.
+              <div className="text-muted-foreground py-6 text-center text-sm">
+                No documents found in your LifeLedger account. Upload documents in your main
+                dashboard first.
               </div>
             ) : (
-              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+              <div className="max-h-[400px] space-y-3 overflow-y-auto pr-1">
                 {allDocs.map((doc) => {
                   const isInVault = vaultItems.some((item) => item.documentId === doc.id);
                   return (
                     <div
                       key={doc.id}
-                      onClick={() => (isInVault ? handleRemoveFromVault(doc.id) : handleAddToVault(doc.id))}
-                      className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer transition-all duration-200 hover:border-primary/50 select-none ${
+                      onClick={() =>
+                        isInVault ? handleRemoveFromVault(doc.id) : handleAddToVault(doc.id)
+                      }
+                      className={`hover:border-primary/50 flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-all duration-200 select-none ${
                         isInVault ? 'bg-primary/5 border-primary/30' : 'border-border'
                       }`}
                     >
                       <div className="max-w-[70%]">
-                        <p className="font-semibold text-xs text-foreground truncate">{doc.title}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{doc.category.name}</p>
+                        <p className="text-foreground truncate text-xs font-semibold">
+                          {doc.title}
+                        </p>
+                        <p className="text-muted-foreground truncate text-[10px]">
+                          {doc.category.name}
+                        </p>
                       </div>
                       <div
-                        className={`h-5 w-5 rounded-md flex items-center justify-center border transition-all ${
+                        className={`flex h-5 w-5 items-center justify-center rounded-md border transition-all ${
                           isInVault
                             ? 'bg-primary border-primary text-primary-foreground'
                             : 'border-muted-foreground/30 bg-background'

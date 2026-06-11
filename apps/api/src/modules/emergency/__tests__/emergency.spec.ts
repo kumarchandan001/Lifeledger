@@ -33,41 +33,41 @@ describe('Emergency Platform Services', () => {
       create: jest.fn(),
       findFirst: jest.fn(),
       findUnique: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
       update: jest.fn(),
       delete: jest.fn(),
     },
     document: {
       findUnique: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
       update: jest.fn(),
     },
     category: {
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
     },
     subCategory: {
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
     },
     emergencyVaultDocument: {
       create: jest.fn(),
       findUnique: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
       delete: jest.fn(),
     },
     emergencyAccessRequest: {
       create: jest.fn(),
       findUnique: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
       update: jest.fn(),
     },
     emergencyAccessGrant: {
       create: jest.fn(),
       findUnique: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
     },
     emergencyActivity: {
       create: jest.fn(),
-      findMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
     },
   };
 
@@ -168,7 +168,11 @@ describe('Emergency Platform Services', () => {
 
   describe('EmergencyVaultService', () => {
     it('should add a document to the vault if owned by user', async () => {
-      mockPrisma.document.findUnique.mockResolvedValue({ id: 'doc-1', userId: 'user-1', title: 'Will' });
+      mockPrisma.document.findUnique.mockResolvedValue({
+        id: 'doc-1',
+        userId: 'user-1',
+        title: 'Will',
+      });
       mockPrisma.emergencyVaultDocument.findUnique.mockResolvedValue(null);
       mockPrisma.emergencyVaultDocument.create.mockResolvedValue({ id: 'vd-1' });
 
@@ -182,15 +186,17 @@ describe('Emergency Platform Services', () => {
     it('should block adding documents owned by other users', async () => {
       mockPrisma.document.findUnique.mockResolvedValue({ id: 'doc-1', userId: 'other-user' });
 
-      await expect(
-        vaultService.addDocument('user-1', 'doc-1'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(vaultService.addDocument('user-1', 'doc-1')).rejects.toThrow(ForbiddenException);
     });
   });
 
   describe('EmergencyRequestsService', () => {
     it('should create an access request for designated contact', async () => {
-      mockPrisma.user.findUnique.mockResolvedValue({ id: 'owner-1', email: 'owner@example.com', emergencyWaitingPeriod: 7 });
+      mockPrisma.user.findUnique.mockResolvedValue({
+        id: 'owner-1',
+        email: 'owner@example.com',
+        emergencyWaitingPeriod: 7,
+      });
       mockPrisma.trustedContact.findFirst.mockResolvedValue({ id: 'contact-1' });
       mockPrisma.emergencyAccessRequest.create.mockResolvedValue({
         id: 'request-1',
@@ -237,7 +243,10 @@ describe('Emergency Platform Services', () => {
         },
       };
       mockPrisma.emergencyAccessRequest.findUnique.mockResolvedValue(mockReq);
-      mockPrisma.emergencyAccessRequest.update.mockResolvedValue({ id: 'request-1', status: RequestStatus.APPROVED });
+      mockPrisma.emergencyAccessRequest.update.mockResolvedValue({
+        id: 'request-1',
+        status: RequestStatus.APPROVED,
+      });
       mockPrisma.emergencyAccessGrant.create.mockResolvedValue({ id: 'grant-1' });
 
       const result = await requestsService.resolve('request-1', 'owner-1', {
@@ -255,7 +264,7 @@ describe('Emergency Platform Services', () => {
   describe('EmergencyAccessService', () => {
     it('should start session if grant is valid and active', async () => {
       const mockGrant = {
-        id: 'grant-1',
+        id: '123e4567-e89b-12d3-a456-426614174000',
         requestId: 'request-1',
         expiresAt: new Date(Date.now() + 60000),
         request: {
@@ -269,20 +278,20 @@ describe('Emergency Platform Services', () => {
       };
       mockPrisma.emergencyAccessGrant.findUnique.mockResolvedValue(mockGrant);
 
-      const result = await accessService.startSession('grant-1');
+      const result = await accessService.startSession('123e4567-e89b-12d3-a456-426614174000');
       expect(result.ownerName).toBe('Alice');
       expect(mockMail.sendSessionStartedEmail).toHaveBeenCalled();
     });
 
     it('should prevent access if session has expired', async () => {
       const mockGrant = {
-        id: 'grant-1',
+        id: '123e4567-e89b-12d3-a456-426614174000',
         expiresAt: new Date(Date.now() - 60000), // in the past
       };
       mockPrisma.emergencyAccessGrant.findUnique.mockResolvedValue(mockGrant);
 
       await expect(
-        accessService.startSession('grant-1'),
+        accessService.startSession('123e4567-e89b-12d3-a456-426614174000'),
       ).rejects.toThrow(ForbiddenException);
     });
   });
@@ -291,7 +300,7 @@ describe('Emergency Platform Services', () => {
     it('should escalate pending requests past waiting period', async () => {
       const expiredRequests = [{ id: 'req-expired', status: RequestStatus.PENDING }];
       mockPrisma.emergencyAccessRequest.findMany.mockResolvedValue(expiredRequests);
-      
+
       mockPrisma.emergencyAccessRequest.findUnique.mockResolvedValue({
         id: 'req-expired',
         status: RequestStatus.PENDING,

@@ -38,7 +38,10 @@ export class NotificationsService {
     }
   }
 
-  async findAll(userId: string, query: QueryNotificationsDto): Promise<{
+  async findAll(
+    userId: string,
+    query: QueryNotificationsDto,
+  ): Promise<{
     notifications: Notification[];
     total: number;
     page: number;
@@ -118,7 +121,10 @@ export class NotificationsService {
     return { updated: result.count };
   }
 
-  async deleteNotification(id: string, userId: string): Promise<{ success: boolean; message: string }> {
+  async deleteNotification(
+    id: string,
+    userId: string,
+  ): Promise<{ success: boolean; message: string }> {
     const notification = await this.prisma.notification.findFirst({
       where: { id, userId },
     });

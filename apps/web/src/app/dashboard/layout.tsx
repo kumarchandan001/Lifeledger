@@ -25,9 +25,7 @@ const NAV_ITEMS = [
   },
   {
     section: 'Alerts',
-    items: [
-      { label: 'Notifications', href: '/dashboard/notifications', icon: '🔔' },
-    ],
+    items: [{ label: 'Notifications', href: '/dashboard/notifications', icon: '🔔' }],
   },
   {
     section: 'Settings',
@@ -132,11 +130,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'EXPIRY_WARNING': return '⏰';
-      case 'DOCUMENT_EXPIRED': return '🚨';
-      case 'SECURITY_ALERT': return '🔒';
-      case 'ACCOUNT_ACTIVITY': return '👤';
-      default: return '📢';
+      case 'EXPIRY_WARNING':
+        return '⏰';
+      case 'DOCUMENT_EXPIRED':
+        return '🚨';
+      case 'SECURITY_ALERT':
+        return '🔒';
+      case 'ACCOUNT_ACTIVITY':
+        return '👤';
+      default:
+        return '📢';
     }
   };
 
@@ -151,13 +154,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return `${days}d ago`;
   };
 
-  const currentTitle = NAV_ITEMS
-    .flatMap((s) => s.items)
-    .find((item) => pathname === item.href)?.label ?? 'Dashboard';
+  const currentTitle =
+    NAV_ITEMS.flatMap((s) => s.items).find((item) => pathname === item.href)?.label ?? 'Dashboard';
 
   if (!isAuthenticated) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+        }}
+      >
         <div style={{ fontSize: 14, color: 'hsl(var(--muted-foreground))' }}>Loading...</div>
       </div>
     );
@@ -225,7 +234,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 aria-label="Notifications"
                 id="notification-bell"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                   <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                 </svg>
@@ -240,15 +258,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div className="notification-dropdown">
                   <div className="dropdown-header">
                     <h3>Notifications</h3>
-                    <Link href="/dashboard/notifications" className="dropdown-link" onClick={() => setBellOpen(false)}>
+                    <Link
+                      href="/dashboard/notifications"
+                      className="dropdown-link"
+                      onClick={() => setBellOpen(false)}
+                    >
                       View all
                     </Link>
                   </div>
                   <div className="dropdown-body">
                     {recentNotifications.length === 0 ? (
-                      <div className="dropdown-empty">
-                        🔔 No notifications yet
-                      </div>
+                      <div className="dropdown-empty">🔔 No notifications yet</div>
                     ) : (
                       recentNotifications.map((n) => (
                         <div
@@ -262,10 +282,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <div
                             className="dropdown-item-icon"
                             style={{
-                              background: n.type === 'EXPIRY_WARNING' ? '#fffbeb'
-                                : n.type === 'DOCUMENT_EXPIRED' ? '#fef2f2'
-                                : n.type === 'SECURITY_ALERT' ? '#fef2f2'
-                                : '#eff6ff',
+                              background:
+                                n.type === 'EXPIRY_WARNING'
+                                  ? '#fffbeb'
+                                  : n.type === 'DOCUMENT_EXPIRED'
+                                    ? '#fef2f2'
+                                    : n.type === 'SECURITY_ALERT'
+                                      ? '#fef2f2'
+                                      : '#eff6ff',
                             }}
                           >
                             {getNotificationIcon(n.type)}
@@ -291,9 +315,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </header>
 
         {/* Page Content */}
-        <main className="dashboard-content">
-          {children}
-        </main>
+        <main className="dashboard-content">{children}</main>
       </div>
     </div>
   );

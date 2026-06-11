@@ -30,10 +30,12 @@ export const createAccessRequestSchema = z.object({
 export const resolveAccessRequestSchema = z.object({
   status: z.enum(['APPROVED', 'REJECTED']),
   sessionDuration: z.enum(['24h', '72h', '7d']).optional().default('72h'),
-  accessScope: z.object({
-    categories: z.array(z.string()).optional(),
-    documentIds: z.array(z.string()).optional(),
-  }).optional(),
+  accessScope: z
+    .object({
+      categories: z.array(z.string()).optional(),
+      documentIds: z.array(z.string()).optional(),
+    })
+    .optional(),
 });
 
 export const updateEmergencySettingsSchema = z.object({

@@ -1,19 +1,10 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { QueueService } from '../queue/queue.service';
 import { OcrService } from '../ocr/ocr.service';
 import { AiService } from '../ai/ai.service';
-import {
-  AuditAction,
-  AIAnalysisStatus,
-  ProcessingJobType,
-} from '@lifeledger/database';
+import { AuditAction, AIAnalysisStatus, ProcessingJobType } from '@lifeledger/database';
 import { isAISupportedMimeType, CATEGORIES, SUB_CATEGORIES } from '@lifeledger/shared';
 import { ApproveAISuggestionDto, RejectAISuggestionDto } from './dto/document-intelligence.dto';
 
@@ -177,9 +168,7 @@ export class DocumentIntelligenceService {
 
     const analysis = await this.aiService.getAIAnalysis(documentId);
     if (!analysis) {
-      throw new NotFoundException(
-        'AI analysis not available for this document',
-      );
+      throw new NotFoundException('AI analysis not available for this document');
     }
     return analysis;
   }
@@ -210,9 +199,7 @@ export class DocumentIntelligenceService {
 
     // Apply category if requested
     if (dto.applyCategory && analysis.suggestedCategory) {
-      const category = CATEGORIES.find(
-        (c) => c.slug === analysis.suggestedCategory,
-      );
+      const category = CATEGORIES.find((c) => c.slug === analysis.suggestedCategory);
       if (category) {
         // Look up the category ID from the database
         const dbCategory = await this.prisma.category.findFirst({
@@ -231,8 +218,7 @@ export class DocumentIntelligenceService {
             },
           });
           if (dbSubCategory) {
-            updateData.subCategoryId =
-              dto.overrides?.subCategoryId || dbSubCategory.id;
+            updateData.subCategoryId = dto.overrides?.subCategoryId || dbSubCategory.id;
           }
         }
       }
@@ -244,8 +230,7 @@ export class DocumentIntelligenceService {
         updateData.title = dto.overrides?.title || metadata.title;
       }
       if (dto.overrides?.description || metadata.description) {
-        updateData.description =
-          dto.overrides?.description || metadata.description;
+        updateData.description = dto.overrides?.description || metadata.description;
       }
       if (dto.overrides?.documentNumber !== undefined || metadata.documentNumber) {
         updateData.documentNumber =
@@ -276,22 +261,17 @@ export class DocumentIntelligenceService {
 
       // Apply tags if requested
       if (dto.applyTags) {
-        const tags = dto.overrides?.tags ||
-          (Array.isArray(analysis.generatedTags)
-            ? (analysis.generatedTags as string[])
-            : []);
+        const tags =
+          dto.overrides?.tags ||
+          (Array.isArray(analysis.generatedTags) ? (analysis.generatedTags as string[]) : []);
 
         if (tags.length > 0) {
           const existingTags = await tx.documentTag.findMany({
             where: { documentId },
             select: { tag: true },
           });
-          const existingSet = new Set(
-            existingTags.map((t) => t.tag.toLowerCase()),
-          );
-          const newTags = tags.filter(
-            (t) => !existingSet.has(t.toLowerCase()),
-          );
+          const existingSet = new Set(existingTags.map((t) => t.tag.toLowerCase()));
+          const newTags = tags.filter((t) => !existingSet.has(t.toLowerCase()));
 
           if (newTags.length > 0) {
             await tx.documentTag.createMany({

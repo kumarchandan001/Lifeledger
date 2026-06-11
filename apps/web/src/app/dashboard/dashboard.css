@@ -212,8 +212,13 @@
 }
 
 @keyframes bell-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 /* ─── Notification Dropdown ─── */
@@ -351,7 +356,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s, box-shadow 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
 }
 
 .user-avatar-btn:hover {
@@ -381,7 +388,9 @@
   border: 1px solid hsl(var(--border));
   border-radius: 12px;
   padding: 24px;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .dashboard-widget:hover {

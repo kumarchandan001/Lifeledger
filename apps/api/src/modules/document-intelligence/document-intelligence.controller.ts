@@ -26,9 +26,7 @@ import { CurrentUser, CurrentUserPayload } from '../auth/decorators/current-user
 @UseGuards(JwtAuthGuard)
 @Controller({ version: '1' })
 export class DocumentIntelligenceController {
-  constructor(
-    private readonly intelligenceService: DocumentIntelligenceService,
-  ) {}
+  constructor(private readonly intelligenceService: DocumentIntelligenceService) {}
 
   // ═══════════════════════════════════════════════════
   // Document-scoped endpoints
@@ -174,10 +172,6 @@ export class DocumentIntelligenceController {
     @Query('page') page = 1,
     @Query('limit') limit = 20,
   ): Promise<any> {
-    return this.intelligenceService.getReviewQueue(
-      user.userId,
-      Number(page),
-      Number(limit),
-    );
+    return this.intelligenceService.getReviewQueue(user.userId, Number(page), Number(limit));
   }
 }

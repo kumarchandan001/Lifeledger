@@ -98,9 +98,7 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       priority: 0,
     });
 
-    this.logger.log(
-      `Enqueued ${type} job ${job.id} for document ${documentId}`,
-    );
+    this.logger.log(`Enqueued ${type} job ${job.id} for document ${documentId}`);
 
     return job.id;
   }

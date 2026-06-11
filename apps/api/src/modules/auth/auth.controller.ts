@@ -16,7 +16,13 @@ import { Throttle } from '@nestjs/throttler';
 import { Request, Response } from 'express';
 
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, VerifyEmailDto, ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto';
+import {
+  RegisterDto,
+  LoginDto,
+  VerifyEmailDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
+} from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
@@ -58,7 +64,11 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @ApiResponse({ status: 403, description: 'Account locked' })
-  async login(@Body() dto: LoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async login(
+    @Body() dto: LoginDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const result = await this.authService.login(
       dto.email,
       dto.password,
@@ -111,7 +121,11 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout and invalidate session' })
-  async logout(@CurrentUser() user: CurrentUserPayload, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async logout(
+    @CurrentUser() user: CurrentUserPayload,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     if (user.sessionId) {
       await this.authService.logout(user.sessionId, user.userId, req.ip, req.headers['user-agent']);
     }
@@ -146,7 +160,11 @@ export class AuthController {
   @ApiOperation({ summary: 'Request password reset email' })
   @ApiResponse({ status: 200, description: 'Reset email sent if account exists' })
   async forgotPassword(@Body() dto: ForgotPasswordDto, @Req() req: Request) {
-    const result = await this.authService.forgotPassword(dto.email, req.ip, req.headers['user-agent']);
+    const result = await this.authService.forgotPassword(
+      dto.email,
+      req.ip,
+      req.headers['user-agent'],
+    );
     return { success: true, data: result };
   }
 
@@ -158,7 +176,12 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Password reset successfully' })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   async resetPassword(@Body() dto: ResetPasswordDto, @Req() req: Request) {
-    const result = await this.authService.resetPassword(dto.token, dto.password, req.ip, req.headers['user-agent']);
+    const result = await this.authService.resetPassword(
+      dto.token,
+      dto.password,
+      req.ip,
+      req.headers['user-agent'],
+    );
     return { success: true, data: result };
   }
 
@@ -182,7 +205,12 @@ export class AuthController {
     @CurrentUser() user: CurrentUserPayload,
     @Req() req: Request,
   ) {
-    const result = await this.authService.revokeSession(sessionId, user.userId, req.ip, req.headers['user-agent']);
+    const result = await this.authService.revokeSession(
+      sessionId,
+      user.userId,
+      req.ip,
+      req.headers['user-agent'],
+    );
     return { success: true, data: result };
   }
 

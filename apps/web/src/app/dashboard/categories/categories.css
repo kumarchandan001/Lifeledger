@@ -103,7 +103,11 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background: linear-gradient(180deg, var(--cat-header-bg, hsl(var(--muted) / 0.15)) 0%, transparent 100%);
+  background: linear-gradient(
+    180deg,
+    var(--cat-header-bg, hsl(var(--muted) / 0.15)) 0%,
+    transparent 100%
+  );
   border-bottom: 1px solid hsl(var(--border) / 0.3);
 }
 
@@ -268,7 +272,7 @@
     align-items: stretch;
     padding: 24px;
   }
-  
+
   .categories-hero-stats {
     flex-direction: column;
     gap: 16px;

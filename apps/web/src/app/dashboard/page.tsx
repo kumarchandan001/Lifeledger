@@ -33,11 +33,13 @@ export default function DashboardPage() {
 
         setExpiringSoon(expiringRes.data ?? []);
         setRecentlyExpired(expiredRes.data ?? []);
-        setSummary(summaryRes.data ?? {
-          totalNotifications: 0,
-          unreadNotifications: 0,
-          expiringThisMonth: 0,
-        });
+        setSummary(
+          summaryRes.data ?? {
+            totalNotifications: 0,
+            unreadNotifications: 0,
+            expiringThisMonth: 0,
+          },
+        );
       } catch {
         // silently ignore dashboard data fetch errors
       } finally {
@@ -70,8 +72,17 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 0' }}>
-        <div style={{ fontSize: 14, color: 'hsl(var(--muted-foreground))' }}>Loading dashboard...</div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '80px 0',
+        }}
+      >
+        <div style={{ fontSize: 14, color: 'hsl(var(--muted-foreground))' }}>
+          Loading dashboard...
+        </div>
       </div>
     );
   }
@@ -83,7 +94,9 @@ export default function DashboardPage() {
         <div className="dashboard-widget">
           <div className="widget-header">
             <span className="widget-title">Total Notifications</span>
-            <div className="widget-icon" style={{ background: '#eff6ff' }}>🔔</div>
+            <div className="widget-icon" style={{ background: '#eff6ff' }}>
+              🔔
+            </div>
           </div>
           <div className="widget-value">{summary.totalNotifications}</div>
           <div className="widget-subtitle">All time notifications</div>
@@ -92,9 +105,14 @@ export default function DashboardPage() {
         <div className="dashboard-widget">
           <div className="widget-header">
             <span className="widget-title">Unread</span>
-            <div className="widget-icon" style={{ background: '#fef2f2' }}>📬</div>
+            <div className="widget-icon" style={{ background: '#fef2f2' }}>
+              📬
+            </div>
           </div>
-          <div className="widget-value" style={{ color: summary.unreadNotifications > 0 ? '#dc2626' : undefined }}>
+          <div
+            className="widget-value"
+            style={{ color: summary.unreadNotifications > 0 ? '#dc2626' : undefined }}
+          >
             {summary.unreadNotifications}
           </div>
           <div className="widget-subtitle">Pending notifications</div>
@@ -103,9 +121,14 @@ export default function DashboardPage() {
         <div className="dashboard-widget">
           <div className="widget-header">
             <span className="widget-title">Expiring This Month</span>
-            <div className="widget-icon" style={{ background: '#fffbeb' }}>⏰</div>
+            <div className="widget-icon" style={{ background: '#fffbeb' }}>
+              ⏰
+            </div>
           </div>
-          <div className="widget-value" style={{ color: summary.expiringThisMonth > 0 ? '#d97706' : undefined }}>
+          <div
+            className="widget-value"
+            style={{ color: summary.expiringThisMonth > 0 ? '#d97706' : undefined }}
+          >
             {summary.expiringThisMonth}
           </div>
           <div className="widget-subtitle">Documents expiring soon</div>
@@ -120,9 +143,7 @@ export default function DashboardPage() {
             <span className="widget-title">⏰ Expiring Soon</span>
           </div>
           {expiringSoon.length === 0 ? (
-            <div className="widget-empty">
-              ✅ No documents expiring within 90 days
-            </div>
+            <div className="widget-empty">✅ No documents expiring within 90 days</div>
           ) : (
             <div className="widget-table">
               {expiringSoon.map((doc) => (
@@ -147,9 +168,7 @@ export default function DashboardPage() {
             <span className="widget-title">🚨 Recently Expired</span>
           </div>
           {recentlyExpired.length === 0 ? (
-            <div className="widget-empty">
-              ✅ No documents expired recently
-            </div>
+            <div className="widget-empty">✅ No documents expired recently</div>
           ) : (
             <div className="widget-table">
               {recentlyExpired.map((doc) => (

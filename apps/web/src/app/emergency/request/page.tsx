@@ -55,14 +55,16 @@ export default function PublicRequestPage() {
       case 'PENDING':
         return {
           title: 'Waiting Period Active',
-          description: 'The request is currently in the security waiting period. The vault owner has been notified.',
+          description:
+            'The request is currently in the security waiting period. The vault owner has been notified.',
           color: 'text-yellow-600 bg-yellow-500/10 border-yellow-500/20',
           icon: <Clock className="h-10 w-10 text-yellow-500" />,
         };
       case 'ESCALATED':
         return {
           title: 'Escalated for Review',
-          description: 'The waiting period expired with no response. The request is undergoing manual verification.',
+          description:
+            'The waiting period expired with no response. The request is undergoing manual verification.',
           color: 'text-orange-600 bg-orange-500/10 border-orange-500/20',
           icon: <AlertTriangle className="h-10 w-10 text-orange-500" />,
         };
@@ -105,33 +107,42 @@ export default function PublicRequestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-sans">
-      <div className="max-w-xl w-full space-y-8">
-        <div className="text-center space-y-2">
-          <div className="inline-flex h-12 w-12 bg-primary/10 text-primary rounded-full items-center justify-center mb-2">
+    <div className="bg-background flex min-h-screen flex-col items-center justify-center p-6 font-sans">
+      <div className="w-full max-w-xl space-y-8">
+        <div className="space-y-2 text-center">
+          <div className="bg-primary/10 text-primary mb-2 inline-flex h-12 w-12 items-center justify-center rounded-full">
             <Shield className="h-6 w-6" />
           </div>
-          <h2 className="text-3xl font-extrabold text-foreground tracking-tight">LifeLedger Emergency Portal</h2>
-          <p className="text-sm text-muted-foreground font-normal">
+          <h2 className="text-foreground text-3xl font-extrabold tracking-tight">
+            LifeLedger Emergency Portal
+          </h2>
+          <p className="text-muted-foreground text-sm font-normal">
             Request emergency access to a user's critical documents or track an existing request.
           </p>
         </div>
 
         {submittedRequest ? (
-          <div className="bg-card border border-border rounded-xl p-8 space-y-6 shadow-md text-center">
-            <div className="inline-flex h-12 w-12 bg-green-500/10 text-green-500 rounded-full items-center justify-center">
+          <div className="bg-card border-border space-y-6 rounded-xl border p-8 text-center shadow-md">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10 text-green-500">
               <CheckCircle2 className="h-6 w-6" />
             </div>
             <div className="space-y-2">
               <h3 className="text-xl font-bold">Request Submitted Successfully</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Your request has been filed. To protect user privacy, a security waiting period of {submittedRequest.waitingPeriod} days has started.
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                Your request has been filed. To protect user privacy, a security waiting period of{' '}
+                {submittedRequest.waitingPeriod} days has started.
               </p>
             </div>
-            <div className="bg-muted p-4 rounded-xl border border-border">
-              <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Your Request Tracker ID</p>
-              <p className="text-md font-mono font-bold mt-1 text-foreground select-all">{submittedRequest.id}</p>
-              <p className="text-[10px] text-muted-foreground mt-2">Copy this ID to track your request status below.</p>
+            <div className="bg-muted border-border rounded-xl border p-4">
+              <p className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
+                Your Request Tracker ID
+              </p>
+              <p className="text-md text-foreground mt-1 font-mono font-bold select-all">
+                {submittedRequest.id}
+              </p>
+              <p className="text-muted-foreground mt-2 text-[10px]">
+                Copy this ID to track your request status below.
+              </p>
             </div>
             <button
               onClick={() => {
@@ -139,7 +150,7 @@ export default function PublicRequestPage() {
                 setSubmittedRequest(null);
                 setTrackingRequest(null);
               }}
-              className="px-6 py-2.5 bg-primary hover:bg-primary/95 text-primary-foreground rounded-lg text-sm font-semibold transition-all w-full shadow-sm"
+              className="bg-primary hover:bg-primary/95 text-primary-foreground w-full rounded-lg px-6 py-2.5 text-sm font-semibold shadow-sm transition-all"
             >
               Track Request Status
             </button>
@@ -147,73 +158,83 @@ export default function PublicRequestPage() {
         ) : (
           <div className="grid grid-cols-1 gap-8">
             {!trackingRequest && (
-              <div className="bg-card border border-border rounded-xl p-6 shadow-md space-y-4">
+              <div className="bg-card border-border space-y-4 rounded-xl border p-6 shadow-md">
                 <h3 className="text-lg font-bold">Submit New Request</h3>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-muted-foreground">Owner's Email Address</label>
+                      <label className="text-muted-foreground text-xs font-semibold">
+                        Owner's Email Address
+                      </label>
                       <input
                         type="email"
                         required
                         value={form.ownerEmail}
                         onChange={(e) => setForm({ ...form, ownerEmail: e.target.value })}
                         placeholder="e.g. owner@example.com"
-                        className="w-full px-3 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="bg-background border-input focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs font-semibold text-muted-foreground">Your Email Address</label>
+                      <label className="text-muted-foreground text-xs font-semibold">
+                        Your Email Address
+                      </label>
                       <input
                         type="email"
                         required
                         value={form.requesterEmail}
                         onChange={(e) => setForm({ ...form, requesterEmail: e.target.value })}
                         placeholder="e.g. contact@example.com"
-                        className="w-full px-3 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="bg-background border-input focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-muted-foreground">Your Full Name</label>
+                    <label className="text-muted-foreground text-xs font-semibold">
+                      Your Full Name
+                    </label>
                     <input
                       type="text"
                       required
                       value={form.requesterName}
                       onChange={(e) => setForm({ ...form, requesterName: e.target.value })}
                       placeholder="e.g. Jane Doe"
-                      className="w-full px-3 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="bg-background border-input focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-muted-foreground">Reason for Emergency Access</label>
+                    <label className="text-muted-foreground text-xs font-semibold">
+                      Reason for Emergency Access
+                    </label>
                     <textarea
                       required
                       rows={3}
                       value={form.reason}
                       onChange={(e) => setForm({ ...form, reason: e.target.value })}
                       placeholder="Specify relationship, emergency scenario (hospitalization, incapacity), and urgency..."
-                      className="w-full px-3 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="bg-background border-input focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-muted-foreground">Supporting Info / Attachment URL (Optional)</label>
+                    <label className="text-muted-foreground text-xs font-semibold">
+                      Supporting Info / Attachment URL (Optional)
+                    </label>
                     <input
                       type="text"
                       value={form.supportingInfo}
                       onChange={(e) => setForm({ ...form, supportingInfo: e.target.value })}
                       placeholder="Optional link to document or details..."
-                      className="w-full px-3 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                      className="bg-background border-input focus:ring-primary w-full rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="flex items-center justify-center gap-1.5 px-5 py-2.5 bg-primary hover:bg-primary/95 disabled:bg-primary/50 text-primary-foreground rounded-lg text-sm font-semibold transition-all w-full shadow-sm"
+                    className="bg-primary hover:bg-primary/95 disabled:bg-primary/50 text-primary-foreground flex w-full items-center justify-center gap-1.5 rounded-lg px-5 py-2.5 text-sm font-semibold shadow-sm transition-all"
                   >
                     <Send className="h-4 w-4" />
                     <span>{submitting ? 'Submitting...' : 'Submit Access Request'}</span>
@@ -222,7 +243,7 @@ export default function PublicRequestPage() {
               </div>
             )}
 
-            <div className="bg-card border border-border rounded-xl p-6 shadow-md space-y-4">
+            <div className="bg-card border-border space-y-4 rounded-xl border p-6 shadow-md">
               <h3 className="text-lg font-bold">Track Request Status</h3>
               <form onSubmit={handleTrack} className="flex gap-2">
                 <input
@@ -231,40 +252,40 @@ export default function PublicRequestPage() {
                   value={trackId}
                   onChange={(e) => setTrackId(e.target.value)}
                   placeholder="Enter Request ID"
-                  className="flex-1 px-3 py-2 bg-background border border-input rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="bg-background border-input focus:ring-primary flex-1 rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={trackingLoading}
-                  className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg text-sm font-semibold transition-all shrink-0"
+                  className="bg-secondary hover:bg-secondary/80 text-secondary-foreground shrink-0 rounded-lg px-4 py-2 text-sm font-semibold transition-all"
                 >
                   Track
                 </button>
               </form>
 
               {trackingRequest && (
-                <div className="border border-border rounded-xl p-5 mt-4 space-y-4 animate-in fade-in duration-200">
+                <div className="border-border animate-in fade-in mt-4 space-y-4 rounded-xl border p-5 duration-200">
                   <div className="flex items-center gap-3">
                     {getStatusDisplay(trackingRequest.status).icon}
                     <div>
-                      <h4 className="font-bold text-sm text-foreground">
+                      <h4 className="text-foreground text-sm font-bold">
                         {getStatusDisplay(trackingRequest.status).title}
                       </h4>
-                      <p className="text-xs text-muted-foreground font-semibold mt-0.5">
+                      <p className="text-muted-foreground mt-0.5 text-xs font-semibold">
                         Owner: {trackingRequest.trustedContact.user.fullName}
                       </p>
                     </div>
                   </div>
 
-                  <p className="text-xs text-muted-foreground bg-muted/50 p-3 rounded-lg border border-border font-normal leading-relaxed">
+                  <p className="text-muted-foreground bg-muted/50 border-border rounded-lg border p-3 text-xs leading-relaxed font-normal">
                     {getStatusDisplay(trackingRequest.status).description}
                   </p>
 
                   {trackingRequest.status === 'APPROVED' && trackingRequest.grant && (
-                    <div className="border-t border-border pt-4">
+                    <div className="border-border border-t pt-4">
                       <Link
                         href={`/emergency/access?token=${trackingRequest.grant.id}`}
-                        className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-semibold transition-all w-full shadow-sm"
+                        className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-green-700"
                       >
                         <Eye className="h-4 w-4" />
                         <span>Enter Access Session</span>

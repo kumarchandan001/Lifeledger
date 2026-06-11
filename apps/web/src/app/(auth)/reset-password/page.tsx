@@ -40,7 +40,11 @@ function ResetPasswordContent() {
           <h3 className="auth-status-title">Invalid reset link</h3>
           <p className="auth-status-message">This password reset link is invalid or has expired.</p>
           <div style={{ marginTop: '1.5rem' }}>
-            <Link href="/forgot-password" className="auth-btn auth-btn-primary" style={{ textDecoration: 'none' }}>
+            <Link
+              href="/forgot-password"
+              className="auth-btn auth-btn-primary"
+              style={{ textDecoration: 'none' }}
+            >
               Request a new link
             </Link>
           </div>
@@ -80,7 +84,11 @@ function ResetPasswordContent() {
             Your password has been reset successfully. You can now sign in with your new password.
           </p>
           <div style={{ marginTop: '1.5rem' }}>
-            <Link href="/login" className="auth-btn auth-btn-primary" style={{ textDecoration: 'none' }}>
+            <Link
+              href="/login"
+              className="auth-btn auth-btn-primary"
+              style={{ textDecoration: 'none' }}
+            >
               Sign in
             </Link>
           </div>
@@ -105,7 +113,9 @@ function ResetPasswordContent() {
 
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="auth-field">
-          <label className="auth-label" htmlFor="reset-password">New password</label>
+          <label className="auth-label" htmlFor="reset-password">
+            New password
+          </label>
           <div style={{ position: 'relative' }}>
             <input
               id="reset-password"
@@ -149,15 +159,15 @@ function ResetPasswordContent() {
                   />
                 ))}
               </div>
-              <span className="password-strength-label">
-                Password strength: {strength.label}
-              </span>
+              <span className="password-strength-label">Password strength: {strength.label}</span>
             </>
           )}
         </div>
 
         <div className="auth-field">
-          <label className="auth-label" htmlFor="reset-confirm">Confirm password</label>
+          <label className="auth-label" htmlFor="reset-confirm">
+            Confirm password
+          </label>
           <input
             id="reset-confirm"
             className={`auth-input ${confirmPassword && password !== confirmPassword ? 'auth-input-error' : ''}`}
@@ -176,7 +186,13 @@ function ResetPasswordContent() {
         <button
           type="submit"
           className="auth-btn auth-btn-primary"
-          disabled={isLoading || !password || !confirmPassword || password !== confirmPassword || password.length < 8}
+          disabled={
+            isLoading ||
+            !password ||
+            !confirmPassword ||
+            password !== confirmPassword ||
+            password.length < 8
+          }
         >
           {isLoading ? <span className="auth-spinner" /> : 'Reset password'}
         </button>
@@ -187,16 +203,26 @@ function ResetPasswordContent() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={
-      <div className="auth-card">
-        <div className="auth-status">
-          <div className="auth-status-icon auth-status-icon-loading">
-            <span className="auth-spinner" style={{ borderColor: 'rgba(99, 102, 241, 0.3)', borderTopColor: '#6366f1', width: 28, height: 28 }} />
+    <Suspense
+      fallback={
+        <div className="auth-card">
+          <div className="auth-status">
+            <div className="auth-status-icon auth-status-icon-loading">
+              <span
+                className="auth-spinner"
+                style={{
+                  borderColor: 'rgba(99, 102, 241, 0.3)',
+                  borderTopColor: '#6366f1',
+                  width: 28,
+                  height: 28,
+                }}
+              />
+            </div>
+            <h3 className="auth-status-title">Loading...</h3>
           </div>
-          <h3 className="auth-status-title">Loading...</h3>
         </div>
-      </div>
-    }>
+      }
+    >
       <ResetPasswordContent />
     </Suspense>
   );

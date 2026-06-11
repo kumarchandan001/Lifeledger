@@ -4,11 +4,7 @@ import { use, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { toast } from 'sonner';
-import {
-  CATEGORIES,
-  SUB_CATEGORIES,
-  AI_CONFIDENCE_THRESHOLDS,
-} from '@lifeledger/shared';
+import { CATEGORIES, SUB_CATEGORIES, AI_CONFIDENCE_THRESHOLDS } from '@lifeledger/shared';
 import './document-intelligence.css';
 
 interface PageProps {
@@ -77,7 +73,7 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
           const analysis = data.aiAnalysis;
           setSelectedCategory(analysis.suggestedCategory || '');
           setSelectedSubCategory(analysis.suggestedSubCategory || '');
-          
+
           const meta = analysis.extractedMetadata || {};
           setMetadataTitle(meta.title || data.document.title || '');
           setMetadataDesc(meta.description || '');
@@ -85,7 +81,7 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
           setMetadataIssuer(meta.issuer || '');
           setMetadataIssueDate(formatDateForInput(meta.issueDate));
           setMetadataExpiryDate(formatDateForInput(meta.expiryDate));
-          
+
           if (Array.isArray(analysis.generatedTags)) {
             setTagsInput(analysis.generatedTags.join(', '));
           }
@@ -183,8 +179,10 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
 
   // Confidence Bar Helpers
   const getConfidenceLevel = (confidence: number) => {
-    if (confidence >= AI_CONFIDENCE_THRESHOLDS.HIGH) return { label: 'High', color: '#10b981', class: 'confidence-high' };
-    if (confidence >= AI_CONFIDENCE_THRESHOLDS.MEDIUM) return { label: 'Medium', color: '#f59e0b', class: 'confidence-medium' };
+    if (confidence >= AI_CONFIDENCE_THRESHOLDS.HIGH)
+      return { label: 'High', color: '#10b981', class: 'confidence-high' };
+    if (confidence >= AI_CONFIDENCE_THRESHOLDS.MEDIUM)
+      return { label: 'Medium', color: '#f59e0b', class: 'confidence-medium' };
     return { label: 'Low', color: '#ef4444', class: 'confidence-low' };
   };
 
@@ -199,12 +197,34 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
 
   if (loading) {
     return (
-      <div className="loading-center" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <div className="spinner" style={{ width: '40px', height: '40px', border: '3px solid #f3f3f3', borderTop: '3px solid #3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+      <div
+        className="loading-center"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '400px',
+        }}
+      >
+        <div
+          className="spinner"
+          style={{
+            width: '40px',
+            height: '40px',
+            border: '3px solid #f3f3f3',
+            borderTop: '3px solid #3b82f6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+          }}
+        />
         <style jsx global>{`
           @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
           }
         `}</style>
       </div>
@@ -216,7 +236,11 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
       <div className="error-container" style={{ padding: '24px', textAlign: 'center' }}>
         <h3 style={{ color: 'hsl(var(--destructive))' }}>Error Loading Document</h3>
         <p>{error || 'Document not found'}</p>
-        <button className="btn-process btn-outline" style={{ marginTop: '12px' }} onClick={() => router.push('/dashboard/intelligence')}>
+        <button
+          className="btn-process btn-outline"
+          style={{ marginTop: '12px' }}
+          onClick={() => router.push('/dashboard/intelligence')}
+        >
           Back to Dashboard
         </button>
       </div>
@@ -239,29 +263,46 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
       <div className="doc-header">
         <div className="doc-header-info">
           <div className="doc-header-icon">
-            {CATEGORIES.find((c) => c.slug === (aiAnalysis?.suggestedCategory || selectedCategory))?.icon || '📄'}
+            {CATEGORIES.find((c) => c.slug === (aiAnalysis?.suggestedCategory || selectedCategory))
+              ?.icon || '📄'}
           </div>
           <div>
             <div className="doc-header-title">{documentData.title}</div>
             <div className="doc-header-sub">
-              Uploaded on {new Date(documentData.createdAt).toLocaleDateString('en-IN')} • Type: {documentData.mimeType}
+              Uploaded on {new Date(documentData.createdAt).toLocaleDateString('en-IN')} • Type:{' '}
+              {documentData.mimeType}
             </div>
           </div>
         </div>
         <div className="doc-header-actions">
-          <button 
-            className="btn-process btn-outline" 
+          <button
+            className="btn-process btn-outline"
             onClick={() => router.push(`/dashboard/documents/${documentId}`)}
-            style={{ padding: '8px 16px', fontSize: 13, borderRadius: 6, cursor: 'pointer', background: 'none', border: '1px solid hsl(var(--border))' }}
+            style={{
+              padding: '8px 16px',
+              fontSize: 13,
+              borderRadius: 6,
+              cursor: 'pointer',
+              background: 'none',
+              border: '1px solid hsl(var(--border))',
+            }}
           >
             View Original Document
           </button>
           {(processingStatus === 'COMPLETED' || processingStatus === 'FAILED') && (
-            <button 
-              className="btn-process btn-primary" 
-              onClick={handleReprocess} 
+            <button
+              className="btn-process btn-primary"
+              onClick={handleReprocess}
               disabled={submitting}
-              style={{ padding: '8px 16px', fontSize: 13, color: '#fff', background: '#3b82f6', border: 'none', borderRadius: 6, cursor: 'pointer' }}
+              style={{
+                padding: '8px 16px',
+                fontSize: 13,
+                color: '#fff',
+                background: '#3b82f6',
+                border: 'none',
+                borderRadius: 6,
+                cursor: 'pointer',
+              }}
             >
               Reprocess Document
             </button>
@@ -271,16 +312,14 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
 
       {/* ─── Main Two Columns ─── */}
       <div className="doc-columns">
-        
         {/* Left Column: OCR and Timeline */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          
           {/* OCR Result Card */}
           <div className="intel-card">
             <div className="intel-card-header">
               <span className="intel-card-title">🔍 OCR Extracted Text</span>
-              <button 
-                className="btn-process btn-outline btn-sm" 
+              <button
+                className="btn-process btn-outline btn-sm"
                 onClick={() => setShowOcrText(!showOcrText)}
                 style={{ fontSize: 12, padding: '4px 8px', cursor: 'pointer' }}
               >
@@ -309,15 +348,29 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
                       {ocrResult.extractedText || 'No text extracted.'}
                     </div>
                   ) : (
-                    <p style={{ fontSize: 13, color: 'hsl(var(--muted-foreground))', fontStyle: 'italic' }}>
-                      Click Show to view {ocrResult.extractedText?.length || 0} characters of extracted text.
+                    <p
+                      style={{
+                        fontSize: 13,
+                        color: 'hsl(var(--muted-foreground))',
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      Click Show to view {ocrResult.extractedText?.length || 0} characters of
+                      extracted text.
                     </p>
                   )}
                 </>
               ) : (
-                <div style={{ padding: '16px 0', textAlign: 'center', color: 'hsl(var(--muted-foreground))', fontSize: 13 }}>
-                  {processingStatus === 'QUEUED' || processingStatus === 'PROCESSING' 
-                    ? 'OCR processing is in progress...' 
+                <div
+                  style={{
+                    padding: '16px 0',
+                    textAlign: 'center',
+                    color: 'hsl(var(--muted-foreground))',
+                    fontSize: 13,
+                  }}
+                >
+                  {processingStatus === 'QUEUED' || processingStatus === 'PROCESSING'
+                    ? 'OCR processing is in progress...'
                     : 'No OCR results available for this document.'}
                 </div>
               )}
@@ -332,19 +385,30 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
             <div className="intel-card-body">
               <div className="timeline">
                 {processingJobs.length === 0 ? (
-                  <p style={{ fontSize: 13, color: 'hsl(var(--muted-foreground))' }}>No jobs run yet.</p>
+                  <p style={{ fontSize: 13, color: 'hsl(var(--muted-foreground))' }}>
+                    No jobs run yet.
+                  </p>
                 ) : (
                   processingJobs.map((job) => (
-                    <div 
-                      key={job.id} 
+                    <div
+                      key={job.id}
                       className={`timeline-item ${job.status === 'COMPLETED' ? 'completed' : job.status === 'FAILED' ? 'failed' : 'processing'}`}
                     >
                       <div className="timeline-title">{job.type.replace(/_/g, ' ')}</div>
                       <div className="timeline-meta">
-                        Status: <strong style={{ textTransform: 'capitalize' }}>{job.status.toLowerCase()}</strong>
+                        Status:{' '}
+                        <strong style={{ textTransform: 'capitalize' }}>
+                          {job.status.toLowerCase()}
+                        </strong>
                         {job.completedAt && ` • Done: ${formatDate(job.completedAt)}`}
                         {job.error && (
-                          <div style={{ color: 'hsl(var(--destructive))', marginTop: '4px', fontSize: 11 }}>
+                          <div
+                            style={{
+                              color: 'hsl(var(--destructive))',
+                              marginTop: '4px',
+                              fontSize: 11,
+                            }}
+                          >
                             Error: {job.error}
                           </div>
                         )}
@@ -359,7 +423,6 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
 
         {/* Right Column: AI Analysis & Review */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          
           {/* AI Suggestions Card */}
           <div className="intel-card">
             <div className="intel-card-header">
@@ -373,34 +436,46 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
             <div className="intel-card-body">
               {aiAnalysis ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  
                   {/* Confidence meter */}
                   <div className="confidence-meter">
-                    <span style={{ fontSize: 12, fontWeight: 500, color: 'hsl(var(--muted-foreground))', minWidth: '70px' }}>Confidence:</span>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 500,
+                        color: 'hsl(var(--muted-foreground))',
+                        minWidth: '70px',
+                      }}
+                    >
+                      Confidence:
+                    </span>
                     <div className="confidence-bar-bg">
-                      <div className="confidence-bar-fill" style={{ width: `${confidence}%`, backgroundColor: confidenceLevel.color }} />
+                      <div
+                        className="confidence-bar-fill"
+                        style={{ width: `${confidence}%`, backgroundColor: confidenceLevel.color }}
+                      />
                     </div>
-                    <span className="confidence-label" style={{ color: confidenceLevel.color }}>{Math.round(confidence)}%</span>
+                    <span className="confidence-label" style={{ color: confidenceLevel.color }}>
+                      {Math.round(confidence)}%
+                    </span>
                   </div>
 
                   <hr style={{ border: 'none', borderTop: '1px solid hsl(var(--border) / 0.5)' }} />
 
                   {/* Suggestions Form */}
                   <div className="metadata-grid">
-                    
                     {/* Category Selection */}
                     <div className="metadata-field">
                       <label className="metadata-label">
-                        <input 
-                          type="checkbox" 
-                          checked={applyCategory} 
-                          onChange={(e) => setApplyCategory(e.target.checked)} 
-                          style={{ marginRight: 6 }} 
+                        <input
+                          type="checkbox"
+                          checked={applyCategory}
+                          onChange={(e) => setApplyCategory(e.target.checked)}
+                          style={{ marginRight: 6 }}
                         />
                         Category
                       </label>
-                      <select 
-                        className="metadata-input" 
+                      <select
+                        className="metadata-input"
                         value={selectedCategory}
                         onChange={(e) => {
                           setSelectedCategory(e.target.value);
@@ -409,7 +484,9 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
                       >
                         <option value="">Select Category</option>
                         {CATEGORIES.map((c) => (
-                          <option key={c.slug} value={c.slug}>{c.icon} {c.name}</option>
+                          <option key={c.slug} value={c.slug}>
+                            {c.icon} {c.name}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -417,121 +494,132 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
                     {/* Subcategory Selection */}
                     <div className="metadata-field">
                       <label className="metadata-label">Subcategory</label>
-                      <select 
-                        className="metadata-input" 
+                      <select
+                        className="metadata-input"
                         value={selectedSubCategory}
                         disabled={!selectedCategory}
                         onChange={(e) => setSelectedSubCategory(e.target.value)}
                       >
                         <option value="">Select Subcategory</option>
-                        {selectedCategory && (SUB_CATEGORIES[selectedCategory as keyof typeof SUB_CATEGORIES] || []).map((s) => (
-                          <option key={s.slug} value={s.slug}>{s.name}</option>
-                        ))}
+                        {selectedCategory &&
+                          (
+                            SUB_CATEGORIES[selectedCategory as keyof typeof SUB_CATEGORIES] || []
+                          ).map((s) => (
+                            <option key={s.slug} value={s.slug}>
+                              {s.name}
+                            </option>
+                          ))}
                       </select>
                     </div>
 
                     {/* Metadata Fields */}
                     <div className="metadata-field full-width">
                       <label className="metadata-label">
-                        <input 
-                          type="checkbox" 
-                          checked={applyMetadata} 
-                          onChange={(e) => setApplyMetadata(e.target.checked)} 
-                          style={{ marginRight: 6 }} 
+                        <input
+                          type="checkbox"
+                          checked={applyMetadata}
+                          onChange={(e) => setApplyMetadata(e.target.checked)}
+                          style={{ marginRight: 6 }}
                         />
                         Document Title
                       </label>
-                      <input 
-                        type="text" 
-                        className="metadata-input" 
-                        value={metadataTitle} 
-                        onChange={(e) => setMetadataTitle(e.target.value)} 
+                      <input
+                        type="text"
+                        className="metadata-input"
+                        value={metadataTitle}
+                        onChange={(e) => setMetadataTitle(e.target.value)}
                       />
                     </div>
 
                     <div className="metadata-field full-width">
                       <label className="metadata-label">AI Description / Summary</label>
-                      <textarea 
-                        className="metadata-input" 
+                      <textarea
+                        className="metadata-input"
                         style={{ minHeight: '60px', resize: 'vertical' }}
-                        value={metadataDesc} 
-                        onChange={(e) => setMetadataDesc(e.target.value)} 
+                        value={metadataDesc}
+                        onChange={(e) => setMetadataDesc(e.target.value)}
                       />
                     </div>
 
                     <div className="metadata-field">
                       <label className="metadata-label">Document Number</label>
-                      <input 
-                        type="text" 
-                        className="metadata-input" 
-                        value={metadataDocNo} 
-                        onChange={(e) => setMetadataDocNo(e.target.value)} 
+                      <input
+                        type="text"
+                        className="metadata-input"
+                        value={metadataDocNo}
+                        onChange={(e) => setMetadataDocNo(e.target.value)}
                       />
                     </div>
 
                     <div className="metadata-field">
                       <label className="metadata-label">Issuer</label>
-                      <input 
-                        type="text" 
-                        className="metadata-input" 
-                        value={metadataIssuer} 
-                        onChange={(e) => setMetadataIssuer(e.target.value)} 
+                      <input
+                        type="text"
+                        className="metadata-input"
+                        value={metadataIssuer}
+                        onChange={(e) => setMetadataIssuer(e.target.value)}
                       />
                     </div>
 
                     <div className="metadata-field">
                       <label className="metadata-label">Issue Date</label>
-                      <input 
-                        type="date" 
-                        className="metadata-input" 
-                        value={metadataIssueDate} 
-                        onChange={(e) => setMetadataIssueDate(e.target.value)} 
+                      <input
+                        type="date"
+                        className="metadata-input"
+                        value={metadataIssueDate}
+                        onChange={(e) => setMetadataIssueDate(e.target.value)}
                       />
                     </div>
 
                     <div className="metadata-field">
                       <label className="metadata-label">Expiry Date</label>
-                      <input 
-                        type="date" 
-                        className="metadata-input" 
-                        value={metadataExpiryDate} 
-                        onChange={(e) => setMetadataExpiryDate(e.target.value)} 
+                      <input
+                        type="date"
+                        className="metadata-input"
+                        value={metadataExpiryDate}
+                        onChange={(e) => setMetadataExpiryDate(e.target.value)}
                       />
                     </div>
 
                     {/* Tags */}
                     <div className="metadata-field full-width">
                       <label className="metadata-label">
-                        <input 
-                          type="checkbox" 
-                          checked={applyTags} 
-                          onChange={(e) => setApplyTags(e.target.checked)} 
-                          style={{ marginRight: 6 }} 
+                        <input
+                          type="checkbox"
+                          checked={applyTags}
+                          onChange={(e) => setApplyTags(e.target.checked)}
+                          style={{ marginRight: 6 }}
                         />
                         Tags (comma separated)
                       </label>
-                      <input 
-                        type="text" 
-                        className="metadata-input" 
-                        value={tagsInput} 
-                        onChange={(e) => setTagsInput(e.target.value)} 
+                      <input
+                        type="text"
+                        className="metadata-input"
+                        value={tagsInput}
+                        onChange={(e) => setTagsInput(e.target.value)}
                       />
                       <div className="tags-container" style={{ marginTop: '8px' }}>
-                        {tagsInput.split(',').map((t) => t.trim()).filter((t) => t.length > 0).map((t, idx) => (
-                          <span key={idx} className="tag-pill ai">#{t}</span>
-                        ))}
+                        {tagsInput
+                          .split(',')
+                          .map((t) => t.trim())
+                          .filter((t) => t.length > 0)
+                          .map((t, idx) => (
+                            <span key={idx} className="tag-pill ai">
+                              #{t}
+                            </span>
+                          ))}
                       </div>
                     </div>
 
                     {/* Review Notes */}
                     <div className="metadata-field full-width" style={{ marginTop: '10px' }}>
                       <label className="metadata-label">Review / Audit Notes (Optional)</label>
-                      <input 
-                        type="text" 
-                        className="metadata-input" 
+                      <input
+                        type="text"
+                        className="metadata-input"
                         placeholder="Add reason for modifications or approval notes"
-                        value={reviewNotes} 
-                        onChange={(e) => setReviewNotes(e.target.value)} 
+                        value={reviewNotes}
+                        onChange={(e) => setReviewNotes(e.target.value)}
                       />
                     </div>
                   </div>
@@ -541,22 +629,36 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
                     <div className="review-action-bar" style={{ marginTop: '16px' }}>
                       <div className="review-action-info">
                         <span className="review-action-title">Awaiting Your Review</span>
-                        <span className="review-action-desc">Verify AI values and apply to document</span>
+                        <span className="review-action-desc">
+                          Verify AI values and apply to document
+                        </span>
                       </div>
                       <div className="review-action-btns">
-                        <button 
-                          className="btn-process btn-outline" 
-                          onClick={handleReject} 
+                        <button
+                          className="btn-process btn-outline"
+                          onClick={handleReject}
                           disabled={submitting}
-                          style={{ cursor: 'pointer', padding: '8px 16px', borderRadius: 6, border: '1px solid hsl(var(--border))' }}
+                          style={{
+                            cursor: 'pointer',
+                            padding: '8px 16px',
+                            borderRadius: 6,
+                            border: '1px solid hsl(var(--border))',
+                          }}
                         >
                           Reject
                         </button>
-                        <button 
-                          className="btn-process btn-primary" 
-                          onClick={handleApprove} 
+                        <button
+                          className="btn-process btn-primary"
+                          onClick={handleApprove}
                           disabled={submitting}
-                          style={{ cursor: 'pointer', padding: '8px 16px', color: '#fff', background: '#10b981', border: 'none', borderRadius: 6 }}
+                          style={{
+                            cursor: 'pointer',
+                            padding: '8px 16px',
+                            color: '#fff',
+                            background: '#10b981',
+                            border: 'none',
+                            borderRadius: 6,
+                          }}
                         >
                           {submitting ? 'Applying...' : 'Approve & Apply'}
                         </button>
@@ -565,21 +667,48 @@ export default function DocumentIntelligenceDetailPage({ params }: PageProps) {
                   )}
 
                   {aiAnalysis.status === 'APPROVED' && (
-                    <div style={{ padding: '12px', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '8px', color: '#065f46', fontSize: 13, textAlign: 'center' }}>
+                    <div
+                      style={{
+                        padding: '12px',
+                        background: '#ecfdf5',
+                        border: '1px solid #a7f3d0',
+                        borderRadius: '8px',
+                        color: '#065f46',
+                        fontSize: 13,
+                        textAlign: 'center',
+                      }}
+                    >
                       ✓ AI Suggestions have been approved and applied to this document.
                     </div>
                   )}
 
                   {aiAnalysis.status === 'REJECTED' && (
-                    <div style={{ padding: '12px', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px', color: '#991b1b', fontSize: 13, textAlign: 'center' }}>
+                    <div
+                      style={{
+                        padding: '12px',
+                        background: '#fef2f2',
+                        border: '1px solid #fca5a5',
+                        borderRadius: '8px',
+                        color: '#991b1b',
+                        fontSize: 13,
+                        textAlign: 'center',
+                      }}
+                    >
                       ✗ AI Suggestions were rejected.
                     </div>
                   )}
                 </div>
               ) : (
-                <div style={{ padding: '32px 0', textAlign: 'center', color: 'hsl(var(--muted-foreground))', fontSize: 13 }}>
-                  {processingStatus === 'QUEUED' || processingStatus === 'PROCESSING' 
-                    ? 'AI analysis is running in the background...' 
+                <div
+                  style={{
+                    padding: '32px 0',
+                    textAlign: 'center',
+                    color: 'hsl(var(--muted-foreground))',
+                    fontSize: 13,
+                  }}
+                >
+                  {processingStatus === 'QUEUED' || processingStatus === 'PROCESSING'
+                    ? 'AI analysis is running in the background...'
                     : 'No AI analysis result available.'}
                 </div>
               )}

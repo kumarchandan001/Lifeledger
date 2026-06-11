@@ -41,9 +41,7 @@ export type RejectAISuggestionInput = z.infer<typeof rejectAISuggestionSchema>;
 export const queryProcessingJobsSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
-  status: z
-    .enum(['QUEUED', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELLED'])
-    .optional(),
+  status: z.enum(['QUEUED', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELLED']).optional(),
   type: z
     .enum([
       'OCR_EXTRACTION',

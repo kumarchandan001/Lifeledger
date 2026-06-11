@@ -18,12 +18,7 @@ export type ProcessingJobType =
   | 'AI_TAG_GENERATION'
   | 'FULL_PIPELINE';
 
-export type ProcessingJobStatus =
-  | 'QUEUED'
-  | 'PROCESSING'
-  | 'COMPLETED'
-  | 'FAILED'
-  | 'CANCELLED';
+export type ProcessingJobStatus = 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
 
 // ─── OCR ───
 

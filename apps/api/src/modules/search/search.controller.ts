@@ -16,7 +16,10 @@ export class SearchController {
   @ApiQuery({ name: 'q', required: true, description: 'Search term' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number', type: Number })
   @ApiQuery({ name: 'limit', required: false, description: 'Page size limit', type: Number })
-  @ApiResponse({ status: 200, description: 'Search results matching the query retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Search results matching the query retrieved successfully',
+  })
   async search(
     @CurrentUser() user: CurrentUserPayload,
     @Query('q') query: string,

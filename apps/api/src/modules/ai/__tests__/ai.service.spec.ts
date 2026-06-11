@@ -68,12 +68,13 @@ describe('AiService', () => {
     it('should classify document and map category correctly', async () => {
       mockGenerateContent.mockResolvedValue({
         response: {
-          text: () => JSON.stringify({
-            categorySlug: 'identity',
-            subcategorySlug: 'passport',
-            confidence: 98,
-            reasoning: 'Matches passport format',
-          }),
+          text: () =>
+            JSON.stringify({
+              categorySlug: 'identity',
+              subcategorySlug: 'passport',
+              confidence: 98,
+              reasoning: 'Matches passport format',
+            }),
         },
       });
 
@@ -87,10 +88,11 @@ describe('AiService', () => {
     it('should fallback to identity with low confidence if AI returns unknown category', async () => {
       mockGenerateContent.mockResolvedValue({
         response: {
-          text: () => JSON.stringify({
-            categorySlug: 'unknown-category',
-            confidence: 90,
-          }),
+          text: () =>
+            JSON.stringify({
+              categorySlug: 'unknown-category',
+              confidence: 90,
+            }),
         },
       });
 
@@ -104,14 +106,15 @@ describe('AiService', () => {
     it('should extract metadata fields', async () => {
       mockGenerateContent.mockResolvedValue({
         response: {
-          text: () => JSON.stringify({
-            title: 'My Title',
-            description: 'My description',
-            documentNumber: '123456',
-            issuer: 'Govt',
-            issueDate: '2020-01-01',
-            expiryDate: '2030-01-01',
-          }),
+          text: () =>
+            JSON.stringify({
+              title: 'My Title',
+              description: 'My description',
+              documentNumber: '123456',
+              issuer: 'Govt',
+              issueDate: '2020-01-01',
+              expiryDate: '2030-01-01',
+            }),
         },
       });
 
@@ -126,10 +129,11 @@ describe('AiService', () => {
     it('should generate tag list', async () => {
       mockGenerateContent.mockResolvedValue({
         response: {
-          text: () => JSON.stringify({
-            tags: ['tag1', 'tag2', 'tag3'],
-            reasoning: 'Keywords found',
-          }),
+          text: () =>
+            JSON.stringify({
+              tags: ['tag1', 'tag2', 'tag3'],
+              reasoning: 'Keywords found',
+            }),
         },
       });
 
@@ -143,31 +147,34 @@ describe('AiService', () => {
       // Classification response
       mockGenerateContent.mockResolvedValueOnce({
         response: {
-          text: () => JSON.stringify({
-            categorySlug: 'identity',
-            subcategorySlug: 'passport',
-            confidence: 96,
-            reasoning: 'Reasoning',
-          }),
+          text: () =>
+            JSON.stringify({
+              categorySlug: 'identity',
+              subcategorySlug: 'passport',
+              confidence: 96,
+              reasoning: 'Reasoning',
+            }),
         },
       });
 
       // Metadata response
       mockGenerateContent.mockResolvedValueOnce({
         response: {
-          text: () => JSON.stringify({
-            title: 'Passport',
-            description: 'User passport',
-          }),
+          text: () =>
+            JSON.stringify({
+              title: 'Passport',
+              description: 'User passport',
+            }),
         },
       });
 
       // Tags response
       mockGenerateContent.mockResolvedValueOnce({
         response: {
-          text: () => JSON.stringify({
-            tags: ['passport', 'id'],
-          }),
+          text: () =>
+            JSON.stringify({
+              tags: ['passport', 'id'],
+            }),
         },
       });
 
@@ -187,9 +194,9 @@ describe('AiService', () => {
     it('should set status to FAILED and throw when generation fails', async () => {
       mockGenerateContent.mockRejectedValue(new Error('Gemini error'));
 
-      await expect(
-        service.analyzeDocument('doc-uuid', 'some text'),
-      ).rejects.toThrow('AI processing failed: Gemini error');
+      await expect(service.analyzeDocument('doc-uuid', 'some text')).rejects.toThrow(
+        'AI processing failed: Gemini error',
+      );
 
       expect(mockPrisma.aIAnalysis.upsert).toHaveBeenLastCalledWith({
         where: { documentId: 'doc-uuid' },

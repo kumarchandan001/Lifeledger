@@ -157,7 +157,10 @@ describe('AuthService', () => {
         phone: undefined,
       });
       expect(mockPrisma.verificationToken.create).toHaveBeenCalled();
-      expect(mockMailService.sendVerificationEmail).toHaveBeenCalledWith('test@example.com', expect.any(String));
+      expect(mockMailService.sendVerificationEmail).toHaveBeenCalledWith(
+        'test@example.com',
+        expect.any(String),
+      );
       expect(mockAuditService.log).toHaveBeenCalledWith(
         expect.objectContaining({ action: 'AUTH_REGISTER' }),
       );
@@ -172,14 +175,17 @@ describe('AuthService', () => {
       mockUsersService.comparePassword.mockResolvedValue(true);
       mockUsersService.resetFailedLogins.mockResolvedValue(undefined);
       mockUsersService.updateLastLogin.mockResolvedValue(undefined);
-      
+
       mockPrisma.userSession.create.mockResolvedValue({ id: 'session-id', expiresAt: new Date() });
       mockJwtService.sign.mockReturnValue('signed-token');
 
       const result = await service.login('test@example.com', 'password123');
 
       expect(mockUsersService.findByEmail).toHaveBeenCalledWith('test@example.com');
-      expect(mockUsersService.comparePassword).toHaveBeenCalledWith('password123', 'hashedpassword');
+      expect(mockUsersService.comparePassword).toHaveBeenCalledWith(
+        'password123',
+        'hashedpassword',
+      );
       expect(mockUsersService.resetFailedLogins).toHaveBeenCalledWith(mockUser.id);
       expect(mockPrisma.userSession.create).toHaveBeenCalled();
       expect(result.accessToken).toBe('signed-token');
@@ -224,14 +230,16 @@ describe('AuthService', () => {
       };
       mockPrisma.userSession.findUnique.mockResolvedValue(mockSession);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-      
+
       mockUsersService.findById.mockResolvedValue(mockUser);
       mockJwtService.sign.mockReturnValue('new-access-token');
       mockPrisma.userSession.update.mockResolvedValue(mockSession);
 
       const result = await service.refreshTokens('user-123', 'session-id', 'old-token');
 
-      expect(mockPrisma.userSession.findUnique).toHaveBeenCalledWith({ where: { id: 'session-id' } });
+      expect(mockPrisma.userSession.findUnique).toHaveBeenCalledWith({
+        where: { id: 'session-id' },
+      });
       expect(result.accessToken).toBe('new-access-token');
       expect(result.refreshToken).toBeDefined();
     });
@@ -246,9 +254,9 @@ describe('AuthService', () => {
       mockPrisma.userSession.findUnique.mockResolvedValue(mockSession);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(
-        service.refreshTokens('user-123', 'session-id', 'old-token'),
-      ).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshTokens('user-123', 'session-id', 'old-token')).rejects.toThrow(
+        UnauthorizedException,
+      );
 
       expect(mockPrisma.userSession.delete).toHaveBeenCalledWith({ where: { id: 'session-id' } });
     });

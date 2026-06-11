@@ -55,9 +55,7 @@ export class AiService implements OnModuleInit {
   async onModuleInit() {
     const apiKey = this.configService.get<string>('GEMINI_API_KEY');
     if (!apiKey) {
-      this.logger.warn(
-        'GEMINI_API_KEY is not set. AI processing will be unavailable.',
-      );
+      this.logger.warn('GEMINI_API_KEY is not set. AI processing will be unavailable.');
       return;
     }
 
@@ -137,10 +135,7 @@ export class AiService implements OnModuleInit {
   /**
    * Extract structured metadata from document text.
    */
-  async extractMetadata(
-    ocrText: string,
-    categorySlug: string,
-  ): Promise<MetadataResult> {
+  async extractMetadata(ocrText: string, categorySlug: string): Promise<MetadataResult> {
     if (!this.model) throw new Error('AI service is not initialized');
 
     const prompt = buildMetadataExtractionPrompt(ocrText, categorySlug);
@@ -188,10 +183,7 @@ export class AiService implements OnModuleInit {
   /**
    * Run the full AI analysis pipeline for a document.
    */
-  async analyzeDocument(
-    documentId: string,
-    ocrText: string,
-  ): Promise<FullAnalysisResult> {
+  async analyzeDocument(documentId: string, ocrText: string): Promise<FullAnalysisResult> {
     const startTime = Date.now();
 
     // Update AI analysis status to PROCESSING
@@ -212,7 +204,8 @@ export class AiService implements OnModuleInit {
       const tags = await this.generateTags(ocrText, classification.categorySlug, metadata as any);
 
       // Step 4: Generate summary
-      const summary = metadata.description ||
+      const summary =
+        metadata.description ||
         `${classification.categoryName} document${classification.subcategoryName ? ` (${classification.subcategoryName})` : ''}`;
 
       const totalProcessingTimeMs = Date.now() - startTime;
@@ -296,11 +289,18 @@ export class AiService implements OnModuleInit {
    * Suggest which of the user's active documents should be added to the Emergency Vault.
    */
   async suggestVaultDocuments(
-    documents: Array<{ id: string; title: string; categorySlug: string; subCategorySlug?: string | null }>,
+    documents: Array<{
+      id: string;
+      title: string;
+      categorySlug: string;
+      subCategorySlug?: string | null;
+    }>,
   ): Promise<Array<{ documentId: string; reason: string }>> {
     if (!this.model) {
       return documents
-        .filter((d) => ['identity', 'medical', 'insurance', 'legal', 'emergency'].includes(d.categorySlug))
+        .filter((d) =>
+          ['identity', 'medical', 'insurance', 'legal', 'emergency'].includes(d.categorySlug),
+        )
         .map((d) => ({
           documentId: d.id,
           reason: `Document belongs to critical category "${d.categorySlug}" suitable for emergencies.`,
@@ -331,13 +331,17 @@ Do not include any markdown styling, return ONLY the raw JSON array.`;
       const responseText = await this.callGemini(prompt);
       const parsed = this.parseJsonResponse(responseText);
       if (Array.isArray(parsed)) {
-        return parsed.filter((item) => typeof item.documentId === 'string' && typeof item.reason === 'string');
+        return parsed.filter(
+          (item) => typeof item.documentId === 'string' && typeof item.reason === 'string',
+        );
       }
       return [];
     } catch (error) {
       this.logger.error('Failed to suggest vault documents', error);
       return documents
-        .filter((d) => ['identity', 'medical', 'insurance', 'legal', 'emergency'].includes(d.categorySlug))
+        .filter((d) =>
+          ['identity', 'medical', 'insurance', 'legal', 'emergency'].includes(d.categorySlug),
+        )
         .map((d) => ({
           documentId: d.id,
           reason: `Recommended based on its category: ${d.categorySlug}`,
@@ -350,7 +354,9 @@ Do not include any markdown styling, return ONLY the raw JSON array.`;
    */
   async identifyMissingDocuments(
     vaultDocuments: Array<{ title: string; categorySlug: string; subCategorySlug?: string | null }>,
-  ): Promise<Array<{ categorySlug: string; categoryName: string; documentType: string; reason: string }>> {
+  ): Promise<
+    Array<{ categorySlug: string; categoryName: string; documentType: string; reason: string }>
+  > {
     if (!this.model) {
       const existingCategories = new Set(vaultDocuments.map((d) => d.categorySlug));
       const criticalCategories = [

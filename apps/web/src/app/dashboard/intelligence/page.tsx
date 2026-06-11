@@ -44,7 +44,16 @@ export default function IntelligencePage() {
   const fetchSummary = useCallback(async () => {
     try {
       const res = await api.get('/processing/status');
-      setSummary(res.data ?? { queued: 0, processing: 0, completed: 0, failed: 0, needsReview: 0, totalProcessed: 0 });
+      setSummary(
+        res.data ?? {
+          queued: 0,
+          processing: 0,
+          completed: 0,
+          failed: 0,
+          needsReview: 0,
+          totalProcessed: 0,
+        },
+      );
     } catch {
       // silently ignore
     }
@@ -52,7 +61,9 @@ export default function IntelligencePage() {
 
   const fetchJobs = useCallback(async (page = 1) => {
     try {
-      const res = await api.get('/processing/jobs', { params: { page, limit: 10, sortOrder: 'desc' } });
+      const res = await api.get('/processing/jobs', {
+        params: { page, limit: 10, sortOrder: 'desc' },
+      });
       setJobs(res.data?.jobs ?? []);
       setJobsTotal(res.data?.total ?? 0);
       setJobsPage(page);
@@ -124,7 +135,9 @@ export default function IntelligencePage() {
         <div className="status-card">
           <div className="status-card-header">
             <span className="status-card-label">Queued</span>
-            <div className="status-card-icon" style={{ background: '#f1f5f9' }}>⏳</div>
+            <div className="status-card-icon" style={{ background: '#f1f5f9' }}>
+              ⏳
+            </div>
           </div>
           <div className="status-card-value">{summary.queued}</div>
           <div className="status-card-sub">Waiting to process</div>
@@ -133,9 +146,14 @@ export default function IntelligencePage() {
         <div className="status-card">
           <div className="status-card-header">
             <span className="status-card-label">Processing</span>
-            <div className="status-card-icon" style={{ background: '#eff6ff' }}>⚙️</div>
+            <div className="status-card-icon" style={{ background: '#eff6ff' }}>
+              ⚙️
+            </div>
           </div>
-          <div className="status-card-value" style={{ color: summary.processing > 0 ? '#3b82f6' : undefined }}>
+          <div
+            className="status-card-value"
+            style={{ color: summary.processing > 0 ? '#3b82f6' : undefined }}
+          >
             {summary.processing}
           </div>
           <div className="status-card-sub">Currently running</div>
@@ -144,7 +162,9 @@ export default function IntelligencePage() {
         <div className="status-card">
           <div className="status-card-header">
             <span className="status-card-label">Completed</span>
-            <div className="status-card-icon" style={{ background: '#ecfdf5' }}>✅</div>
+            <div className="status-card-icon" style={{ background: '#ecfdf5' }}>
+              ✅
+            </div>
           </div>
           <div className="status-card-value" style={{ color: '#10b981' }}>
             {summary.completed}
@@ -155,9 +175,14 @@ export default function IntelligencePage() {
         <div className="status-card">
           <div className="status-card-header">
             <span className="status-card-label">Failed</span>
-            <div className="status-card-icon" style={{ background: '#fef2f2' }}>❌</div>
+            <div className="status-card-icon" style={{ background: '#fef2f2' }}>
+              ❌
+            </div>
           </div>
-          <div className="status-card-value" style={{ color: summary.failed > 0 ? '#ef4444' : undefined }}>
+          <div
+            className="status-card-value"
+            style={{ color: summary.failed > 0 ? '#ef4444' : undefined }}
+          >
             {summary.failed}
           </div>
           <div className="status-card-sub">Need attention</div>
@@ -166,9 +191,14 @@ export default function IntelligencePage() {
         <div className="status-card">
           <div className="status-card-header">
             <span className="status-card-label">Needs Review</span>
-            <div className="status-card-icon" style={{ background: '#fffbeb' }}>👁️</div>
+            <div className="status-card-icon" style={{ background: '#fffbeb' }}>
+              👁️
+            </div>
           </div>
-          <div className="status-card-value" style={{ color: summary.needsReview > 0 ? '#d97706' : undefined }}>
+          <div
+            className="status-card-value"
+            style={{ color: summary.needsReview > 0 ? '#d97706' : undefined }}
+          >
             {summary.needsReview}
           </div>
           <div className="status-card-sub">Awaiting approval</div>
@@ -185,13 +215,19 @@ export default function IntelligencePage() {
         </button>
         <button
           className={`tab-btn ${activeTab === 'jobs' ? 'active' : ''}`}
-          onClick={() => { setActiveTab('jobs'); fetchJobs(); }}
+          onClick={() => {
+            setActiveTab('jobs');
+            fetchJobs();
+          }}
         >
           📋 Processing Jobs
         </button>
         <button
           className={`tab-btn ${activeTab === 'review' ? 'active' : ''}`}
-          onClick={() => { setActiveTab('review'); fetchReviewQueue(); }}
+          onClick={() => {
+            setActiveTab('review');
+            fetchReviewQueue();
+          }}
         >
           👁️ Review Queue {summary.needsReview > 0 && `(${summary.needsReview})`}
         </button>
@@ -209,7 +245,8 @@ export default function IntelligencePage() {
                 <div className="empty-state-icon">🧠</div>
                 <div className="empty-state-title">No processing jobs yet</div>
                 <div className="empty-state-desc">
-                  Upload a document and click &quot;Process with AI&quot; to start extracting intelligence.
+                  Upload a document and click &quot;Process with AI&quot; to start extracting
+                  intelligence.
                 </div>
               </div>
             ) : (
@@ -258,7 +295,9 @@ export default function IntelligencePage() {
               <div className="empty-state">
                 <div className="empty-state-icon">📭</div>
                 <div className="empty-state-title">No jobs found</div>
-                <div className="empty-state-desc">Processing jobs will appear here once you start processing documents.</div>
+                <div className="empty-state-desc">
+                  Processing jobs will appear here once you start processing documents.
+                </div>
               </div>
             ) : (
               <>
@@ -287,7 +326,9 @@ export default function IntelligencePage() {
                             {job.status}
                           </span>
                         </td>
-                        <td>{job.attempts}/{job.maxAttempts || 3}</td>
+                        <td>
+                          {job.attempts}/{job.maxAttempts || 3}
+                        </td>
                         <td>{job.startedAt ? formatDate(job.startedAt) : '—'}</td>
                         <td>{job.completedAt ? formatDate(job.completedAt) : '—'}</td>
                       </tr>
@@ -303,7 +344,13 @@ export default function IntelligencePage() {
                     >
                       ← Previous
                     </button>
-                    <span style={{ padding: '5px 12px', fontSize: 13, color: 'hsl(var(--muted-foreground))' }}>
+                    <span
+                      style={{
+                        padding: '5px 12px',
+                        fontSize: 13,
+                        color: 'hsl(var(--muted-foreground))',
+                      }}
+                    >
                       Page {jobsPage} of {Math.ceil(jobsTotal / 10)}
                     </span>
                     <button
@@ -338,13 +385,12 @@ export default function IntelligencePage() {
                 <div
                   key={item.id}
                   className="review-item"
-                  onClick={() => router.push(`/dashboard/intelligence/${item.document?.id || item.documentId}`)}
+                  onClick={() =>
+                    router.push(`/dashboard/intelligence/${item.document?.id || item.documentId}`)
+                  }
                   style={{ cursor: 'pointer' }}
                 >
-                  <div
-                    className="review-item-icon"
-                    style={{ background: '#fffbeb' }}
-                  >
+                  <div className="review-item-icon" style={{ background: '#fffbeb' }}>
                     {item.document?.category?.icon || '📄'}
                   </div>
                   <div className="review-item-info">
@@ -358,12 +404,13 @@ export default function IntelligencePage() {
                     </div>
                   </div>
                   <div className="review-item-actions">
-                    <span className={`confidence-badge ${getConfidenceClass(item.categoryConfidence)}`}>
-                      {getConfidenceLabel(item.categoryConfidence)} ({Math.round(item.categoryConfidence)}%)
+                    <span
+                      className={`confidence-badge ${getConfidenceClass(item.categoryConfidence)}`}
+                    >
+                      {getConfidenceLabel(item.categoryConfidence)} (
+                      {Math.round(item.categoryConfidence)}%)
                     </span>
-                    <button className="btn-process btn-primary btn-sm">
-                      Review →
-                    </button>
+                    <button className="btn-process btn-primary btn-sm">Review →</button>
                   </div>
                 </div>
               ))

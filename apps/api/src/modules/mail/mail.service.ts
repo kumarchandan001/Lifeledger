@@ -116,7 +116,8 @@ export class MailService {
       day: 'numeric',
     });
 
-    const urgencyColor = daysRemaining <= 7 ? '#ef4444' : daysRemaining <= 30 ? '#f59e0b' : '#6366f1';
+    const urgencyColor =
+      daysRemaining <= 7 ? '#ef4444' : daysRemaining <= 30 ? '#f59e0b' : '#6366f1';
 
     try {
       await this.transporter.sendMail({
@@ -277,7 +278,11 @@ export class MailService {
     }
   }
 
-  async sendTrustedContactAdditionEmail(email: string, name: string, ownerName: string): Promise<void> {
+  async sendTrustedContactAdditionEmail(
+    email: string,
+    name: string,
+    ownerName: string,
+  ): Promise<void> {
     try {
       await this.transporter.sendMail({
         from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
@@ -301,7 +306,12 @@ export class MailService {
     }
   }
 
-  async sendEmergencyRequestEmail(email: string, requesterName: string, waitingPeriod: number, requestId: string): Promise<void> {
+  async sendEmergencyRequestEmail(
+    email: string,
+    requesterName: string,
+    waitingPeriod: number,
+    requestId: string,
+  ): Promise<void> {
     const appUrl = this.config.get<string>('APP_URL', 'http://localhost:3000');
     try {
       await this.transporter.sendMail({
@@ -332,7 +342,12 @@ export class MailService {
     }
   }
 
-  async sendRequestConfirmationEmail(email: string, name: string, ownerName: string, waitingPeriod: number): Promise<void> {
+  async sendRequestConfirmationEmail(
+    email: string,
+    name: string,
+    ownerName: string,
+    waitingPeriod: number,
+  ): Promise<void> {
     try {
       await this.transporter.sendMail({
         from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
@@ -353,7 +368,13 @@ export class MailService {
     }
   }
 
-  async sendRequestApprovedEmail(email: string, name: string, ownerName: string, grantId: string, expiresAt: Date): Promise<void> {
+  async sendRequestApprovedEmail(
+    email: string,
+    name: string,
+    ownerName: string,
+    grantId: string,
+    expiresAt: Date,
+  ): Promise<void> {
     const appUrl = this.config.get<string>('APP_URL', 'http://localhost:3000');
     const accessUrl = `${appUrl}/emergency/access?token=${grantId}`;
     try {
@@ -449,7 +470,11 @@ export class MailService {
     }
   }
 
-  async sendEscalationRequesterNoticeEmail(email: string, name: string, ownerName: string): Promise<void> {
+  async sendEscalationRequesterNoticeEmail(
+    email: string,
+    name: string,
+    ownerName: string,
+  ): Promise<void> {
     try {
       await this.transporter.sendMail({
         from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
@@ -470,7 +495,12 @@ export class MailService {
     }
   }
 
-  async sendWaitingPeriodReminderEmail(email: string, name: string, daysRemaining: number, requestId: string): Promise<void> {
+  async sendWaitingPeriodReminderEmail(
+    email: string,
+    name: string,
+    daysRemaining: number,
+    requestId: string,
+  ): Promise<void> {
     try {
       await this.transporter.sendMail({
         from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),

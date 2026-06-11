@@ -36,7 +36,11 @@ export class AuthService {
   ) {}
 
   // ─── Register ───
-  async register(data: { email: string; password: string; fullName: string; phone?: string }, ip?: string, userAgent?: string) {
+  async register(
+    data: { email: string; password: string; fullName: string; phone?: string },
+    ip?: string,
+    userAgent?: string,
+  ) {
     const passwordHash = await this.usersService.hashPassword(data.password);
 
     const user = await this.usersService.create({
@@ -76,7 +80,13 @@ export class AuthService {
   }
 
   // ─── Login ───
-  async login(email: string, password: string, ip?: string, userAgent?: string, deviceName?: string) {
+  async login(
+    email: string,
+    password: string,
+    ip?: string,
+    userAgent?: string,
+    deviceName?: string,
+  ) {
     const user = await this.usersService.findByEmail(email);
 
     if (!user) {
@@ -90,7 +100,9 @@ export class AuthService {
 
     // Check password
     if (!user.passwordHash) {
-      throw new UnauthorizedException('This account uses social login. Please sign in with Google.');
+      throw new UnauthorizedException(
+        'This account uses social login. Please sign in with Google.',
+      );
     }
 
     const isPasswordValid = await this.usersService.comparePassword(password, user.passwordHash);
@@ -109,7 +121,9 @@ export class AuthService {
           ipAddress: ip,
           userAgent,
         });
-        throw new ForbiddenException('Too many failed login attempts. Account locked for 15 minutes.');
+        throw new ForbiddenException(
+          'Too many failed login attempts. Account locked for 15 minutes.',
+        );
       }
 
       await this.auditService.log({
@@ -135,7 +149,12 @@ export class AuthService {
     await this.usersService.updateLastLogin(user.id);
 
     // Generate tokens & create session
-    const { accessToken, refreshToken, sessionId } = await this.generateTokenPair(user, ip, userAgent, deviceName);
+    const { accessToken, refreshToken, sessionId } = await this.generateTokenPair(
+      user,
+      ip,
+      userAgent,
+      deviceName,
+    );
 
     // Audit
     await this.auditService.log({
@@ -155,7 +174,13 @@ export class AuthService {
   }
 
   // ─── Refresh ───
-  async refreshTokens(userId: string, sessionId: string, oldRefreshToken: string, ip?: string, userAgent?: string) {
+  async refreshTokens(
+    userId: string,
+    sessionId: string,
+    oldRefreshToken: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
     const session = await this.prisma.userSession.findUnique({
       where: { id: sessionId },
     });
@@ -268,7 +293,9 @@ export class AuthService {
 
     // Always return success to prevent email enumeration
     if (!user) {
-      return { message: 'If an account with that email exists, a password reset link has been sent.' };
+      return {
+        message: 'If an account with that email exists, a password reset link has been sent.',
+      };
     }
 
     // Delete any existing reset tokens
@@ -296,7 +323,9 @@ export class AuthService {
       userAgent,
     });
 
-    return { message: 'If an account with that email exists, a password reset link has been sent.' };
+    return {
+      message: 'If an account with that email exists, a password reset link has been sent.',
+    };
   }
 
   // ─── Reset Password ───
@@ -341,7 +370,9 @@ export class AuthService {
       userAgent,
     });
 
-    return { message: 'Password has been reset successfully. Please log in with your new password.' };
+    return {
+      message: 'Password has been reset successfully. Please log in with your new password.',
+    };
   }
 
   // ─── Sessions ───
@@ -390,12 +421,17 @@ export class AuthService {
   }
 
   // ─── Google OAuth ───
-  async handleGoogleLogin(profile: {
-    googleId: string;
-    email: string;
-    fullName: string;
-    avatarUrl?: string;
-  }, ip?: string, userAgent?: string, deviceName?: string) {
+  async handleGoogleLogin(
+    profile: {
+      googleId: string;
+      email: string;
+      fullName: string;
+      avatarUrl?: string;
+    },
+    ip?: string,
+    userAgent?: string,
+    deviceName?: string,
+  ) {
     let user = await this.usersService.findByGoogleId(profile.googleId);
 
     if (!user) {
@@ -418,7 +454,12 @@ export class AuthService {
 
     await this.usersService.updateLastLogin(user.id);
 
-    const { accessToken, refreshToken } = await this.generateTokenPair(user, ip, userAgent, deviceName);
+    const { accessToken, refreshToken } = await this.generateTokenPair(
+      user,
+      ip,
+      userAgent,
+      deviceName,
+    );
 
     await this.auditService.log({
       userId: user.id,
@@ -433,7 +474,12 @@ export class AuthService {
   }
 
   // ─── Helpers ───
-  private async generateTokenPair(user: User, ip?: string, userAgent?: string, deviceName?: string) {
+  private async generateTokenPair(
+    user: User,
+    ip?: string,
+    userAgent?: string,
+    deviceName?: string,
+  ) {
     const accessToken = this.generateAccessToken(user);
     const refreshToken = crypto.randomBytes(48).toString('hex');
     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
@@ -460,7 +506,12 @@ export class AuthService {
       },
     );
 
-    return { accessToken, refreshToken: signedRefreshToken, sessionId: session.id, rawRefreshToken: refreshToken };
+    return {
+      accessToken,
+      refreshToken: signedRefreshToken,
+      sessionId: session.id,
+      rawRefreshToken: refreshToken,
+    };
   }
 
   private generateAccessToken(user: User): string {
@@ -505,11 +556,16 @@ export class AuthService {
     const value = parseInt(match[1]!, 10);
     const unit = match[2]!;
     switch (unit) {
-      case 's': return value * 1000;
-      case 'm': return value * 60 * 1000;
-      case 'h': return value * 60 * 60 * 1000;
-      case 'd': return value * 24 * 60 * 60 * 1000;
-      default: return 7 * 24 * 60 * 60 * 1000;
+      case 's':
+        return value * 1000;
+      case 'm':
+        return value * 60 * 1000;
+      case 'h':
+        return value * 60 * 60 * 1000;
+      case 'd':
+        return value * 24 * 60 * 60 * 1000;
+      default:
+        return 7 * 24 * 60 * 60 * 1000;
     }
   }
 }

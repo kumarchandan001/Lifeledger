@@ -89,9 +89,7 @@ export default function SessionsPage() {
               <div className="session-info">
                 <div className="session-device">
                   {session.deviceName || 'Unknown Device'}
-                  {session.isCurrent && (
-                    <span className="session-current-badge">This device</span>
-                  )}
+                  {session.isCurrent && <span className="session-current-badge">This device</span>}
                 </div>
                 <div className="session-meta">
                   <span>{session.ipAddress}</span>
@@ -157,7 +155,9 @@ export default function SessionsPage() {
         }
 
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
         .sessions-empty {
@@ -180,7 +180,9 @@ export default function SessionsPage() {
           background: white;
           border: 1px solid #e5e7eb;
           border-radius: 12px;
-          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+          transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
         }
 
         .session-card:hover {

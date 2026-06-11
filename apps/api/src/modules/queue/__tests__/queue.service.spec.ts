@@ -169,9 +169,9 @@ describe('QueueService', () => {
     it('should throw error if job not found', async () => {
       mockPrisma.processingJob.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.retryJob('job-uuid', 'user-uuid'),
-      ).rejects.toThrow('Processing job not found');
+      await expect(service.retryJob('job-uuid', 'user-uuid')).rejects.toThrow(
+        'Processing job not found',
+      );
     });
 
     it('should throw error if job status is not FAILED', async () => {
@@ -180,9 +180,9 @@ describe('QueueService', () => {
         status: ProcessingJobStatus.COMPLETED,
       });
 
-      await expect(
-        service.retryJob('job-uuid', 'user-uuid'),
-      ).rejects.toThrow('Only failed jobs can be retried');
+      await expect(service.retryJob('job-uuid', 'user-uuid')).rejects.toThrow(
+        'Only failed jobs can be retried',
+      );
     });
 
     it('should enqueue job again if status is FAILED', async () => {

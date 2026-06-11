@@ -15,7 +15,12 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 import { DocumentsService } from './documents.service';
-import { CreateUploadUrlDto, CreateDocumentDto, UpdateDocumentDto, QueryDocumentsDto } from './dto/documents.dto';
+import {
+  CreateUploadUrlDto,
+  CreateDocumentDto,
+  UpdateDocumentDto,
+  QueryDocumentsDto,
+} from './dto/documents.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser, CurrentUserPayload } from '../auth/decorators/current-user.decorator';
 
@@ -51,12 +56,7 @@ export class DocumentsController {
     @Body() dto: CreateDocumentDto,
     @Req() req: Request,
   ) {
-    return this.documentsService.create(
-      user.userId,
-      dto,
-      req.ip,
-      req.headers['user-agent'],
-    );
+    return this.documentsService.create(user.userId, dto, req.ip, req.headers['user-agent']);
   }
 
   @Get()
@@ -88,13 +88,7 @@ export class DocumentsController {
     @Body() dto: UpdateDocumentDto,
     @Req() req: Request,
   ) {
-    return this.documentsService.update(
-      id,
-      user.userId,
-      dto,
-      req.ip,
-      req.headers['user-agent'],
-    );
+    return this.documentsService.update(id, user.userId, dto, req.ip, req.headers['user-agent']);
   }
 
   @Delete(':id')

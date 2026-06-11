@@ -2,10 +2,7 @@
  * Build the metadata extraction prompt for Gemini AI.
  * Extracts structured document metadata from OCR text.
  */
-export function buildMetadataExtractionPrompt(
-  ocrText: string,
-  categorySlug: string,
-): string {
+export function buildMetadataExtractionPrompt(ocrText: string, categorySlug: string): string {
   return `You are a document metadata extraction AI. Extract structured metadata from the following document text.
 
 Document category: ${categorySlug}

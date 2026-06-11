@@ -75,7 +75,9 @@ export class DocumentsService {
 
   async generateUploadUrl(userId: string, fileName: string, mimeType: string, fileSize: number) {
     // ─── Validate file type ───
-    const isAllowedMimeType = (FILE_LIMITS.ALLOWED_MIME_TYPES as readonly string[]).includes(mimeType);
+    const isAllowedMimeType = (FILE_LIMITS.ALLOWED_MIME_TYPES as readonly string[]).includes(
+      mimeType,
+    );
     if (!isAllowedMimeType) {
       throw new BadRequestException('File type not supported');
     }
@@ -291,7 +293,13 @@ export class DocumentsService {
     return serialized;
   }
 
-  async update(id: string, userId: string, dto: UpdateDocumentDto, ipAddress?: string, userAgent?: string) {
+  async update(
+    id: string,
+    userId: string,
+    dto: UpdateDocumentDto,
+    ipAddress?: string,
+    userAgent?: string,
+  ) {
     // Verify document exists
     const document = await this.prisma.document.findFirst({
       where: { id, userId, deletedAt: null },
@@ -326,8 +334,10 @@ export class DocumentsService {
     if (dto.description !== undefined) updateData.description = dto.description;
     if (dto.categoryId !== undefined) updateData.categoryId = dto.categoryId;
     if (dto.subCategoryId !== undefined) updateData.subCategoryId = dto.subCategoryId;
-    if (dto.issueDate !== undefined) updateData.issueDate = dto.issueDate ? new Date(dto.issueDate) : null;
-    if (dto.expiryDate !== undefined) updateData.expiryDate = dto.expiryDate ? new Date(dto.expiryDate) : null;
+    if (dto.issueDate !== undefined)
+      updateData.issueDate = dto.issueDate ? new Date(dto.issueDate) : null;
+    if (dto.expiryDate !== undefined)
+      updateData.expiryDate = dto.expiryDate ? new Date(dto.expiryDate) : null;
     if (dto.documentNumber !== undefined) updateData.documentNumber = dto.documentNumber;
     if (dto.issuer !== undefined) updateData.issuer = dto.issuer;
     if (dto.isSensitive !== undefined) updateData.isSensitive = dto.isSensitive;

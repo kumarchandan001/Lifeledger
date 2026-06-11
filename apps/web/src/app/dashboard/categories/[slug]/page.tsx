@@ -115,7 +115,7 @@ export default function CategoryDetailPage({ params }: PageProps) {
       };
       if (selectedSubSlug) {
         // Find subcategory ID to filter precisely
-        const sub = subCategories.find(s => s.slug === selectedSubSlug);
+        const sub = subCategories.find((s) => s.slug === selectedSubSlug);
         if (sub) {
           params.subCategoryId = sub.id;
         }
@@ -152,7 +152,7 @@ export default function CategoryDetailPage({ params }: PageProps) {
   const handleSubCategorySelect = (subSlug: string) => {
     const nextSlug = selectedSubSlug === subSlug ? '' : subSlug;
     setSelectedSubSlug(nextSlug);
-    
+
     // Update URL query parameter without full reload
     const newParams = new URLSearchParams(window.location.search);
     if (nextSlug) {
@@ -179,7 +179,9 @@ export default function CategoryDetailPage({ params }: PageProps) {
   const formatDate = (d: string | null) => {
     if (!d) return '—';
     return new Date(d).toLocaleDateString('en-IN', {
-      year: 'numeric', month: 'short', day: 'numeric',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
@@ -187,9 +189,11 @@ export default function CategoryDetailPage({ params }: PageProps) {
     e?.stopPropagation();
     try {
       await api.post(`/documents/${docId}/favorite`);
-      setDocs(prev => prev.map(d => d.id === docId ? { ...d, isFavorite: !d.isFavorite } : d));
+      setDocs((prev) =>
+        prev.map((d) => (d.id === docId ? { ...d, isFavorite: !d.isFavorite } : d)),
+      );
       if (drawerDoc?.id === docId) {
-        setDrawerDoc(prev => prev ? { ...prev, isFavorite: !prev.isFavorite } : null);
+        setDrawerDoc((prev) => (prev ? { ...prev, isFavorite: !prev.isFavorite } : null));
       }
     } catch {
       toast.error('Failed to update favorite');
@@ -234,7 +238,17 @@ export default function CategoryDetailPage({ params }: PageProps) {
   if (loadingCategory) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: 100 }}>
-        <div className="spinner" style={{ width: 32, height: 32, border: '3px solid hsl(var(--border))', borderTopColor: 'hsl(var(--primary))', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+        <div
+          className="spinner"
+          style={{
+            width: 32,
+            height: 32,
+            border: '3px solid hsl(var(--border))',
+            borderTopColor: 'hsl(var(--primary))',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite',
+          }}
+        />
       </div>
     );
   }
@@ -249,15 +263,18 @@ export default function CategoryDetailPage({ params }: PageProps) {
         style={{ '--cat-color': category.color } as React.CSSProperties}
       >
         <div className="category-detail-title-area">
-          <button className="category-detail-back" onClick={() => router.push('/dashboard/categories')}>
+          <button
+            className="category-detail-back"
+            onClick={() => router.push('/dashboard/categories')}
+          >
             ←
           </button>
-          <div className="category-detail-icon">
-            {category.icon}
-          </div>
+          <div className="category-detail-icon">{category.icon}</div>
           <div className="category-detail-info">
             <h1 className="category-detail-title">{category.name}</h1>
-            <p className="category-detail-subtitle">{category.description || 'Personal Secure Vault'}</p>
+            <p className="category-detail-subtitle">
+              {category.description || 'Personal Secure Vault'}
+            </p>
           </div>
         </div>
       </div>
@@ -265,14 +282,16 @@ export default function CategoryDetailPage({ params }: PageProps) {
       {/* ─── Subcategory Selectors ─── */}
       {subCategories.length > 0 && (
         <div className="subcategories-bar">
-          {subCategories.map(sub => (
+          {subCategories.map((sub) => (
             <button
               key={sub.id}
               className={`filter-chip ${selectedSubSlug === sub.slug ? 'active' : ''}`}
-              style={{
-                '--primary': category.color,
-                '--primary-foreground': '#fff'
-              } as React.CSSProperties}
+              style={
+                {
+                  '--primary': category.color,
+                  '--primary-foreground': '#fff',
+                } as React.CSSProperties
+              }
               onClick={() => handleSubCategorySelect(sub.slug)}
             >
               {sub.name}
@@ -298,35 +317,51 @@ export default function CategoryDetailPage({ params }: PageProps) {
             className={`docs-view-btn ${viewMode === 'grid' ? 'active' : ''}`}
             onClick={() => setViewMode('grid')}
             aria-label="Grid view"
-          >⊞</button>
+          >
+            ⊞
+          </button>
           <button
             className={`docs-view-btn ${viewMode === 'list' ? 'active' : ''}`}
             onClick={() => setViewMode('list')}
             aria-label="List view"
-          >☰</button>
+          >
+            ☰
+          </button>
         </div>
       </div>
 
       <div className="docs-filters">
         <button
           className={`filter-chip ${!statusFilter && !favFilter ? 'active' : ''}`}
-          onClick={() => { setStatusFilter(''); setFavFilter(false); }}
+          onClick={() => {
+            setStatusFilter('');
+            setFavFilter(false);
+          }}
         >
           All Items
         </button>
         <button
           className={`filter-chip ${favFilter ? 'active' : ''}`}
-          onClick={() => { setFavFilter(!favFilter); setStatusFilter(''); }}
+          onClick={() => {
+            setFavFilter(!favFilter);
+            setStatusFilter('');
+          }}
         >
           ⭐ Favorites
         </button>
-        {['ACTIVE', 'EXPIRING_SOON', 'EXPIRED', 'ARCHIVED'].map(s => (
+        {['ACTIVE', 'EXPIRING_SOON', 'EXPIRED', 'ARCHIVED'].map((s) => (
           <button
             key={s}
             className={`filter-chip ${statusFilter === s ? 'active' : ''}`}
-            onClick={() => { setStatusFilter(statusFilter === s ? '' : s); setFavFilter(false); }}
+            onClick={() => {
+              setStatusFilter(statusFilter === s ? '' : s);
+              setFavFilter(false);
+            }}
           >
-            {s.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
+            {s
+              .replace(/_/g, ' ')
+              .toLowerCase()
+              .replace(/\b\w/g, (c) => c.toUpperCase())}
           </button>
         ))}
       </div>
@@ -334,7 +369,17 @@ export default function CategoryDetailPage({ params }: PageProps) {
       {/* ─── Document Content ─── */}
       {loadingDocs ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
-          <div className="spinner" style={{ width: 32, height: 32, border: '3px solid hsl(var(--border))', borderTopColor: 'hsl(var(--primary))', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <div
+            className="spinner"
+            style={{
+              width: 32,
+              height: 32,
+              border: '3px solid hsl(var(--border))',
+              borderTopColor: 'hsl(var(--primary))',
+              borderRadius: '50%',
+              animation: 'spin 0.8s linear infinite',
+            }}
+          />
         </div>
       ) : docs.length === 0 ? (
         <div className="docs-empty">
@@ -350,7 +395,7 @@ export default function CategoryDetailPage({ params }: PageProps) {
         <>
           {viewMode === 'grid' && (
             <div className="docs-grid">
-              {docs.map(doc => (
+              {docs.map((doc) => (
                 <div
                   key={doc.id}
                   className="doc-card"
@@ -359,7 +404,10 @@ export default function CategoryDetailPage({ params }: PageProps) {
                   id={`doc-card-${doc.id}`}
                 >
                   <div className="doc-card-header">
-                    <div className="doc-card-icon" style={{ background: `${category.color}18`, color: category.color }}>
+                    <div
+                      className="doc-card-icon"
+                      style={{ background: `${category.color}18`, color: category.color }}
+                    >
                       {category.icon}
                     </div>
                     <button
@@ -394,10 +442,17 @@ export default function CategoryDetailPage({ params }: PageProps) {
                 <span>Status</span>
                 <span>Fav</span>
               </div>
-              {docs.map(doc => (
-                <div key={doc.id} className="doc-list-row" onClick={() => openDrawer(doc)} id={`doc-row-${doc.id}`}>
+              {docs.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="doc-list-row"
+                  onClick={() => openDrawer(doc)}
+                  id={`doc-row-${doc.id}`}
+                >
                   <div className="doc-list-name">
-                    <span className="doc-list-name-icon" style={{ color: category.color }}>{category.icon}</span>
+                    <span className="doc-list-name-icon" style={{ color: category.color }}>
+                      {category.icon}
+                    </span>
                     <div className="doc-list-name-text">
                       <div className="doc-list-name-title">{doc.title}</div>
                       <div className="doc-list-name-sub">{formatFileSize(doc.fileSize)}</div>
@@ -433,7 +488,13 @@ export default function CategoryDetailPage({ params }: PageProps) {
           <div className="doc-drawer">
             <div className="drawer-header">
               <span className="drawer-title">{drawerDoc.title}</span>
-              <button className="drawer-close" onClick={() => setDrawerDoc(null)} aria-label="Close drawer">×</button>
+              <button
+                className="drawer-close"
+                onClick={() => setDrawerDoc(null)}
+                aria-label="Close drawer"
+              >
+                ×
+              </button>
             </div>
 
             <div className="drawer-body">
@@ -445,7 +506,9 @@ export default function CategoryDetailPage({ params }: PageProps) {
                   <iframe src={drawerDoc.fileUrl} title={drawerDoc.title} />
                 ) : (
                   <div className="drawer-preview-placeholder">
-                    <div className="drawer-preview-placeholder-icon">{getFileIcon(drawerDoc.mimeType)}</div>
+                    <div className="drawer-preview-placeholder-icon">
+                      {getFileIcon(drawerDoc.mimeType)}
+                    </div>
                     <div>Preview not available for this file type</div>
                   </div>
                 )}
@@ -457,7 +520,9 @@ export default function CategoryDetailPage({ params }: PageProps) {
                 <div className="drawer-meta-grid">
                   <div className="drawer-meta-item">
                     <span className="drawer-meta-label">Category</span>
-                    <span className="drawer-meta-value">{category.icon} {category.name}</span>
+                    <span className="drawer-meta-value">
+                      {category.icon} {category.name}
+                    </span>
                   </div>
                   <div className="drawer-meta-item">
                     <span className="drawer-meta-label">Subcategory</span>
@@ -466,7 +531,9 @@ export default function CategoryDetailPage({ params }: PageProps) {
                   <div className="drawer-meta-item">
                     <span className="drawer-meta-label">Status</span>
                     <span className="drawer-meta-value">
-                      <span className={`doc-card-status doc-status-${drawerDoc.status.toLowerCase()}`}>
+                      <span
+                        className={`doc-card-status doc-status-${drawerDoc.status.toLowerCase()}`}
+                      >
                         {drawerDoc.status.replace(/_/g, ' ')}
                       </span>
                     </span>
@@ -497,7 +564,14 @@ export default function CategoryDetailPage({ params }: PageProps) {
               {drawerDoc.description && (
                 <div className="drawer-section">
                   <div className="drawer-section-title">Description</div>
-                  <p style={{ fontSize: 13, color: 'hsl(var(--foreground))', lineHeight: 1.6, margin: 0 }}>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: 'hsl(var(--foreground))',
+                      lineHeight: 1.6,
+                      margin: 0,
+                    }}
+                  >
                     {drawerDoc.description}
                   </p>
                 </div>
@@ -506,7 +580,15 @@ export default function CategoryDetailPage({ params }: PageProps) {
               {drawerDoc.aiSummary && (
                 <div className="drawer-section">
                   <div className="drawer-section-title">AI Summary</div>
-                  <p style={{ fontSize: 13, color: 'hsl(var(--foreground))', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: 'hsl(var(--foreground))',
+                      lineHeight: 1.6,
+                      margin: 0,
+                      fontStyle: 'italic',
+                    }}
+                  >
                     {drawerDoc.aiSummary}
                   </p>
                 </div>
@@ -516,8 +598,10 @@ export default function CategoryDetailPage({ params }: PageProps) {
                 <div className="drawer-section">
                   <div className="drawer-section-title">Tags</div>
                   <div className="drawer-tags">
-                    {drawerDoc.tags.map(t => (
-                      <span key={t.id} className="drawer-tag">#{t.tag}</span>
+                    {drawerDoc.tags.map((t) => (
+                      <span key={t.id} className="drawer-tag">
+                        #{t.tag}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -537,7 +621,10 @@ export default function CategoryDetailPage({ params }: PageProps) {
               >
                 🧠 AI Analyze
               </button>
-              <button className="drawer-action-btn danger" onClick={() => handleDelete(drawerDoc.id)}>
+              <button
+                className="drawer-action-btn danger"
+                onClick={() => handleDelete(drawerDoc.id)}
+              >
                 🗑 Delete
               </button>
             </div>

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SchedulerService } from '../scheduler.service';
 import { ExpiryService } from '../../expiry/expiry.service';
 import { NotificationsService } from '../../notifications/notifications.service';
+import { EscalationService } from '../../emergency/escalation.service';
 
 describe('SchedulerService', () => {
   let service: SchedulerService;
@@ -15,12 +16,17 @@ describe('SchedulerService', () => {
     deleteArchivedNotifications: jest.fn(),
   };
 
+  const mockEscalationService = {
+    processEscalationAndReminders: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SchedulerService,
         { provide: ExpiryService, useValue: mockExpiryService },
         { provide: NotificationsService, useValue: mockNotificationsService },
+        { provide: EscalationService, useValue: mockEscalationService },
       ],
     }).compile();
 
@@ -71,6 +77,24 @@ describe('SchedulerService', () => {
       );
 
       await expect(service.handleWeeklyCleanup()).resolves.not.toThrow();
+    });
+  });
+
+  describe('handleEmergencyWorkflows', () => {
+    it('should invoke the escalation service', async () => {
+      mockEscalationService.processEscalationAndReminders.mockResolvedValue(undefined);
+
+      await service.handleEmergencyWorkflows();
+
+      expect(mockEscalationService.processEscalationAndReminders).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not throw even if escalation fails', async () => {
+      mockEscalationService.processEscalationAndReminders.mockRejectedValue(
+        new Error('Escalation failed'),
+      );
+
+      await expect(service.handleEmergencyWorkflows()).resolves.not.toThrow();
     });
   });
 });

@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Patch,
-  Body,
-  UseGuards,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, Patch, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { NotificationPreferencesService } from './notification-preferences.service';
 import { UpdateNotificationPreferenceDto } from './dto/notification-preferences.dto';
@@ -18,9 +10,7 @@ import { CurrentUser, CurrentUserPayload } from '../auth/decorators/current-user
 @UseGuards(JwtAuthGuard)
 @Controller({ path: 'notification-preferences', version: '1' })
 export class NotificationPreferencesController {
-  constructor(
-    private readonly preferencesService: NotificationPreferencesService,
-  ) {}
+  constructor(private readonly preferencesService: NotificationPreferencesService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get notification preferences' })

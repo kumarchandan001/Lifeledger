@@ -37,7 +37,11 @@ export class AuditService {
     }
   }
 
-  async getByUser(userId: string, page = 1, limit = 20): Promise<{ logs: AuditLog[]; total: number; page: number; limit: number }> {
+  async getByUser(
+    userId: string,
+    page = 1,
+    limit = 20,
+  ): Promise<{ logs: AuditLog[]; total: number; page: number; limit: number }> {
     const [logs, total] = await Promise.all([
       this.prisma.auditLog.findMany({
         where: { userId },

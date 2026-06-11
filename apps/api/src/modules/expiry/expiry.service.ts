@@ -142,10 +142,7 @@ export class ExpiryService {
               );
             }
           } catch (emailError) {
-            this.logger.error(
-              `Failed to send expiry email for document ${doc.id}`,
-              emailError,
-            );
+            this.logger.error(`Failed to send expiry email for document ${doc.id}`, emailError);
           }
         }
 
@@ -239,23 +236,22 @@ export class ExpiryService {
     const now = new Date();
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-    const [totalNotifications, unreadNotifications, expiringThisMonth] =
-      await Promise.all([
-        this.prisma.notification.count({ where: { userId } }),
-        this.prisma.notification.count({
-          where: { userId, status: 'UNREAD' },
-        }),
-        this.prisma.document.count({
-          where: {
-            userId,
-            deletedAt: null,
-            expiryDate: {
-              gte: now,
-              lte: endOfMonth,
-            },
+    const [totalNotifications, unreadNotifications, expiringThisMonth] = await Promise.all([
+      this.prisma.notification.count({ where: { userId } }),
+      this.prisma.notification.count({
+        where: { userId, status: 'UNREAD' },
+      }),
+      this.prisma.document.count({
+        where: {
+          userId,
+          deletedAt: null,
+          expiryDate: {
+            gte: now,
+            lte: endOfMonth,
           },
-        }),
-      ]);
+        },
+      }),
+    ]);
 
     return {
       totalNotifications,
@@ -288,9 +284,7 @@ export class ExpiryService {
     return null;
   }
 
-  private determineDocumentStatus(
-    daysUntilExpiry: number,
-  ): DocumentStatus {
+  private determineDocumentStatus(daysUntilExpiry: number): DocumentStatus {
     if (daysUntilExpiry <= 0) return DocumentStatus.EXPIRED;
     if (daysUntilExpiry <= 90) return DocumentStatus.EXPIRING_SOON;
     return DocumentStatus.ACTIVE;

@@ -7,10 +7,7 @@ import { OcrService } from '../../ocr/ocr.service';
 import { AiService } from '../../ai/ai.service';
 import { ProcessingJobStatus, ProcessingJobType, OcrStatus } from '@lifeledger/database';
 import { isAISupportedMimeType } from '@lifeledger/shared';
-import {
-  DOCUMENT_PROCESSING_QUEUE,
-  DocumentProcessingJobData,
-} from '../queue.service';
+import { DOCUMENT_PROCESSING_QUEUE, DocumentProcessingJobData } from '../queue.service';
 
 @Injectable()
 export class DocumentProcessingProcessor implements OnModuleInit, OnModuleDestroy {
@@ -34,9 +31,7 @@ export class DocumentProcessingProcessor implements OnModuleInit, OnModuleDestro
         password: redisClient.options?.password || undefined,
       };
 
-      const concurrency = Number(
-        this.configService.get('AI_PROCESSING_CONCURRENCY', 2),
-      );
+      const concurrency = Number(this.configService.get('AI_PROCESSING_CONCURRENCY', 2));
 
       this.worker = new Worker<DocumentProcessingJobData>(
         DOCUMENT_PROCESSING_QUEUE,
@@ -59,9 +54,7 @@ export class DocumentProcessingProcessor implements OnModuleInit, OnModuleDestro
         this.logger.error(`Job ${job?.id} failed: ${err?.message || String(err)}`);
       });
 
-      this.logger.log(
-        `✅ Document Processing Worker started (concurrency: ${concurrency})`,
-      );
+      this.logger.log(`✅ Document Processing Worker started (concurrency: ${concurrency})`);
     } catch (error) {
       this.logger.error('Failed to initialize processing worker', error);
     }
@@ -80,9 +73,7 @@ export class DocumentProcessingProcessor implements OnModuleInit, OnModuleDestro
   private async processJob(job: Job<DocumentProcessingJobData>): Promise<void> {
     const { jobId, documentId, userId, type, fileUrl, mimeType } = job.data;
 
-    this.logger.log(
-      `Processing job ${jobId}: type=${type}, document=${documentId}`,
-    );
+    this.logger.log(`Processing job ${jobId}: type=${type}, document=${documentId}`);
 
     // Update job status to PROCESSING
     await this.prisma.processingJob.update({
@@ -125,9 +116,7 @@ export class DocumentProcessingProcessor implements OnModuleInit, OnModuleDestro
         },
       });
     } catch (error: any) {
-      this.logger.error(
-        `Job ${jobId} failed on attempt ${job.attemptsMade + 1}: ${error.message}`,
-      );
+      this.logger.error(`Job ${jobId} failed on attempt ${job.attemptsMade + 1}: ${error.message}`);
 
       // Mark job as failed (BullMQ will retry if attempts remain)
       await this.prisma.processingJob.update({
@@ -155,11 +144,7 @@ export class DocumentProcessingProcessor implements OnModuleInit, OnModuleDestro
   ): Promise<void> {
     // Step 1: OCR Extraction
     this.logger.log(`[Pipeline] Step 1/4: OCR extraction for ${documentId}`);
-    const ocrResult = await this.ocrService.extractText(
-      documentId,
-      fileUrl,
-      mimeType,
-    );
+    const ocrResult = await this.ocrService.extractText(documentId, fileUrl, mimeType);
 
     if (!ocrResult.extractedText || ocrResult.extractedText.length === 0) {
       this.logger.warn(
@@ -176,10 +161,7 @@ export class DocumentProcessingProcessor implements OnModuleInit, OnModuleDestro
     // Step 2-4: AI Analysis (classification + metadata + tags)
     if (this.aiService.isAvailable()) {
       this.logger.log(`[Pipeline] Step 2-4: AI analysis for ${documentId}`);
-      const analysis = await this.aiService.analyzeDocument(
-        documentId,
-        ocrResult.extractedText,
-      );
+      const analysis = await this.aiService.analyzeDocument(documentId, ocrResult.extractedText);
 
       // Step 5: Auto-apply high-confidence tags
       if (analysis.tags.tags.length > 0) {
@@ -190,19 +172,14 @@ export class DocumentProcessingProcessor implements OnModuleInit, OnModuleDestro
         `[Pipeline] Complete for ${documentId}: category=${analysis.classification.categorySlug}, confidence=${analysis.classification.confidence}%`,
       );
     } else {
-      this.logger.warn(
-        '[Pipeline] AI service not available, skipping AI analysis',
-      );
+      this.logger.warn('[Pipeline] AI service not available, skipping AI analysis');
     }
   }
 
   /**
    * Run a specific AI step (requires OCR text to already exist).
    */
-  private async runAIStep(
-    documentId: string,
-    type: ProcessingJobType,
-  ): Promise<void> {
+  private async runAIStep(documentId: string, type: ProcessingJobType): Promise<void> {
     const document = await this.prisma.document.findUnique({
       where: { id: documentId },
     });
@@ -222,10 +199,7 @@ export class DocumentProcessingProcessor implements OnModuleInit, OnModuleDestro
   /**
    * Apply AI-generated tags to the document.
    */
-  private async applyAITags(
-    documentId: string,
-    tags: string[],
-  ): Promise<void> {
+  private async applyAITags(documentId: string, tags: string[]): Promise<void> {
     // Get document to find user
     const document = await this.prisma.document.findUnique({
       where: { id: documentId },
@@ -254,8 +228,6 @@ export class DocumentProcessingProcessor implements OnModuleInit, OnModuleDestro
       skipDuplicates: true,
     });
 
-    this.logger.log(
-      `Applied ${newTags.length} AI tags to document ${documentId}`,
-    );
+    this.logger.log(`Applied ${newTags.length} AI tags to document ${documentId}`);
   }
 }

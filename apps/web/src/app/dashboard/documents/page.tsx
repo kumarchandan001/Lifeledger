@@ -91,36 +91,42 @@ export default function DocumentsPage() {
 
   // ─── Fetch categories ───
   useEffect(() => {
-    api.get('/categories').then((res) => {
-      setCategories(res.data ?? []);
-    }).catch(() => {});
+    api
+      .get('/categories')
+      .then((res) => {
+        setCategories(res.data ?? []);
+      })
+      .catch(() => {});
   }, []);
 
   // ─── Fetch documents ───
-  const fetchDocs = useCallback(async (p = page) => {
-    setLoading(true);
-    try {
-      const params: Record<string, string | number | boolean> = {
-        page: p,
-        limit,
-        sortBy,
-        sortOrder,
-      };
-      if (search) params.search = search;
-      if (categorySlug) params.categorySlug = categorySlug;
-      if (statusFilter) params.status = statusFilter;
-      if (favFilter) params.isFavorite = true;
+  const fetchDocs = useCallback(
+    async (p = page) => {
+      setLoading(true);
+      try {
+        const params: Record<string, string | number | boolean> = {
+          page: p,
+          limit,
+          sortBy,
+          sortOrder,
+        };
+        if (search) params.search = search;
+        if (categorySlug) params.categorySlug = categorySlug;
+        if (statusFilter) params.status = statusFilter;
+        if (favFilter) params.isFavorite = true;
 
-      const res = await api.get('/documents', { params });
-      setDocs(res.data?.documents ?? []);
-      setTotal(res.data?.total ?? 0);
-      setPage(p);
-    } catch {
-      // silently ignore
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search, categorySlug, statusFilter, sortBy, sortOrder, favFilter]);
+        const res = await api.get('/documents', { params });
+        setDocs(res.data?.documents ?? []);
+        setTotal(res.data?.total ?? 0);
+        setPage(p);
+      } catch {
+        // silently ignore
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page, search, categorySlug, statusFilter, sortBy, sortOrder, favFilter],
+  );
 
   useEffect(() => {
     fetchDocs(1);
@@ -151,7 +157,9 @@ export default function DocumentsPage() {
   const formatDate = (d: string | null) => {
     if (!d) return '—';
     return new Date(d).toLocaleDateString('en-IN', {
-      year: 'numeric', month: 'short', day: 'numeric',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   };
 
@@ -239,7 +247,10 @@ export default function DocumentsPage() {
       setUploadProgress(70);
 
       // Step 3: Register document with backend
-      const tagsArr = uTags.split(',').map(t => t.trim()).filter(t => t.length > 0);
+      const tagsArr = uTags
+        .split(',')
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
 
       await api.post('/documents', {
         categoryId: uCategoryId,
@@ -275,9 +286,11 @@ export default function DocumentsPage() {
     e?.stopPropagation();
     try {
       await api.post(`/documents/${docId}/favorite`);
-      setDocs(prev => prev.map(d => d.id === docId ? { ...d, isFavorite: !d.isFavorite } : d));
+      setDocs((prev) =>
+        prev.map((d) => (d.id === docId ? { ...d, isFavorite: !d.isFavorite } : d)),
+      );
       if (drawerDoc?.id === docId) {
-        setDrawerDoc(prev => prev ? { ...prev, isFavorite: !prev.isFavorite } : null);
+        setDrawerDoc((prev) => (prev ? { ...prev, isFavorite: !prev.isFavorite } : null));
       }
     } catch {
       toast.error('Failed to update favorite');
@@ -323,7 +336,7 @@ export default function DocumentsPage() {
   };
 
   // ─── Derived ───
-  const selectedCat = categories.find(c => c.id === uCategoryId);
+  const selectedCat = categories.find((c) => c.id === uCategoryId);
   const totalPages = Math.ceil(total / limit);
 
   const isImageMime = (mime: string) => mime.startsWith('image/');
@@ -351,8 +364,10 @@ export default function DocumentsPage() {
           id="docs-category-filter"
         >
           <option value="">All Categories</option>
-          {CATEGORIES.map(c => (
-            <option key={c.slug} value={c.slug}>{c.icon} {c.name}</option>
+          {CATEGORIES.map((c) => (
+            <option key={c.slug} value={c.slug}>
+              {c.icon} {c.name}
+            </option>
           ))}
         </select>
 
@@ -374,16 +389,24 @@ export default function DocumentsPage() {
             onClick={() => setViewMode('grid')}
             aria-label="Grid view"
             id="docs-view-grid"
-          >⊞</button>
+          >
+            ⊞
+          </button>
           <button
             className={`docs-view-btn ${viewMode === 'list' ? 'active' : ''}`}
             onClick={() => setViewMode('list')}
             aria-label="List view"
             id="docs-view-list"
-          >☰</button>
+          >
+            ☰
+          </button>
         </div>
 
-        <button className="docs-upload-btn" onClick={() => setShowUpload(true)} id="docs-upload-btn">
+        <button
+          className="docs-upload-btn"
+          onClick={() => setShowUpload(true)}
+          id="docs-upload-btn"
+        >
           ＋ Upload
         </button>
       </div>
@@ -392,27 +415,39 @@ export default function DocumentsPage() {
       <div className="docs-filters">
         <button
           className={`filter-chip ${!statusFilter && !favFilter ? 'active' : ''}`}
-          onClick={() => { setStatusFilter(''); setFavFilter(false); }}
+          onClick={() => {
+            setStatusFilter('');
+            setFavFilter(false);
+          }}
         >
           All
         </button>
         <button
           className={`filter-chip ${favFilter ? 'active' : ''}`}
-          onClick={() => { setFavFilter(!favFilter); setStatusFilter(''); }}
+          onClick={() => {
+            setFavFilter(!favFilter);
+            setStatusFilter('');
+          }}
         >
           ⭐ Favorites
         </button>
-        {['ACTIVE', 'EXPIRING_SOON', 'EXPIRED', 'ARCHIVED'].map(s => (
+        {['ACTIVE', 'EXPIRING_SOON', 'EXPIRED', 'ARCHIVED'].map((s) => (
           <button
             key={s}
             className={`filter-chip ${statusFilter === s ? 'active' : ''}`}
-            onClick={() => { setStatusFilter(statusFilter === s ? '' : s); setFavFilter(false); }}
+            onClick={() => {
+              setStatusFilter(statusFilter === s ? '' : s);
+              setFavFilter(false);
+            }}
           >
             {s === 'ACTIVE' && '✅ '}
             {s === 'EXPIRING_SOON' && '⚠️ '}
             {s === 'EXPIRED' && '🚨 '}
             {s === 'ARCHIVED' && '📦 '}
-            {s.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
+            {s
+              .replace(/_/g, ' ')
+              .toLowerCase()
+              .replace(/\b\w/g, (c) => c.toUpperCase())}
           </button>
         ))}
       </div>
@@ -420,13 +455,25 @@ export default function DocumentsPage() {
       {/* ─── Content ─── */}
       {loading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
-          <div className="spinner" style={{ width: 32, height: 32, border: '3px solid hsl(var(--border))', borderTopColor: 'hsl(var(--primary))', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <div
+            className="spinner"
+            style={{
+              width: 32,
+              height: 32,
+              border: '3px solid hsl(var(--border))',
+              borderTopColor: 'hsl(var(--primary))',
+              borderRadius: '50%',
+              animation: 'spin 0.8s linear infinite',
+            }}
+          />
         </div>
       ) : docs.length === 0 ? (
         <div className="docs-empty">
           <div className="docs-empty-icon">📄</div>
           <div className="docs-empty-title">
-            {search || categorySlug || statusFilter || favFilter ? 'No documents match your filters' : 'No documents yet'}
+            {search || categorySlug || statusFilter || favFilter
+              ? 'No documents match your filters'
+              : 'No documents yet'}
           </div>
           <div className="docs-empty-desc">
             {search || categorySlug || statusFilter || favFilter
@@ -444,16 +491,23 @@ export default function DocumentsPage() {
           {/* Grid View */}
           {viewMode === 'grid' && (
             <div className="docs-grid">
-              {docs.map(doc => (
+              {docs.map((doc) => (
                 <div
                   key={doc.id}
                   className="doc-card"
-                  style={{ '--card-accent': doc.category?.color ?? 'hsl(var(--primary))' } as React.CSSProperties}
+                  style={
+                    {
+                      '--card-accent': doc.category?.color ?? 'hsl(var(--primary))',
+                    } as React.CSSProperties
+                  }
                   onClick={() => openDrawer(doc)}
                   id={`doc-card-${doc.id}`}
                 >
                   <div className="doc-card-header">
-                    <div className="doc-card-icon" style={{ background: `${doc.category?.color ?? '#6366f1'}18` }}>
+                    <div
+                      className="doc-card-icon"
+                      style={{ background: `${doc.category?.color ?? '#6366f1'}18` }}
+                    >
                       {doc.category?.icon ?? '📄'}
                     </div>
                     <button
@@ -490,8 +544,13 @@ export default function DocumentsPage() {
                 <span>Status</span>
                 <span>Fav</span>
               </div>
-              {docs.map(doc => (
-                <div key={doc.id} className="doc-list-row" onClick={() => openDrawer(doc)} id={`doc-row-${doc.id}`}>
+              {docs.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="doc-list-row"
+                  onClick={() => openDrawer(doc)}
+                  id={`doc-row-${doc.id}`}
+                >
                   <div className="doc-list-name">
                     <span className="doc-list-name-icon">{doc.category?.icon ?? '📄'}</span>
                     <div className="doc-list-name-text">
@@ -523,9 +582,15 @@ export default function DocumentsPage() {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="docs-pagination">
-              <button disabled={page <= 1} onClick={() => fetchDocs(page - 1)}>← Prev</button>
-              <span className="docs-pagination-info">Page {page} of {totalPages}</span>
-              <button disabled={page >= totalPages} onClick={() => fetchDocs(page + 1)}>Next →</button>
+              <button disabled={page <= 1} onClick={() => fetchDocs(page - 1)}>
+                ← Prev
+              </button>
+              <span className="docs-pagination-info">
+                Page {page} of {totalPages}
+              </span>
+              <button disabled={page >= totalPages} onClick={() => fetchDocs(page + 1)}>
+                Next →
+              </button>
             </div>
           )}
         </>
@@ -533,13 +598,20 @@ export default function DocumentsPage() {
 
       {/* ═══ Upload Modal ═══ */}
       {showUpload && (
-        <div className="upload-overlay" onClick={(e) => { if (e.target === e.currentTarget) resetUpload(); }}>
+        <div
+          className="upload-overlay"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) resetUpload();
+          }}
+        >
           <div className="upload-modal">
             <div className="upload-modal-header">
               <span className="upload-modal-title">
                 {uploadStep === 'file' ? '📤 Upload Document' : '📝 Document Details'}
               </span>
-              <button className="upload-modal-close" onClick={resetUpload} aria-label="Close">×</button>
+              <button className="upload-modal-close" onClick={resetUpload} aria-label="Close">
+                ×
+              </button>
             </div>
 
             <div className="upload-modal-body">
@@ -567,7 +639,9 @@ export default function DocumentsPage() {
                     type="file"
                     accept={[...FILE_LIMITS.ALLOWED_MIME_TYPES].join(',')}
                     style={{ display: 'none' }}
-                    onChange={(e) => { if (e.target.files?.[0]) onFilePick(e.target.files[0]); }}
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) onFilePick(e.target.files[0]);
+                    }}
                   />
                 </>
               )}
@@ -581,20 +655,35 @@ export default function DocumentsPage() {
                       <div className="upload-file-name">{uploadFile.name}</div>
                       <div className="upload-file-size">{formatFileSize(uploadFile.size)}</div>
                     </div>
-                    <button className="upload-file-remove" onClick={() => { setUploadFile(null); setUploadStep('file'); }} aria-label="Remove">✕</button>
+                    <button
+                      className="upload-file-remove"
+                      onClick={() => {
+                        setUploadFile(null);
+                        setUploadStep('file');
+                      }}
+                      aria-label="Remove"
+                    >
+                      ✕
+                    </button>
                   </div>
 
                   {/* Progress */}
                   {uploading && (
                     <div className="upload-progress">
                       <div className="upload-progress-bar-bg">
-                        <div className="upload-progress-bar-fill" style={{ width: `${uploadProgress}%` }} />
+                        <div
+                          className="upload-progress-bar-fill"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
                       </div>
                       <div className="upload-progress-text">
-                        {uploadProgress < 20 ? 'Preparing upload...'
-                          : uploadProgress < 70 ? 'Uploading file...'
-                          : uploadProgress < 100 ? 'Saving metadata...'
-                          : '✅ Complete!'}
+                        {uploadProgress < 20
+                          ? 'Preparing upload...'
+                          : uploadProgress < 70
+                            ? 'Uploading file...'
+                            : uploadProgress < 100
+                              ? 'Saving metadata...'
+                              : '✅ Complete!'}
                       </div>
                     </div>
                   )}
@@ -604,7 +693,12 @@ export default function DocumentsPage() {
                     <div className="upload-form">
                       <div className="upload-form-field">
                         <label className="upload-form-label">Title *</label>
-                        <input className="upload-form-input" value={uTitle} onChange={e => setUTitle(e.target.value)} id="upload-title" />
+                        <input
+                          className="upload-form-input"
+                          value={uTitle}
+                          onChange={(e) => setUTitle(e.target.value)}
+                          id="upload-title"
+                        />
                       </div>
 
                       <div className="upload-form-row">
@@ -613,12 +707,17 @@ export default function DocumentsPage() {
                           <select
                             className="upload-form-input"
                             value={uCategoryId}
-                            onChange={e => { setUCategoryId(e.target.value); setUSubCategoryId(''); }}
+                            onChange={(e) => {
+                              setUCategoryId(e.target.value);
+                              setUSubCategoryId('');
+                            }}
                             id="upload-category"
                           >
                             <option value="">Select Category</option>
-                            {categories.map(c => (
-                              <option key={c.id} value={c.id}>{c.icon} {c.name}</option>
+                            {categories.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.icon} {c.name}
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -627,13 +726,15 @@ export default function DocumentsPage() {
                           <select
                             className="upload-form-input"
                             value={uSubCategoryId}
-                            onChange={e => setUSubCategoryId(e.target.value)}
+                            onChange={(e) => setUSubCategoryId(e.target.value)}
                             disabled={!selectedCat}
                             id="upload-subcategory"
                           >
                             <option value="">Select Subcategory</option>
-                            {selectedCat?.subCategories.map(s => (
-                              <option key={s.id} value={s.id}>{s.name}</option>
+                            {selectedCat?.subCategories.map((s) => (
+                              <option key={s.id} value={s.id}>
+                                {s.name}
+                              </option>
                             ))}
                           </select>
                         </div>
@@ -641,34 +742,64 @@ export default function DocumentsPage() {
 
                       <div className="upload-form-field">
                         <label className="upload-form-label">Description</label>
-                        <input className="upload-form-input" value={uDescription} onChange={e => setUDescription(e.target.value)} placeholder="Optional description" />
+                        <input
+                          className="upload-form-input"
+                          value={uDescription}
+                          onChange={(e) => setUDescription(e.target.value)}
+                          placeholder="Optional description"
+                        />
                       </div>
 
                       <div className="upload-form-row">
                         <div className="upload-form-field">
                           <label className="upload-form-label">Issue Date</label>
-                          <input type="date" className="upload-form-input" value={uIssueDate} onChange={e => setUIssueDate(e.target.value)} />
+                          <input
+                            type="date"
+                            className="upload-form-input"
+                            value={uIssueDate}
+                            onChange={(e) => setUIssueDate(e.target.value)}
+                          />
                         </div>
                         <div className="upload-form-field">
                           <label className="upload-form-label">Expiry Date</label>
-                          <input type="date" className="upload-form-input" value={uExpiryDate} onChange={e => setUExpiryDate(e.target.value)} />
+                          <input
+                            type="date"
+                            className="upload-form-input"
+                            value={uExpiryDate}
+                            onChange={(e) => setUExpiryDate(e.target.value)}
+                          />
                         </div>
                       </div>
 
                       <div className="upload-form-row">
                         <div className="upload-form-field">
                           <label className="upload-form-label">Document Number</label>
-                          <input className="upload-form-input" value={uDocNumber} onChange={e => setUDocNumber(e.target.value)} placeholder="e.g. ABCD1234" />
+                          <input
+                            className="upload-form-input"
+                            value={uDocNumber}
+                            onChange={(e) => setUDocNumber(e.target.value)}
+                            placeholder="e.g. ABCD1234"
+                          />
                         </div>
                         <div className="upload-form-field">
                           <label className="upload-form-label">Issuer</label>
-                          <input className="upload-form-input" value={uIssuer} onChange={e => setUIssuer(e.target.value)} placeholder="e.g. Govt of India" />
+                          <input
+                            className="upload-form-input"
+                            value={uIssuer}
+                            onChange={(e) => setUIssuer(e.target.value)}
+                            placeholder="e.g. Govt of India"
+                          />
                         </div>
                       </div>
 
                       <div className="upload-form-field">
                         <label className="upload-form-label">Tags (comma separated)</label>
-                        <input className="upload-form-input" value={uTags} onChange={e => setUTags(e.target.value)} placeholder="e.g. passport, travel, id" />
+                        <input
+                          className="upload-form-input"
+                          value={uTags}
+                          onChange={(e) => setUTags(e.target.value)}
+                          placeholder="e.g. passport, travel, id"
+                        />
                       </div>
                     </div>
                   )}
@@ -678,7 +809,9 @@ export default function DocumentsPage() {
 
             {uploadStep === 'meta' && !uploading && (
               <div className="upload-modal-footer">
-                <button className="upload-btn-cancel" onClick={resetUpload}>Cancel</button>
+                <button className="upload-btn-cancel" onClick={resetUpload}>
+                  Cancel
+                </button>
                 <button
                   className="upload-btn-submit"
                   onClick={handleUploadSubmit}
@@ -700,7 +833,13 @@ export default function DocumentsPage() {
           <div className="doc-drawer">
             <div className="drawer-header">
               <span className="drawer-title">{drawerDoc.title}</span>
-              <button className="drawer-close" onClick={() => setDrawerDoc(null)} aria-label="Close drawer">×</button>
+              <button
+                className="drawer-close"
+                onClick={() => setDrawerDoc(null)}
+                aria-label="Close drawer"
+              >
+                ×
+              </button>
             </div>
 
             <div className="drawer-body">
@@ -712,7 +851,9 @@ export default function DocumentsPage() {
                   <iframe src={drawerDoc.fileUrl} title={drawerDoc.title} />
                 ) : (
                   <div className="drawer-preview-placeholder">
-                    <div className="drawer-preview-placeholder-icon">{getFileIcon(drawerDoc.mimeType)}</div>
+                    <div className="drawer-preview-placeholder-icon">
+                      {getFileIcon(drawerDoc.mimeType)}
+                    </div>
                     <div>Preview not available for this file type</div>
                   </div>
                 )}
@@ -724,7 +865,9 @@ export default function DocumentsPage() {
                 <div className="drawer-meta-grid">
                   <div className="drawer-meta-item">
                     <span className="drawer-meta-label">Category</span>
-                    <span className="drawer-meta-value">{drawerDoc.category?.icon} {drawerDoc.category?.name ?? '—'}</span>
+                    <span className="drawer-meta-value">
+                      {drawerDoc.category?.icon} {drawerDoc.category?.name ?? '—'}
+                    </span>
                   </div>
                   <div className="drawer-meta-item">
                     <span className="drawer-meta-label">Subcategory</span>
@@ -733,7 +876,9 @@ export default function DocumentsPage() {
                   <div className="drawer-meta-item">
                     <span className="drawer-meta-label">Status</span>
                     <span className="drawer-meta-value">
-                      <span className={`doc-card-status doc-status-${drawerDoc.status.toLowerCase()}`}>
+                      <span
+                        className={`doc-card-status doc-status-${drawerDoc.status.toLowerCase()}`}
+                      >
                         {drawerDoc.status.replace(/_/g, ' ')}
                       </span>
                     </span>
@@ -773,7 +918,14 @@ export default function DocumentsPage() {
               {drawerDoc.description && (
                 <div className="drawer-section">
                   <div className="drawer-section-title">Description</div>
-                  <p style={{ fontSize: 13, color: 'hsl(var(--foreground))', lineHeight: 1.6, margin: 0 }}>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: 'hsl(var(--foreground))',
+                      lineHeight: 1.6,
+                      margin: 0,
+                    }}
+                  >
                     {drawerDoc.description}
                   </p>
                 </div>
@@ -783,7 +935,15 @@ export default function DocumentsPage() {
               {drawerDoc.aiSummary && (
                 <div className="drawer-section">
                   <div className="drawer-section-title">AI Summary</div>
-                  <p style={{ fontSize: 13, color: 'hsl(var(--foreground))', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: 'hsl(var(--foreground))',
+                      lineHeight: 1.6,
+                      margin: 0,
+                      fontStyle: 'italic',
+                    }}
+                  >
                     {drawerDoc.aiSummary}
                   </p>
                 </div>
@@ -794,8 +954,10 @@ export default function DocumentsPage() {
                 <div className="drawer-section">
                   <div className="drawer-section-title">Tags</div>
                   <div className="drawer-tags">
-                    {drawerDoc.tags.map(t => (
-                      <span key={t.id} className="drawer-tag">#{t.tag}</span>
+                    {drawerDoc.tags.map((t) => (
+                      <span key={t.id} className="drawer-tag">
+                        #{t.tag}
+                      </span>
                     ))}
                   </div>
                 </div>
@@ -804,7 +966,11 @@ export default function DocumentsPage() {
 
             {/* Actions */}
             <div className="drawer-actions">
-              <button className="drawer-action-btn" onClick={() => handleDownload(drawerDoc.id)} id="drawer-download">
+              <button
+                className="drawer-action-btn"
+                onClick={() => handleDownload(drawerDoc.id)}
+                id="drawer-download"
+              >
                 ⬇ Download
               </button>
               <button className="drawer-action-btn" onClick={() => toggleFav(drawerDoc.id)}>
@@ -816,7 +982,11 @@ export default function DocumentsPage() {
               >
                 🧠 AI Analyze
               </button>
-              <button className="drawer-action-btn danger" onClick={() => handleDelete(drawerDoc.id)} id="drawer-delete">
+              <button
+                className="drawer-action-btn danger"
+                onClick={() => handleDelete(drawerDoc.id)}
+                id="drawer-delete"
+              >
                 🗑 Delete
               </button>
             </div>

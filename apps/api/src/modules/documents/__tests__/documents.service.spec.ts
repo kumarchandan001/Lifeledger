@@ -123,14 +123,21 @@ describe('DocumentsService', () => {
     it('should generate signed URL successfully under quota limits', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(mockUserFree);
       mockPrisma.document.count.mockResolvedValue(5);
-      mockPrisma.document.aggregate.mockResolvedValue({ _sum: { fileSize: BigInt(10 * 1024 * 1024) } });
+      mockPrisma.document.aggregate.mockResolvedValue({
+        _sum: { fileSize: BigInt(10 * 1024 * 1024) },
+      });
       mockStorageService.generateUploadUrl.mockResolvedValue({
         uploadUrl: 'http://cloudinary/upload',
         documentId: 'doc-uuid',
         key: 'lifeledger/documents/user-free/doc-uuid',
       });
 
-      const result = await service.generateUploadUrl('user-free', 'passport.pdf', 'application/pdf', 1024);
+      const result = await service.generateUploadUrl(
+        'user-free',
+        'passport.pdf',
+        'application/pdf',
+        1024,
+      );
 
       expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
         where: { id: 'user-free' },
@@ -143,7 +150,9 @@ describe('DocumentsService', () => {
       mockPrisma.user.findUnique.mockResolvedValue(mockUserFree);
       mockPrisma.document.count.mockResolvedValue(5);
       // Free limit is 1 GB (1 * 1024 * 1024 * 1024 bytes)
-      mockPrisma.document.aggregate.mockResolvedValue({ _sum: { fileSize: BigInt(1024 * 1024 * 1024) } });
+      mockPrisma.document.aggregate.mockResolvedValue({
+        _sum: { fileSize: BigInt(1024 * 1024 * 1024) },
+      });
 
       await expect(
         service.generateUploadUrl('user-free', 'large.pdf', 'application/pdf', 1024),
@@ -251,9 +260,9 @@ describe('DocumentsService', () => {
     it('should throw NotFoundException if document does not exist', async () => {
       mockPrisma.document.findFirst.mockResolvedValue(null);
 
-      await expect(
-        service.softDelete('invalid-uuid', 'user-free'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.softDelete('invalid-uuid', 'user-free')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
@@ -283,9 +292,7 @@ describe('DocumentsService', () => {
     it('should throw BadRequestException if document is not deleted', async () => {
       mockPrisma.document.findFirst.mockResolvedValue(mockDocument);
 
-      await expect(
-        service.restore('doc-uuid', 'user-free'),
-      ).rejects.toThrow(BadRequestException);
+      await expect(service.restore('doc-uuid', 'user-free')).rejects.toThrow(BadRequestException);
     });
   });
 });

@@ -83,7 +83,9 @@
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(10px);
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .auth-feature:hover {
@@ -149,9 +151,16 @@
 }
 
 @keyframes float-orb {
-  0%, 100% { transform: translate(0, 0); }
-  33% { transform: translate(30px, -30px); }
-  66% { transform: translate(-20px, 20px); }
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  33% {
+    transform: translate(30px, -30px);
+  }
+  66% {
+    transform: translate(-20px, 20px);
+  }
 }
 
 /* ─── Form Panel ─── */
@@ -175,7 +184,9 @@
   background: white;
   border-radius: 16px;
   padding: 2.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.06);
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
@@ -226,7 +237,10 @@
   font-size: 0.9rem;
   color: #1a1a2e;
   background: #fafbfc;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
   outline: none;
 }
 
@@ -269,10 +283,18 @@
   transition: background 0.3s ease;
 }
 
-.password-strength-segment.active-weak { background: #ef4444; }
-.password-strength-segment.active-fair { background: #f59e0b; }
-.password-strength-segment.active-good { background: #10b981; }
-.password-strength-segment.active-strong { background: #6366f1; }
+.password-strength-segment.active-weak {
+  background: #ef4444;
+}
+.password-strength-segment.active-fair {
+  background: #f59e0b;
+}
+.password-strength-segment.active-good {
+  background: #10b981;
+}
+.password-strength-segment.active-strong {
+  background: #6366f1;
+}
 
 .password-strength-label {
   font-size: 0.7rem;
@@ -423,7 +445,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ─── Status Page (verify, reset success) ─── */
@@ -474,41 +498,41 @@
 
 /* ─── Dark Mode ─── */
 :root.dark .auth-form-panel,
-[data-theme="dark"] .auth-form-panel {
+[data-theme='dark'] .auth-form-panel {
   background: #0f0f23;
 }
 
 :root.dark .auth-card,
-[data-theme="dark"] .auth-card {
+[data-theme='dark'] .auth-card {
   background: #1a1a2e;
   border-color: rgba(255, 255, 255, 0.08);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 :root.dark .auth-card-title,
-[data-theme="dark"] .auth-card-title {
+[data-theme='dark'] .auth-card-title {
   color: #f1f5f9;
 }
 
 :root.dark .auth-label,
-[data-theme="dark"] .auth-label {
+[data-theme='dark'] .auth-label {
   color: #cbd5e1;
 }
 
 :root.dark .auth-input,
-[data-theme="dark"] .auth-input {
+[data-theme='dark'] .auth-input {
   background: #16162a;
   border-color: rgba(255, 255, 255, 0.1);
   color: #f1f5f9;
 }
 
 :root.dark .auth-input:focus,
-[data-theme="dark"] .auth-input:focus {
+[data-theme='dark'] .auth-input:focus {
   background: #1a1a2e;
 }
 
 :root.dark .auth-btn-google,
-[data-theme="dark"] .auth-btn-google {
+[data-theme='dark'] .auth-btn-google {
   background: #1a1a2e;
   border-color: rgba(255, 255, 255, 0.1);
   color: #e2e8f0;

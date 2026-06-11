@@ -83,10 +83,7 @@ export class OcrService {
    * Extract text from a PDF document.
    * Uses pdf-parse for native text PDFs; falls back to Tesseract for scanned PDFs.
    */
-  private async extractFromPdf(
-    buffer: Buffer,
-    startTime: number,
-  ): Promise<OCRExtractionResult> {
+  private async extractFromPdf(buffer: Buffer, startTime: number): Promise<OCRExtractionResult> {
     // Dynamic import to avoid loading at startup
     const pdfParseModule = (await import('pdf-parse')) as any;
     const pdfParse = typeof pdfParseModule === 'function' ? pdfParseModule : pdfParseModule.default;
@@ -116,10 +113,7 @@ export class OcrService {
   /**
    * Extract text from an image using Tesseract.js OCR.
    */
-  private async extractFromImage(
-    buffer: Buffer,
-    startTime: number,
-  ): Promise<OCRExtractionResult> {
+  private async extractFromImage(buffer: Buffer, startTime: number): Promise<OCRExtractionResult> {
     const Tesseract = await import('tesseract.js');
 
     const worker = await Tesseract.createWorker('eng');
@@ -152,10 +146,7 @@ export class OcrService {
   /**
    * Persist OCR results to the database and update the document record.
    */
-  async saveOCRResult(
-    documentId: string,
-    result: OCRExtractionResult,
-  ): Promise<void> {
+  async saveOCRResult(documentId: string, result: OCRExtractionResult): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       // Upsert OCR result (allows reprocessing)
       await tx.oCRResult.upsert({
@@ -186,9 +177,7 @@ export class OcrService {
         where: { id: documentId },
         data: {
           ocrText: result.extractedText,
-          ocrStatus: result.extractedText.length > 0
-            ? OcrStatus.COMPLETED
-            : OcrStatus.FAILED,
+          ocrStatus: result.extractedText.length > 0 ? OcrStatus.COMPLETED : OcrStatus.FAILED,
         },
       });
     });
