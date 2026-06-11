@@ -292,6 +292,148 @@ export class AiService implements OnModuleInit {
     });
   }
 
+  /**
+   * Suggest which of the user's active documents should be added to the Emergency Vault.
+   */
+  async suggestVaultDocuments(
+    documents: Array<{ id: string; title: string; categorySlug: string; subCategorySlug?: string | null }>,
+  ): Promise<Array<{ documentId: string; reason: string }>> {
+    if (!this.model) {
+      return documents
+        .filter((d) => ['identity', 'medical', 'insurance', 'legal', 'emergency'].includes(d.categorySlug))
+        .map((d) => ({
+          documentId: d.id,
+          reason: `Document belongs to critical category "${d.categorySlug}" suitable for emergencies.`,
+        }));
+    }
+
+    const docList = documents.map((d) => ({
+      id: d.id,
+      title: d.title,
+      category: d.categorySlug,
+      subCategory: d.subCategorySlug || 'none',
+    }));
+
+    const prompt = `You are an AI assistant for LifeLedger, a secure digital life management platform.
+Analyze the following list of a user's documents and identify which ones are critical and should be marked for the "Emergency Vault" (accessible by trusted contacts during incapacity, hospitalization, or death).
+Critical categories include: Identity Documents, Medical Records, Insurance, Financial, Legal, Property, and Family Documents. Documents like wills, passports, medical summaries, health insurance policies, and power of attorney are highly critical.
+
+Input documents:
+${JSON.stringify(docList, null, 2)}
+
+Return a JSON array of objects, where each object has:
+- "documentId": string matching the "id" of the suggested document
+- "reason": a short, concise, user-friendly explanation of why this document is essential for emergencies.
+
+Do not include any markdown styling, return ONLY the raw JSON array.`;
+
+    try {
+      const responseText = await this.callGemini(prompt);
+      const parsed = this.parseJsonResponse(responseText);
+      if (Array.isArray(parsed)) {
+        return parsed.filter((item) => typeof item.documentId === 'string' && typeof item.reason === 'string');
+      }
+      return [];
+    } catch (error) {
+      this.logger.error('Failed to suggest vault documents', error);
+      return documents
+        .filter((d) => ['identity', 'medical', 'insurance', 'legal', 'emergency'].includes(d.categorySlug))
+        .map((d) => ({
+          documentId: d.id,
+          reason: `Recommended based on its category: ${d.categorySlug}`,
+        }));
+    }
+  }
+
+  /**
+   * Identify which critical emergency document types are missing from the user's Emergency Vault.
+   */
+  async identifyMissingDocuments(
+    vaultDocuments: Array<{ title: string; categorySlug: string; subCategorySlug?: string | null }>,
+  ): Promise<Array<{ categorySlug: string; categoryName: string; documentType: string; reason: string }>> {
+    if (!this.model) {
+      const existingCategories = new Set(vaultDocuments.map((d) => d.categorySlug));
+      const criticalCategories = [
+        {
+          slug: 'identity',
+          name: 'Identity Documents',
+          type: 'Government Photo ID (Passport/Aadhaar/PAN)',
+          reason: 'Necessary for verification of identity.',
+        },
+        {
+          slug: 'medical',
+          name: 'Medical Records',
+          type: 'Medical Report / History Summary',
+          reason: 'Vital for doctors to understand history in case of emergency hospitalization.',
+        },
+        {
+          slug: 'insurance',
+          name: 'Insurance Policies',
+          type: 'Health Insurance Policy',
+          reason: 'Required to authorize treatment coverage.',
+        },
+        {
+          slug: 'legal',
+          name: 'Legal Documents',
+          type: 'Will or Power of Attorney',
+          reason: 'Essential to dictate legal or medical choices.',
+        },
+      ];
+      return criticalCategories
+        .filter((c) => !existingCategories.has(c.slug))
+        .map((c) => ({
+          categorySlug: c.slug,
+          categoryName: c.name,
+          documentType: c.type,
+          reason: c.reason,
+        }));
+    }
+
+    const currentVault = vaultDocuments.map((d) => ({
+      title: d.title,
+      category: d.categorySlug,
+      subCategory: d.subCategorySlug || 'none',
+    }));
+
+    const prompt = `You are an AI assistant for LifeLedger, a secure digital life management platform.
+Analyze the current documents in the user's "Emergency Vault":
+${JSON.stringify(currentVault, null, 2)}
+
+Identify which critical documents or document categories are MISSING from the vault that are highly recommended to have in case of an emergency (incapacity, hospitalization, or death).
+Crucial categories to check:
+1. Identity Documents (e.g., Passport, Aadhaar, PAN)
+2. Medical Records (e.g., Medical Summary, Blood Group info)
+3. Insurance Policies (e.g., Health Insurance, Life Insurance)
+4. Legal Documents (e.g., Will, Power of Attorney)
+5. Family Records (e.g., Birth/Marriage Certificate)
+
+Return a JSON array of objects, where each object has:
+- "categorySlug": string (e.g. 'identity', 'medical', 'insurance', 'legal', 'family')
+- "categoryName": string (e.g. 'Medical Records')
+- "documentType": string representing the missing document type (e.g. 'Health Insurance Policy')
+- "reason": a short, concise, user-friendly explanation of why having this in the vault is critical.
+
+Do not include any markdown styling, return ONLY the raw JSON array.`;
+
+    try {
+      const responseText = await this.callGemini(prompt);
+      const parsed = this.parseJsonResponse(responseText);
+      if (Array.isArray(parsed)) {
+        return parsed.filter(
+          (item) =>
+            typeof item.categorySlug === 'string' &&
+            typeof item.categoryName === 'string' &&
+            typeof item.documentType === 'string' &&
+            typeof item.reason === 'string',
+        );
+      }
+      return [];
+    } catch (error) {
+      this.logger.error('Failed to identify missing documents', error);
+      return [];
+    }
+  }
+
   // ─── Private Helpers ───
 
   private async callGemini(prompt: string): Promise<string> {

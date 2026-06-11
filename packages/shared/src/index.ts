@@ -6,6 +6,7 @@ export * from './types/document.types';
 export * from './types/category.types';
 export * from './types/notification.types';
 export * from './types/ai.types';
+export * from './types/emergency.types';
 
 // ─── Constants ───
 export * from './constants/categories';

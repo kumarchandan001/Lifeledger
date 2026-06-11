@@ -532,6 +532,7 @@ model EmergencyAccessRequest {
   expiresAt        DateTime               @map("expires_at")
   createdAt        DateTime               @default(now()) @map("created_at")
   updatedAt        DateTime               @updatedAt @map("updated_at")
+  metadata         Json                   @default("{}") @db.JsonB
 
   requester      User?                 @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: SetNull)
   trustedContact TrustedContact         @relation(fields: [trustedContactId], references: [id], onDelete: Cascade)
