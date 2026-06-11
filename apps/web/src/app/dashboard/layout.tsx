@@ -12,6 +12,7 @@ const NAV_ITEMS = [
     section: 'Overview',
     items: [
       { label: 'Dashboard', href: '/dashboard', icon: '📊' },
+      { label: 'Emergency Access', href: '/dashboard/emergency', icon: '🚨' },
     ],
   },
   {

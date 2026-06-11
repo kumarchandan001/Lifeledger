@@ -276,4 +276,218 @@ export class MailService {
       this.logger.error(`Failed to send security alert email to ${email}`, error);
     }
   }
+
+  async sendTrustedContactAdditionEmail(email: string, name: string, ownerName: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
+        to: email,
+        subject: `🛡️ You've been designated as a trusted contact by ${ownerName}`,
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1a1a2e; font-size: 28px; margin: 0;">LifeLedger</h1>
+            </div>
+            <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+              <h2>Hello ${name},</h2>
+              <p>${ownerName} has designated you as a Trusted Contact on LifeLedger.</p>
+              <p>This means you can request secure, read-only emergency access to their critical documents if they become incapacitated. Access is protected by a waiting period and full auditing.</p>
+            </div>
+          </div>
+        `,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send trusted contact email to ${email}`, error);
+    }
+  }
+
+  async sendEmergencyRequestEmail(email: string, requesterName: string, waitingPeriod: number, requestId: string): Promise<void> {
+    const appUrl = this.config.get<string>('APP_URL', 'http://localhost:3000');
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
+        to: email,
+        subject: `🚨 Action Required: Emergency access requested by ${requesterName}`,
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="text-align: center; margin-bottom: 32px;">
+              <h1 style="color: #1a1a2e; font-size: 28px; margin: 0;">LifeLedger</h1>
+            </div>
+            <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+              <h2>Emergency Access Request</h2>
+              <p>Your trusted contact <strong>${requesterName}</strong> has requested emergency access to your vault.</p>
+              <p>A waiting period of <strong>${waitingPeriod} days</strong> has started. If you do not respond, the request will automatically escalate.</p>
+              <p>If you approve or want to deny this request immediately, please go to your dashboard.</p>
+              <div style="text-align: center; margin: 32px 0;">
+                <a href="${appUrl}/dashboard/emergency/requests" style="background: #ef4444; color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
+                  Review Request
+                </a>
+              </div>
+            </div>
+          </div>
+        `,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send emergency request email to ${email}`, error);
+    }
+  }
+
+  async sendRequestConfirmationEmail(email: string, name: string, ownerName: string, waitingPeriod: number): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
+        to: email,
+        subject: `🚨 Emergency request submitted for ${ownerName}`,
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+              <h2>Request Received</h2>
+              <p>Hello ${name}, your request to access the emergency vault of <strong>${ownerName}</strong> has been submitted.</p>
+              <p>A secure waiting period of <strong>${waitingPeriod} days</strong> has started. We will notify you once access is granted or if the request is escalated.</p>
+            </div>
+          </div>
+        `,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send request confirmation email to ${email}`, error);
+    }
+  }
+
+  async sendRequestApprovedEmail(email: string, name: string, ownerName: string, grantId: string, expiresAt: Date): Promise<void> {
+    const appUrl = this.config.get<string>('APP_URL', 'http://localhost:3000');
+    const accessUrl = `${appUrl}/emergency/access?token=${grantId}`;
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
+        to: email,
+        subject: `✅ Emergency access request APPROVED for ${ownerName}`,
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+              <h2>Access Granted</h2>
+              <p>Hello ${name}, your emergency access request for <strong>${ownerName}</strong> has been approved.</p>
+              <p>You can access the documents using the secure link below. This session is active until <strong>${expiresAt.toLocaleString()}</strong>.</p>
+              <div style="text-align: center; margin: 32px 0;">
+                <a href="${accessUrl}" style="background: #10b981; color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
+                  Access Vault Documents
+                </a>
+              </div>
+            </div>
+          </div>
+        `,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send approval email to ${email}`, error);
+    }
+  }
+
+  async sendRequestRejectedEmail(email: string, name: string, ownerName: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
+        to: email,
+        subject: `❌ Emergency access request rejected for ${ownerName}`,
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+              <h2>Request Declined</h2>
+              <p>Hello ${name}, your emergency access request for <strong>${ownerName}</strong> was rejected.</p>
+            </div>
+          </div>
+        `,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send rejection email to ${email}`, error);
+    }
+  }
+
+  async sendSessionStartedEmail(email: string, name: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
+        to: email,
+        subject: `🚨 Security Notice: Emergency session started by ${name}`,
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+              <h2>Session Active</h2>
+              <p>Your trusted contact <strong>${name}</strong> has started their emergency access session to view your documents.</p>
+              <p>If this was unauthorized, you can end the session from your dashboard immediately.</p>
+            </div>
+          </div>
+        `,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send session started email to ${email}`, error);
+    }
+  }
+
+  async sendEscalationNoticeEmail(email: string, name: string, requestId: string): Promise<void> {
+    const appUrl = this.config.get<string>('APP_URL', 'http://localhost:3000');
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
+        to: email,
+        subject: `⚠️ Urgent: Emergency request from ${name} has ESCALATED`,
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+              <h2>Request Escalated</h2>
+              <p>The waiting period for the emergency request submitted by <strong>${name}</strong> has expired with no response from you.</p>
+              <p>The request status is now <strong>ESCALATED</strong>. It is undergoing manual review, and no access has been granted automatically.</p>
+              <div style="text-align: center; margin: 32px 0;">
+                <a href="${appUrl}/dashboard/emergency/requests" style="background: #f59e0b; color: #ffffff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
+                  Resolve Request
+                </a>
+              </div>
+            </div>
+          </div>
+        `,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send escalation email to ${email}`, error);
+    }
+  }
+
+  async sendEscalationRequesterNoticeEmail(email: string, name: string, ownerName: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
+        to: email,
+        subject: `⚠️ Emergency request for ${ownerName} has escalated`,
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+              <h2>Waiting Period Expired</h2>
+              <p>Hello ${name}, the waiting period for your request to access the emergency vault of <strong>${ownerName}</strong> has ended.</p>
+              <p>The request is now <strong>ESCALATED</strong> and awaits manual review. Access is not granted automatically.</p>
+            </div>
+          </div>
+        `,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send requester escalation email to ${email}`, error);
+    }
+  }
+
+  async sendWaitingPeriodReminderEmail(email: string, name: string, daysRemaining: number, requestId: string): Promise<void> {
+    try {
+      await this.transporter.sendMail({
+        from: this.config.get<string>('SMTP_FROM', 'noreply@lifeledger.local'),
+        to: email,
+        subject: `⏰ Reminder: Emergency request from ${name} will escalate in ${daysRemaining} days`,
+        html: `
+          <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: #ffffff; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+              <h2>Waiting Period Reminder</h2>
+              <p>This is a reminder that <strong>${name}</strong> has requested emergency access to your vault.</p>
+              <p>The waiting period will end and the request will escalate in <strong>${daysRemaining} days</strong>. Please log in to approve or reject the request.</p>
+            </div>
+          </div>
+        `,
+      });
+    } catch (error) {
+      this.logger.error(`Failed to send reminder email to ${email}`, error);
+    }
+  }
 }
