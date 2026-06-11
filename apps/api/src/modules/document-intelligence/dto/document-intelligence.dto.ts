@@ -109,7 +109,7 @@ export class QueryProcessingJobsDto {
   @IsNumber()
   @Min(1)
   @Type(() => Number)
-  page: number = 1;
+  page?: number = 1;
 
   @ApiPropertyOptional({ default: 20 })
   @IsOptional()
@@ -117,7 +117,7 @@ export class QueryProcessingJobsDto {
   @Min(1)
   @Max(100)
   @Type(() => Number)
-  limit: number = 20;
+  limit?: number = 20;
 
   @ApiPropertyOptional({ enum: ['QUEUED', 'PROCESSING', 'COMPLETED', 'FAILED', 'CANCELLED'] })
   @IsOptional()
@@ -134,10 +134,10 @@ export class QueryProcessingJobsDto {
   @ApiPropertyOptional({ enum: ['createdAt', 'updatedAt', 'completedAt'], default: 'createdAt' })
   @IsOptional()
   @IsEnum(['createdAt', 'updatedAt', 'completedAt'])
-  sortBy: string = 'createdAt';
+  sortBy?: string = 'createdAt';
 
   @ApiPropertyOptional({ enum: ['asc', 'desc'], default: 'desc' })
   @IsOptional()
   @IsEnum(['asc', 'desc'])
-  sortOrder: 'asc' | 'desc' = 'desc';
+  sortOrder?: 'asc' | 'desc' = 'desc';
 }
