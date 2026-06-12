@@ -271,29 +271,30 @@
 
 .plan-card {
   position: relative;
-  background: rgba(32, 33, 36, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 20px;
   padding: 2rem;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
+  box-shadow: var(--card-shadow);
   backdrop-filter: blur(6px);
 }
 
 .plan-card:hover {
-  border-color: rgba(138, 180, 248, 0.2);
+  border-color: var(--card-hover-border);
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--card-hover-shadow);
 }
 
 .plan-popular {
-  border-color: rgba(138, 180, 248, 0.3);
+  border-color: rgba(138, 180, 248, 0.35);
   background: linear-gradient(135deg, rgba(138, 180, 248, 0.05), rgba(174, 144, 240, 0.04));
 }
 
 .plan-current {
-  border-color: rgba(52, 168, 83, 0.3);
+  border-color: rgba(52, 168, 83, 0.45);
 }
 
 .plan-popular-badge {
@@ -333,13 +334,13 @@
 .plan-name {
   font-size: 1.35rem;
   font-weight: 700;
-  color: var(--text-primary, #e8eaed);
+  color: var(--text-primary);
   margin-bottom: 0.35rem;
 }
 
 .plan-description {
   font-size: 0.85rem;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 
@@ -350,13 +351,13 @@
 .plan-price {
   font-size: 2.4rem;
   font-weight: 800;
-  color: var(--text-primary, #e8eaed);
+  color: var(--text-primary);
   letter-spacing: -0.04em;
 }
 
 .plan-cycle {
   font-size: 0.95rem;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
 }
 
 .plan-trial-badge {
@@ -381,7 +382,7 @@
   align-items: center;
   gap: 0.6rem;
   font-size: 0.88rem;
-  color: var(--text-secondary, #bdc1c6);
+  color: var(--text-secondary);
 }
 
 .feature-icon {
@@ -414,24 +415,24 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #8ab4f8, #669df6);
-  color: #1a1a2e;
+  background: var(--primary-blue);
+  color: var(--card-bg);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #aecbfa, #8ab4f8);
+  background: var(--primary-blue-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(138, 180, 248, 0.3);
+  box-shadow: 0 4px 16px var(--primary-blue-bg);
 }
 
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-primary, #e8eaed);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--card-border);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--card-border);
 }
 
 .btn-current {
@@ -471,14 +472,14 @@
   align-items: center;
   gap: 1rem;
   padding: 0.85rem 1rem;
-  background: rgba(32, 33, 36, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   transition: border-color 0.2s;
 }
 
 .activity-item:hover {
-  border-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--card-hover-border);
 }
 
 .activity-icon {
@@ -491,14 +492,14 @@
 
 .activity-action {
   font-size: 0.9rem;
-  color: var(--text-primary, #e8eaed);
+  color: var(--text-primary);
   font-weight: 500;
   margin-bottom: 0.15rem;
 }
 
 .activity-date {
   font-size: 0.78rem;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
 }
 
 /* ─── Dialog ─── */
@@ -515,8 +516,8 @@
 }
 
 .billing-dialog {
-  background: #292a2d;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--dialog-bg);
+  border: 1px solid var(--dialog-border);
   border-radius: 20px;
   padding: 2rem;
   max-width: 480px;
@@ -527,24 +528,24 @@
 .billing-dialog h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--text-primary, #e8eaed);
+  color: var(--text-primary);
   margin-bottom: 0.75rem;
 }
 
 .billing-dialog p {
   font-size: 0.9rem;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 1.25rem;
 }
 
 .cancel-reason-input {
   width: 100%;
-  background: rgba(32, 33, 36, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--input-bg);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   padding: 0.75rem;
-  color: var(--text-primary, #e8eaed);
+  color: var(--text-primary);
   font-size: 0.88rem;
   resize: vertical;
   font-family: inherit;
@@ -552,7 +553,7 @@
 }
 
 .cancel-reason-input::placeholder {
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-muted);
 }
 
 .dialog-actions {
@@ -592,16 +593,18 @@
 }
 
 .usage-card {
-  background: rgba(32, 33, 36, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   border-radius: 16px;
   padding: 1.5rem;
   transition: all 0.25s ease;
 }
 
 .usage-card:hover {
-  border-color: rgba(138, 180, 248, 0.15);
+  border-color: var(--card-hover-border);
   transform: translateY(-2px);
+  box-shadow: var(--card-hover-shadow);
 }
 
 .usage-card-header {
@@ -617,7 +620,7 @@
 
 .usage-card-label {
   font-size: 0.82rem;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 600;
@@ -633,20 +636,20 @@
 .usage-current {
   font-size: 1.75rem;
   font-weight: 800;
-  color: var(--text-primary, #e8eaed);
+  color: var(--text-primary);
   letter-spacing: -0.02em;
 }
 
 .usage-limit {
   font-size: 0.88rem;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
 }
 
 /* Progress Bar */
 .usage-progress-container {
   width: 100%;
   height: 6px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--track-bg);
   border-radius: 6px;
   overflow: hidden;
   margin-bottom: 0.5rem;
@@ -662,11 +665,11 @@
 .progress-safe { background: linear-gradient(90deg, #34a853, #81c995); }
 .progress-warning { background: linear-gradient(90deg, #fbbc04, #fdd663); }
 .progress-danger { background: linear-gradient(90deg, #ea4335, #f28b82); }
-.progress-unlimited { background: linear-gradient(90deg, #8ab4f8, #ae90f0); }
+.progress-unlimited { background: linear-gradient(90deg, var(--primary-blue), #ae90f0); }
 
 .usage-percentage {
   font-size: 0.75rem;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
   text-align: right;
 }
 
@@ -676,12 +679,12 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background: rgba(138, 180, 248, 0.06);
-  border: 1px solid rgba(138, 180, 248, 0.1);
+  background: var(--primary-blue-bg);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   margin-bottom: 2rem;
   font-size: 0.88rem;
-  color: var(--text-secondary, #bdc1c6);
+  color: var(--text-secondary);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -695,8 +698,9 @@
 }
 
 .invoices-table-wrapper {
-  background: rgba(32, 33, 36, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   border-radius: 16px;
   overflow: hidden;
 }
@@ -711,22 +715,22 @@
   padding: 1rem 1.25rem;
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.02);
+  border-bottom: 1px solid var(--card-border);
 }
 
 .invoices-table td {
   padding: 0.85rem 1.25rem;
   font-size: 0.9rem;
-  color: var(--text-primary, #e8eaed);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--card-border);
 }
 
 .invoices-table tbody tr:hover {
-  background: rgba(138, 180, 248, 0.03);
+  background: var(--primary-blue-bg);
 }
 
 .invoices-table tbody tr:last-child td {
@@ -742,7 +746,7 @@
 }
 
 .invoice-status.PAID { background: rgba(52, 168, 83, 0.2); color: #81c995; }
-.invoice-status.ISSUED { background: rgba(138, 180, 248, 0.2); color: #8ab4f8; }
+.invoice-status.ISSUED { background: var(--primary-blue-bg); color: var(--primary-blue); }
 .invoice-status.DRAFT { background: rgba(154, 160, 166, 0.2); color: #9aa0a6; }
 .invoice-status.VOID { background: rgba(234, 67, 53, 0.2); color: #f28b82; }
 .invoice-status.REFUNDED { background: rgba(251, 188, 4, 0.2); color: #fdd663; }
@@ -750,7 +754,7 @@
 .invoices-empty {
   text-align: center;
   padding: 3rem 1rem;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
 }
 
 .invoices-empty p {
@@ -767,18 +771,18 @@
 
 .pagination-btn {
   padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 8px;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: rgba(138, 180, 248, 0.1);
-  color: #8ab4f8;
+  background: var(--primary-blue-bg);
+  color: var(--primary-blue);
 }
 
 .pagination-btn:disabled {
@@ -804,20 +808,21 @@
 }
 
 .revenue-metric-card {
-  background: rgba(32, 33, 36, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   border-radius: 16px;
   padding: 1.5rem;
   transition: border-color 0.25s;
 }
 
 .revenue-metric-card:hover {
-  border-color: rgba(138, 180, 248, 0.15);
+  border-color: var(--card-hover-border);
 }
 
 .metric-label {
   font-size: 0.78rem;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 600;
@@ -827,7 +832,7 @@
 .metric-value {
   font-size: 1.75rem;
   font-weight: 800;
-  color: var(--text-primary, #e8eaed);
+  color: var(--text-primary);
   letter-spacing: -0.02em;
 }
 
@@ -836,7 +841,7 @@
 
 .metric-suffix {
   font-size: 0.88rem;
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
   font-weight: 400;
 }
 
@@ -855,8 +860,9 @@
 }
 
 .distribution-card {
-  background: rgba(32, 33, 36, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
   border-radius: 16px;
   padding: 1.5rem;
 }
@@ -864,7 +870,7 @@
 .distribution-card h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary, #e8eaed);
+  color: var(--text-primary);
   margin-bottom: 1.25rem;
 }
 
@@ -887,18 +893,18 @@
 }
 
 .distribution-bar-label span:first-child {
-  color: var(--text-primary, #e8eaed);
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .distribution-bar-label span:last-child {
-  color: var(--text-secondary, #9aa0a6);
+  color: var(--text-secondary);
 }
 
 .distribution-bar-track {
   width: 100%;
   height: 8px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--track-bg);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -909,7 +915,7 @@
   transition: width 0.6s ease;
 }
 
-.bar-blue { background: linear-gradient(90deg, #8ab4f8, #669df6); }
+.bar-blue { background: linear-gradient(90deg, var(--primary-blue), #669df6); }
 .bar-purple { background: linear-gradient(90deg, #ae90f0, #9370db); }
 .bar-green { background: linear-gradient(90deg, #34a853, #81c995); }
 .bar-yellow { background: linear-gradient(90deg, #fbbc04, #fdd663); }
