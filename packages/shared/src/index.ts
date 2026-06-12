@@ -7,6 +7,7 @@ export * from './types/category.types';
 export * from './types/notification.types';
 export * from './types/ai.types';
 export * from './types/emergency.types';
+export * from './types/legacy.types';
 
 // ─── Constants ───
 export * from './constants/categories';

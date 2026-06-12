@@ -112,13 +112,83 @@ enum LegacyDirectiveType {
 }
 
 enum DigitalAssetType {
+  BANK_ACCOUNT
+  INSURANCE_POLICY
+  INVESTMENT
+  PROPERTY
+  BUSINESS_ASSET
+  ONLINE_ACCOUNT
+  SUBSCRIPTION
   EMAIL
   SOCIAL_MEDIA
-  BANKING
-  CRYPTO
-  SUBSCRIPTION
   DOMAIN
   OTHER
+}
+
+enum BeneficiaryRelationship {
+  SPOUSE
+  PARENT
+  CHILD
+  SIBLING
+  EXECUTOR
+  LAWYER
+  FRIEND
+  OTHER
+}
+
+enum BeneficiaryStatus {
+  ACTIVE
+  PENDING_VERIFICATION
+  REMOVED
+}
+
+enum LegacyPlanType {
+  FAMILY
+  FINANCIAL
+  BUSINESS
+  PERSONAL
+  CUSTOM
+}
+
+enum LegacyDocumentCategory {
+  FAMILY
+  INSURANCE
+  PROPERTY
+  MEDICAL
+  FINANCIAL
+  BUSINESS
+  PERSONAL
+  NOTES
+}
+
+enum LegacyInstructionCategory {
+  FAMILY
+  FINANCIAL
+  MEDICAL
+  PROPERTY
+  BUSINESS
+  PERSONAL
+}
+
+enum PersonalMessageType {
+  LETTER
+  NOTE
+  FUTURE_MESSAGE
+  FAMILY_MESSAGE
+}
+
+enum LegacyAccessRequestStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum LegacySessionDuration {
+  DAYS_7
+  DAYS_30
+  DAYS_90
 }
 
 enum SubscriptionStatus {
@@ -150,6 +220,7 @@ enum NotificationType {
   EMERGENCY
   FAMILY
   BILLING
+  LEGACY
 }
 
 enum NotificationStatus {
@@ -251,6 +322,16 @@ model User {
   shareLinks               ShareLink[]
   processingJobs           ProcessingJob[]
   emergencyWaitingPeriod   Int                @default(7) @map("emergency_waiting_period")
+
+  // Sprint 8: Legacy Planning
+  beneficiaries            Beneficiary[]
+  legacyPlans              LegacyPlan[]
+  legacyVaultDocuments     LegacyVaultDocument[]
+  legacyInstructions       LegacyInstruction[]
+  personalMessages         PersonalMessage[]
+  digitalAssets            DigitalAsset[]
+  legacyAccessRequests     LegacyAccessRequest[] @relation("LegacyRequestOwner")
+  legacyActivities         LegacyActivity[]
 
   @@map("users")
 }
@@ -366,6 +447,7 @@ model Document {
   tags          DocumentTag[]
   shareLinks             ShareLink[]
   emergencyVaultDocument EmergencyVaultDocument?
+  legacyVaultDocuments   LegacyVaultDocument[]
   ocrResult              OCRResult?
   aiAnalysis             AIAnalysis?
   processingJobs         ProcessingJob[]
@@ -568,73 +650,240 @@ model EmergencyActivity {
 }
 
 // ═══════════════════════════════════════════════════
-// LEGACY
+// LEGACY & DIGITAL LEGACY PLANNING (Sprint 8)
 // ═══════════════════════════════════════════════════
 
 model LegacyVault {
   id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId       String    @unique @map("user_id") @db.Uuid
-  isActive     Boolean   @default(false) @map("is_active")
+  isActive     Boolean   @default(true) @map("is_active")
   lastReviewed DateTime? @map("last_reviewed") @db.Date
   createdAt    DateTime  @default(now()) @map("created_at")
   updatedAt    DateTime  @updatedAt @map("updated_at")
 
-  user       User              @relation(fields: [userId], references: [id])
-  nominees   LegacyNominee[]
-  directives LegacyDirective[]
-  assets     DigitalAsset[]
+  user      User                @relation(fields: [userId], references: [id])
+  documents LegacyVaultDocument[]
 
   @@map("legacy_vaults")
 }
 
-model LegacyNominee {
+// ─── Beneficiary ───
+
+model Beneficiary {
+  id           String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String                  @map("user_id") @db.Uuid
+  name         String                  @db.VarChar(255)
+  email        String                  @db.VarChar(255)
+  phone        String?                 @db.VarChar(20)
+  relationship BeneficiaryRelationship
+  status       BeneficiaryStatus       @default(ACTIVE)
+  notes        String?                 @db.Text
+  linkedUserId String?                 @map("linked_user_id") @db.Uuid
+  priority     Int                     @default(1)
+  createdAt    DateTime                @default(now()) @map("created_at")
+  updatedAt    DateTime                @updatedAt @map("updated_at")
+
+  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planBeneficiaries LegacyPlanBeneficiary[]
+  digitalAssets    DigitalAsset[]
+  accessRequests   LegacyAccessRequest[]
+
+  @@unique([userId, email])
+  @@index([userId])
+  @@map("beneficiaries")
+}
+
+// ─── Legacy Plan ───
+
+model LegacyPlan {
+  id          String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String         @map("user_id") @db.Uuid
+  name        String         @db.VarChar(255)
+  type        LegacyPlanType
+  description String?        @db.Text
+  accessRules Json           @default("{}") @map("access_rules") @db.JsonB
+  isActive    Boolean        @default(true) @map("is_active")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+
+  user          User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  beneficiaries LegacyPlanBeneficiary[]
+
+  @@index([userId])
+  @@map("legacy_plans")
+}
+
+model LegacyPlanBeneficiary {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  legacyVaultId String   @map("legacy_vault_id") @db.Uuid
-  nomineeName   String   @map("nominee_name") @db.VarChar(255)
-  nomineeEmail  String   @map("nominee_email") @db.VarChar(255)
-  nomineePhone  String   @map("nominee_phone") @db.VarChar(20)
-  relationship  String   @db.VarChar(50)
-  accessScope   Json     @map("access_scope") @db.JsonB
-  priority      Int      @default(1)
+  planId        String   @map("plan_id") @db.Uuid
+  beneficiaryId String   @map("beneficiary_id") @db.Uuid
+  accessScope   Json     @default("{}") @map("access_scope") @db.JsonB
   createdAt     DateTime @default(now()) @map("created_at")
 
-  legacyVault LegacyVault       @relation(fields: [legacyVaultId], references: [id], onDelete: Cascade)
-  directives  LegacyDirective[]
-  assets      DigitalAsset[]
+  plan        LegacyPlan  @relation(fields: [planId], references: [id], onDelete: Cascade)
+  beneficiary Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
 
-  @@map("legacy_nominees")
+  @@unique([planId, beneficiaryId])
+  @@map("legacy_plan_beneficiaries")
 }
 
-model LegacyDirective {
-  id              String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  legacyVaultId   String              @map("legacy_vault_id") @db.Uuid
-  type            LegacyDirectiveType
-  title           String              @db.VarChar(255)
-  content         String              @db.Text
-  targetNomineeId String?             @map("target_nominee_id") @db.Uuid
-  createdAt       DateTime            @default(now()) @map("created_at")
-  updatedAt       DateTime            @updatedAt @map("updated_at")
+// ─── Legacy Vault Document ───
 
-  legacyVault   LegacyVault    @relation(fields: [legacyVaultId], references: [id], onDelete: Cascade)
-  targetNominee LegacyNominee? @relation(fields: [targetNomineeId], references: [id])
+model LegacyVaultDocument {
+  id           String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String                @map("user_id") @db.Uuid
+  legacyVaultId String               @map("legacy_vault_id") @db.Uuid
+  documentId   String                @map("document_id") @db.Uuid
+  category     LegacyDocumentCategory
+  notes        String?               @db.Text
+  createdAt    DateTime              @default(now()) @map("created_at")
 
-  @@map("legacy_directives")
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  legacyVault LegacyVault @relation(fields: [legacyVaultId], references: [id], onDelete: Cascade)
+  document    Document    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@unique([legacyVaultId, documentId])
+  @@index([userId])
+  @@map("legacy_vault_documents")
 }
+
+// ─── Legacy Instruction ───
+
+model LegacyInstruction {
+  id          String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String                    @map("user_id") @db.Uuid
+  title       String                    @db.VarChar(255)
+  content     String                    @db.Text
+  category    LegacyInstructionCategory
+  attachments Json                      @default("[]") @db.JsonB
+  version     Int                       @default(1)
+  isActive    Boolean                   @default(true) @map("is_active")
+  createdAt   DateTime                  @default(now()) @map("created_at")
+  updatedAt   DateTime                  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, category])
+  @@map("legacy_instructions")
+}
+
+// ─── Personal Message ───
+
+model PersonalMessage {
+  id        String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String              @map("user_id") @db.Uuid
+  type      PersonalMessageType
+  title     String              @db.VarChar(255)
+  content   String              @db.Text
+  recipientName String?         @map("recipient_name") @db.VarChar(255)
+  isPrivate Boolean             @default(true) @map("is_private")
+  createdAt DateTime            @default(now()) @map("created_at")
+  updatedAt DateTime            @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, type])
+  @@map("personal_messages")
+}
+
+// ─── Digital Asset ───
 
 model DigitalAsset {
-  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  legacyVaultId     String           @map("legacy_vault_id") @db.Uuid
-  assetType         DigitalAssetType @map("asset_type")
-  serviceName       String           @map("service_name") @db.VarChar(255)
-  username          String?          @db.VarChar(255)
-  notes             String?          @db.Text
-  assignedNomineeId String?          @map("assigned_nominee_id") @db.Uuid
-  createdAt         DateTime         @default(now()) @map("created_at")
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String           @map("user_id") @db.Uuid
+  assetType       DigitalAssetType @map("asset_type")
+  serviceName     String           @map("service_name") @db.VarChar(255)
+  accountRef      String?          @map("account_ref") @db.VarChar(255)
+  institutionName String?          @map("institution_name") @db.VarChar(255)
+  notes           String?          @db.Text
+  metadata        Json             @default("{}") @db.JsonB
+  assignedBeneficiaryId String?    @map("assigned_beneficiary_id") @db.Uuid
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
 
-  legacyVault     LegacyVault    @relation(fields: [legacyVaultId], references: [id], onDelete: Cascade)
-  assignedNominee LegacyNominee? @relation(fields: [assignedNomineeId], references: [id])
+  user              User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignedBeneficiary Beneficiary? @relation(fields: [assignedBeneficiaryId], references: [id], onDelete: SetNull)
 
+  @@index([userId])
+  @@index([userId, assetType])
   @@map("digital_assets")
+}
+
+// ─── Legacy Access Request ───
+
+model LegacyAccessRequest {
+  id              String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerId         String                     @map("owner_id") @db.Uuid
+  beneficiaryId   String                     @map("beneficiary_id") @db.Uuid
+  reason          String                     @db.Text
+  status          LegacyAccessRequestStatus  @default(PENDING)
+  reviewNotes     String?                    @map("review_notes") @db.Text
+  expiresAt       DateTime                   @map("expires_at")
+  resolvedAt      DateTime?                  @map("resolved_at")
+  createdAt       DateTime                   @default(now()) @map("created_at")
+  updatedAt       DateTime                   @updatedAt @map("updated_at")
+
+  owner       User                @relation("LegacyRequestOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  beneficiary Beneficiary         @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  grant       LegacyAccessGrant?
+
+  @@index([ownerId])
+  @@index([ownerId, status])
+  @@map("legacy_access_requests")
+}
+
+// ─── Legacy Access Grant ───
+
+model LegacyAccessGrant {
+  id          String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  requestId   String               @unique @map("request_id") @db.Uuid
+  duration    LegacySessionDuration
+  accessScope Json                 @default("{}") @map("access_scope") @db.JsonB
+  grantedAt   DateTime             @default(now()) @map("granted_at")
+  expiresAt   DateTime             @map("expires_at")
+  isActive    Boolean              @default(true) @map("is_active")
+  createdAt   DateTime             @default(now()) @map("created_at")
+
+  request LegacyAccessRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@map("legacy_access_grants")
+}
+
+// ─── Legacy Activity ───
+
+model LegacyActivity {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  actorId   String?  @map("actor_id") @db.VarChar(255)
+  action    String   @db.VarChar(100)
+  resourceType String @map("resource_type") @db.VarChar(50)
+  resourceId String? @map("resource_id") @db.Uuid
+  metadata  Json     @default("{}") @db.JsonB
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("legacy_activities")
+}
+
+// ─── Legacy Readiness Report ───
+
+model LegacyReadinessReport {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String   @map("user_id") @db.Uuid
+  score           Int      @default(0)
+  maxScore        Int      @default(100) @map("max_score")
+  breakdown       Json     @default("{}") @db.JsonB
+  suggestions     Json     @default("[]") @db.JsonB
+  missingItems    Json     @default("[]") @map("missing_items") @db.JsonB
+  generatedAt     DateTime @default(now()) @map("generated_at")
+  modelVersion    String   @default("gemini-2.0-flash") @map("model_version") @db.VarChar(50)
+
+  @@index([userId, generatedAt(sort: Desc)])
+  @@map("legacy_readiness_reports")
 }
 
 // ═══════════════════════════════════════════════════
