@@ -20,7 +20,7 @@ export class LegacyAccessService {
     private readonly notificationsService: NotificationsService,
   ) {}
 
-  async createRequest(ownerId: string, beneficiaryId: string, reason: string) {
+  async createRequest(ownerId: string, beneficiaryId: string, reason: string): Promise<any> {
     // Validate beneficiary belongs to the owner
     const beneficiary = await this.prisma.beneficiary.findUnique({
       where: { id: beneficiaryId },
@@ -75,7 +75,7 @@ export class LegacyAccessService {
     return request;
   }
 
-  async findIncomingRequests(ownerId: string) {
+  async findIncomingRequests(ownerId: string): Promise<any> {
     return this.prisma.legacyAccessRequest.findMany({
       where: { ownerId },
       include: {
@@ -88,7 +88,7 @@ export class LegacyAccessService {
     });
   }
 
-  async resolve(requestId: string, ownerId: string, dto: ResolveLegacyAccessRequestDto) {
+  async resolve(requestId: string, ownerId: string, dto: ResolveLegacyAccessRequestDto): Promise<any> {
     const request = await this.prisma.legacyAccessRequest.findUnique({
       where: { id: requestId },
       include: { beneficiary: true },
@@ -158,7 +158,7 @@ export class LegacyAccessService {
     return updated;
   }
 
-  async getActiveSessions(ownerId: string) {
+  async getActiveSessions(ownerId: string): Promise<any> {
     return this.prisma.legacyAccessGrant.findMany({
       where: {
         request: { ownerId },
@@ -178,7 +178,7 @@ export class LegacyAccessService {
     });
   }
 
-  async expireOldSessions() {
+  async expireOldSessions(): Promise<any> {
     const expired = await this.prisma.legacyAccessGrant.updateMany({
       where: {
         isActive: true,

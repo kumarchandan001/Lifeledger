@@ -17,7 +17,7 @@ export class LegacyPlanService {
     private readonly activityService: LegacyActivityService,
   ) {}
 
-  async create(userId: string, dto: CreateLegacyPlanDto) {
+  async create(userId: string, dto: CreateLegacyPlanDto): Promise<any> {
     const plan = await this.prisma.legacyPlan.create({
       data: {
         userId,
@@ -40,7 +40,7 @@ export class LegacyPlanService {
     return plan;
   }
 
-  async findAll(userId: string) {
+  async findAll(userId: string): Promise<any> {
     return this.prisma.legacyPlan.findMany({
       where: { userId },
       include: {
@@ -55,7 +55,7 @@ export class LegacyPlanService {
     });
   }
 
-  async findOne(userId: string, id: string) {
+  async findOne(userId: string, id: string): Promise<any> {
     const plan = await this.prisma.legacyPlan.findUnique({
       where: { id },
       include: {
@@ -70,7 +70,7 @@ export class LegacyPlanService {
     return plan;
   }
 
-  async update(userId: string, id: string, dto: UpdateLegacyPlanDto) {
+  async update(userId: string, id: string, dto: UpdateLegacyPlanDto): Promise<any> {
     const existing = await this.prisma.legacyPlan.findUnique({ where: { id } });
     if (!existing || existing.userId !== userId) {
       throw new NotFoundException('Legacy plan not found');
@@ -98,7 +98,7 @@ export class LegacyPlanService {
     return updated;
   }
 
-  async remove(userId: string, id: string) {
+  async remove(userId: string, id: string): Promise<any> {
     const existing = await this.prisma.legacyPlan.findUnique({ where: { id } });
     if (!existing || existing.userId !== userId) {
       throw new NotFoundException('Legacy plan not found');
@@ -118,7 +118,7 @@ export class LegacyPlanService {
     return { success: true, message: 'Legacy plan deleted' };
   }
 
-  async assignBeneficiary(userId: string, planId: string, dto: AssignPlanBeneficiaryDto) {
+  async assignBeneficiary(userId: string, planId: string, dto: AssignPlanBeneficiaryDto): Promise<any> {
     const plan = await this.prisma.legacyPlan.findUnique({ where: { id: planId } });
     if (!plan || plan.userId !== userId) {
       throw new NotFoundException('Legacy plan not found');
@@ -152,7 +152,7 @@ export class LegacyPlanService {
     return assignment;
   }
 
-  async removeBeneficiary(userId: string, planId: string, beneficiaryId: string) {
+  async removeBeneficiary(userId: string, planId: string, beneficiaryId: string): Promise<any> {
     const plan = await this.prisma.legacyPlan.findUnique({ where: { id: planId } });
     if (!plan || plan.userId !== userId) {
       throw new NotFoundException('Legacy plan not found');

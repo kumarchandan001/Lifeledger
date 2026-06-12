@@ -16,7 +16,7 @@ export class LegacyInstructionService {
     private readonly activityService: LegacyActivityService,
   ) {}
 
-  async create(userId: string, dto: CreateLegacyInstructionDto) {
+  async create(userId: string, dto: CreateLegacyInstructionDto): Promise<any> {
     const instruction = await this.prisma.legacyInstruction.create({
       data: {
         userId,
@@ -39,7 +39,7 @@ export class LegacyInstructionService {
     return instruction;
   }
 
-  async findAll(userId: string, category?: string) {
+  async findAll(userId: string, category?: string): Promise<any> {
     const where: any = { userId, isActive: true };
     if (category) {
       where.category = category;
@@ -51,7 +51,7 @@ export class LegacyInstructionService {
     });
   }
 
-  async findOne(userId: string, id: string) {
+  async findOne(userId: string, id: string): Promise<any> {
     const instruction = await this.prisma.legacyInstruction.findUnique({ where: { id } });
     if (!instruction || instruction.userId !== userId) {
       throw new NotFoundException('Instruction not found');
@@ -59,7 +59,7 @@ export class LegacyInstructionService {
     return instruction;
   }
 
-  async update(userId: string, id: string, dto: UpdateLegacyInstructionDto) {
+  async update(userId: string, id: string, dto: UpdateLegacyInstructionDto): Promise<any> {
     const existing = await this.prisma.legacyInstruction.findUnique({ where: { id } });
     if (!existing || existing.userId !== userId) {
       throw new NotFoundException('Instruction not found');
@@ -94,7 +94,7 @@ export class LegacyInstructionService {
     return updated;
   }
 
-  async remove(userId: string, id: string) {
+  async remove(userId: string, id: string): Promise<any> {
     const existing = await this.prisma.legacyInstruction.findUnique({ where: { id } });
     if (!existing || existing.userId !== userId) {
       throw new NotFoundException('Instruction not found');

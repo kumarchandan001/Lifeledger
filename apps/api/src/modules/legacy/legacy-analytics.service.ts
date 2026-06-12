@@ -13,7 +13,7 @@ export class LegacyAnalyticsService {
     private readonly activityService: LegacyActivityService,
   ) {}
 
-  async getDashboardStats(userId: string) {
+  async getDashboardStats(userId: string): Promise<any> {
     const [
       beneficiaryCount,
       planCount,
@@ -58,7 +58,7 @@ export class LegacyAnalyticsService {
     };
   }
 
-  async generateReadinessReport(userId: string) {
+  async generateReadinessReport(userId: string): Promise<any> {
     const stats = await this.getDashboardStats(userId);
 
     // Get detailed data for AI analysis
@@ -179,7 +179,7 @@ export class LegacyAnalyticsService {
     };
   }
 
-  async getLatestReport(userId: string) {
+  async getLatestReport(userId: string): Promise<any> {
     return this.prisma.legacyReadinessReport.findFirst({
       where: { userId },
       orderBy: { generatedAt: 'desc' },

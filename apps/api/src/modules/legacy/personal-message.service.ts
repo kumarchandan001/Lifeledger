@@ -16,7 +16,7 @@ export class PersonalMessageService {
     private readonly activityService: LegacyActivityService,
   ) {}
 
-  async create(userId: string, dto: CreatePersonalMessageDto) {
+  async create(userId: string, dto: CreatePersonalMessageDto): Promise<any> {
     const message = await this.prisma.personalMessage.create({
       data: {
         userId,
@@ -40,7 +40,7 @@ export class PersonalMessageService {
     return message;
   }
 
-  async findAll(userId: string, type?: string) {
+  async findAll(userId: string, type?: string): Promise<any> {
     const where: any = { userId };
     if (type) {
       where.type = type;
@@ -52,7 +52,7 @@ export class PersonalMessageService {
     });
   }
 
-  async findOne(userId: string, id: string) {
+  async findOne(userId: string, id: string): Promise<any> {
     const message = await this.prisma.personalMessage.findUnique({ where: { id } });
     if (!message || message.userId !== userId) {
       throw new NotFoundException('Message not found');
@@ -60,7 +60,7 @@ export class PersonalMessageService {
     return message;
   }
 
-  async update(userId: string, id: string, dto: UpdatePersonalMessageDto) {
+  async update(userId: string, id: string, dto: UpdatePersonalMessageDto): Promise<any> {
     const existing = await this.prisma.personalMessage.findUnique({ where: { id } });
     if (!existing || existing.userId !== userId) {
       throw new NotFoundException('Message not found');
@@ -89,7 +89,7 @@ export class PersonalMessageService {
     return updated;
   }
 
-  async remove(userId: string, id: string) {
+  async remove(userId: string, id: string): Promise<any> {
     const existing = await this.prisma.personalMessage.findUnique({ where: { id } });
     if (!existing || existing.userId !== userId) {
       throw new NotFoundException('Message not found');

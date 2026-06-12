@@ -1074,3 +1074,4 @@ model ProcessingJob {
   @@index([userId, status])
   @@map("processing_jobs")
 }
+

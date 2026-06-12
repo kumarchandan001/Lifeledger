@@ -14,7 +14,7 @@ export class LegacyActivityService {
     resourceId?: string,
     actorId?: string,
     metadata: Record<string, unknown> = {},
-  ) {
+  ): Promise<any> {
     try {
       return await this.prisma.legacyActivity.create({
         data: {
@@ -31,7 +31,7 @@ export class LegacyActivityService {
     }
   }
 
-  async getActivityFeed(userId: string, limit = 50, offset = 0) {
+  async getActivityFeed(userId: string, limit = 50, offset = 0): Promise<any> {
     const [activities, total] = await Promise.all([
       this.prisma.legacyActivity.findMany({
         where: { userId },

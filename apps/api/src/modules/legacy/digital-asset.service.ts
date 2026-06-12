@@ -16,7 +16,7 @@ export class DigitalAssetService {
     private readonly activityService: LegacyActivityService,
   ) {}
 
-  async register(userId: string, dto: RegisterDigitalAssetDto) {
+  async register(userId: string, dto: RegisterDigitalAssetDto): Promise<any> {
     // Validate beneficiary if assigned
     if (dto.assignedBeneficiaryId) {
       const beneficiary = await this.prisma.beneficiary.findUnique({
@@ -57,7 +57,7 @@ export class DigitalAssetService {
     return asset;
   }
 
-  async findAll(userId: string, assetType?: string) {
+  async findAll(userId: string, assetType?: string): Promise<any> {
     const where: any = { userId };
     if (assetType) {
       where.assetType = assetType;
@@ -74,7 +74,7 @@ export class DigitalAssetService {
     });
   }
 
-  async findOne(userId: string, id: string) {
+  async findOne(userId: string, id: string): Promise<any> {
     const asset = await this.prisma.digitalAsset.findUnique({
       where: { id },
       include: { assignedBeneficiary: true },
@@ -85,7 +85,7 @@ export class DigitalAssetService {
     return asset;
   }
 
-  async update(userId: string, id: string, dto: UpdateDigitalAssetDto) {
+  async update(userId: string, id: string, dto: UpdateDigitalAssetDto): Promise<any> {
     const existing = await this.prisma.digitalAsset.findUnique({ where: { id } });
     if (!existing || existing.userId !== userId) {
       throw new NotFoundException('Digital asset not found');
@@ -132,7 +132,7 @@ export class DigitalAssetService {
     return updated;
   }
 
-  async remove(userId: string, id: string) {
+  async remove(userId: string, id: string): Promise<any> {
     const existing = await this.prisma.digitalAsset.findUnique({ where: { id } });
     if (!existing || existing.userId !== userId) {
       throw new NotFoundException('Digital asset not found');

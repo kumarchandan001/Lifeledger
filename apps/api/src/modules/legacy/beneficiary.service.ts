@@ -18,7 +18,7 @@ export class BeneficiaryService {
     private readonly activityService: LegacyActivityService,
   ) {}
 
-  async create(userId: string, dto: CreateBeneficiaryDto) {
+  async create(userId: string, dto: CreateBeneficiaryDto): Promise<any> {
     // Check for duplicate email
     const existing = await this.prisma.beneficiary.findUnique({
       where: { userId_email: { userId, email: dto.email } },
@@ -51,7 +51,7 @@ export class BeneficiaryService {
     return beneficiary;
   }
 
-  async findAll(userId: string) {
+  async findAll(userId: string): Promise<any> {
     return this.prisma.beneficiary.findMany({
       where: { userId, status: { not: 'REMOVED' as any } },
       orderBy: [{ priority: 'asc' }, { createdAt: 'desc' }],
@@ -64,7 +64,7 @@ export class BeneficiaryService {
     });
   }
 
-  async findOne(userId: string, id: string) {
+  async findOne(userId: string, id: string): Promise<any> {
     const beneficiary = await this.prisma.beneficiary.findUnique({
       where: { id },
       include: {
@@ -81,7 +81,7 @@ export class BeneficiaryService {
     return beneficiary;
   }
 
-  async update(userId: string, id: string, dto: UpdateBeneficiaryDto) {
+  async update(userId: string, id: string, dto: UpdateBeneficiaryDto): Promise<any> {
     const existing = await this.prisma.beneficiary.findUnique({ where: { id } });
     if (!existing || existing.userId !== userId) {
       throw new NotFoundException('Beneficiary not found');
@@ -121,7 +121,7 @@ export class BeneficiaryService {
     return updated;
   }
 
-  async remove(userId: string, id: string) {
+  async remove(userId: string, id: string): Promise<any> {
     const existing = await this.prisma.beneficiary.findUnique({ where: { id } });
     if (!existing || existing.userId !== userId) {
       throw new NotFoundException('Beneficiary not found');
@@ -147,7 +147,7 @@ export class BeneficiaryService {
   /**
    * Import family members as beneficiaries
    */
-  async importFromFamily(userId: string) {
+  async importFromFamily(userId: string): Promise<any> {
     const memberships = await this.prisma.familyMembership.findMany({
       where: {
         family: { createdBy: userId },
@@ -180,7 +180,7 @@ export class BeneficiaryService {
   /**
    * Import trusted contacts as beneficiaries
    */
-  async importFromTrustedContacts(userId: string) {
+  async importFromTrustedContacts(userId: string): Promise<any> {
     const contacts = await this.prisma.trustedContact.findMany({
       where: { userId },
     });

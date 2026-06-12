@@ -31,7 +31,7 @@ export class LegacyVaultService {
     return vault;
   }
 
-  async addDocument(userId: string, dto: AddLegacyVaultDocumentDto) {
+  async addDocument(userId: string, dto: AddLegacyVaultDocumentDto): Promise<any> {
     const vault = await this.ensureVault(userId);
 
     // Verify document ownership
@@ -85,7 +85,7 @@ export class LegacyVaultService {
     return vaultDoc;
   }
 
-  async findAll(userId: string) {
+  async findAll(userId: string): Promise<any> {
     const vault = await this.ensureVault(userId);
     return this.prisma.legacyVaultDocument.findMany({
       where: { legacyVaultId: vault.id },
@@ -101,7 +101,7 @@ export class LegacyVaultService {
     });
   }
 
-  async removeDocument(userId: string, documentId: string) {
+  async removeDocument(userId: string, documentId: string): Promise<any> {
     const vaultDoc = await this.prisma.legacyVaultDocument.findFirst({
       where: { userId, documentId },
       include: { document: { select: { title: true } } },
@@ -124,7 +124,7 @@ export class LegacyVaultService {
     return { success: true, message: 'Document removed from legacy vault' };
   }
 
-  async getVaultStats(userId: string) {
+  async getVaultStats(userId: string): Promise<any> {
     const vault = await this.ensureVault(userId);
     const count = await this.prisma.legacyVaultDocument.count({
       where: { legacyVaultId: vault.id },
