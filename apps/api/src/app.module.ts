@@ -28,6 +28,7 @@ import { DocumentIntelligenceModule } from './modules/document-intelligence/docu
 import { EmergencyModule } from './modules/emergency/emergency.module';
 
 // Sprint 8: Digital Legacy & Future Planning
+import { BillingModule } from './modules/billing/billing.module';
 import { LegacyModule } from './modules/legacy/legacy.module';
 
 @Module({
@@ -86,6 +87,9 @@ import { LegacyModule } from './modules/legacy/legacy.module';
 
     // ─── Sprint 8: Digital Legacy & Future Planning ───
     LegacyModule,
+
+    // ─── Sprint 9: SaaS Billing & Subscriptions ───
+    BillingModule,
   ],
   providers: [
     {

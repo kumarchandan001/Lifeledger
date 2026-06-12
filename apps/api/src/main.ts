@@ -16,6 +16,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+    rawBody: true, // Required for Stripe webhook signature verification
   });
 
   // ─── Security ───
@@ -61,6 +62,7 @@ async function bootstrap() {
       .addTag('search', 'Search & Discovery')
       .addTag('notifications', 'Notification Management')
       .addTag('health', 'System Health')
+      .addTag('Billing', 'Billing, Subscriptions & Payments')
       .build();
 
     const document = SwaggerModule.createDocument(app, config);

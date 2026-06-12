@@ -29,6 +29,14 @@ const NAV_ITEMS = [
     items: [{ label: 'Notifications', href: '/dashboard/notifications', icon: '🔔' }],
   },
   {
+    section: 'Billing',
+    items: [
+      { label: 'Subscription', href: '/dashboard/billing', icon: '💳' },
+      { label: 'Usage & Limits', href: '/dashboard/billing/usage', icon: '📈' },
+      { label: 'Invoices', href: '/dashboard/billing/invoices', icon: '🧾' },
+    ],
+  },
+  {
     section: 'Settings',
     items: [
       { label: 'Preferences', href: '/dashboard/settings/preferences', icon: '⚙️' },

@@ -214,7 +214,7 @@ export class UsageService {
   async getUsageHistory(
     userId: string,
     options: { type?: string; page?: number; limit?: number },
-  ) {
+  ): Promise<any> {
     const { type, page = 1, limit = 20 } = options;
 
     const where: any = { userId };

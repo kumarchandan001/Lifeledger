@@ -82,7 +82,7 @@ export class BillingService {
     if (!stripeCustomerId && Number(plan.priceMonthly) > 0) {
       stripeCustomerId = await this.stripe.createCustomer(
         user.email,
-        `${user.firstName} ${user.lastName}`,
+        user.fullName,
         { userId },
       );
     }
@@ -369,7 +369,7 @@ export class BillingService {
 
   // ─── Billing Activity ───
 
-  async getBillingActivity(userId: string, page: number = 1, limit: number = 20) {
+  async getBillingActivity(userId: string, page: number = 1, limit: number = 20): Promise<any> {
     const [activities, total] = await Promise.all([
       this.prisma.billingActivity.findMany({
         where: { userId },
