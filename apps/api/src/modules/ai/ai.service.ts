@@ -6,6 +6,10 @@ import { CATEGORIES, SUB_CATEGORIES, AI_CONFIDENCE_THRESHOLDS } from '@lifeledge
 import { buildClassificationPrompt } from './prompts/classification.prompt';
 import { buildMetadataExtractionPrompt } from './prompts/metadata-extraction.prompt';
 import { buildTagGenerationPrompt } from './prompts/tag-generation.prompt';
+import {
+  buildLegacyReadinessPrompt,
+  LegacyReadinessInput,
+} from './prompts/legacy-readiness.prompt';
 
 export interface ClassificationResult {
   categorySlug: string;
@@ -437,6 +441,35 @@ Do not include any markdown styling, return ONLY the raw JSON array.`;
     } catch (error) {
       this.logger.error('Failed to identify missing documents', error);
       return [];
+    }
+  }
+
+  // ─── Legacy Readiness Analysis (Sprint 8) ───
+
+  isAvailable(): boolean {
+    return !!this.model;
+  }
+
+  async generateLegacyReadinessScore(
+    data: LegacyReadinessInput,
+  ): Promise<{ suggestions: any[]; missingItems: any[] }> {
+    if (!this.model) {
+      this.logger.warn('AI unavailable — returning empty readiness analysis');
+      return { suggestions: [], missingItems: [] };
+    }
+
+    try {
+      const prompt = buildLegacyReadinessPrompt(data);
+      const rawResponse = await this.callGemini(prompt);
+      const parsed = this.parseJsonResponse(rawResponse);
+
+      return {
+        suggestions: Array.isArray(parsed.suggestions) ? parsed.suggestions : [],
+        missingItems: Array.isArray(parsed.missingItems) ? parsed.missingItems : [],
+      };
+    } catch (error) {
+      this.logger.error('Legacy readiness AI analysis failed', error);
+      return { suggestions: [], missingItems: [] };
     }
   }
 

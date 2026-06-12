@@ -27,6 +27,9 @@ import { DocumentIntelligenceModule } from './modules/document-intelligence/docu
 // Sprint 7: Emergency Access
 import { EmergencyModule } from './modules/emergency/emergency.module';
 
+// Sprint 8: Digital Legacy & Future Planning
+import { LegacyModule } from './modules/legacy/legacy.module';
+
 @Module({
   imports: [
     // ─── Global Config ───
@@ -80,6 +83,9 @@ import { EmergencyModule } from './modules/emergency/emergency.module';
     QueueModule,
     DocumentIntelligenceModule,
     EmergencyModule,
+
+    // ─── Sprint 8: Digital Legacy & Future Planning ───
+    LegacyModule,
   ],
   providers: [
     {
