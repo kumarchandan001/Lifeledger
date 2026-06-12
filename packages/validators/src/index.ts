@@ -5,3 +5,4 @@ export * from './notification.schema';
 export * from './ai.schema';
 export * from './emergency.schema';
 export * from './legacy.schema';
+export * from './billing.schema';

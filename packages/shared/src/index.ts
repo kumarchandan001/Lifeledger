@@ -8,6 +8,7 @@ export * from './types/notification.types';
 export * from './types/ai.types';
 export * from './types/emergency.types';
 export * from './types/legacy.types';
+export * from './types/billing.types';
 
 // ─── Constants ───
 export * from './constants/categories';

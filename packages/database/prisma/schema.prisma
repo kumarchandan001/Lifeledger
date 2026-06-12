@@ -196,6 +196,7 @@ enum SubscriptionStatus {
   TRIAL
   PAST_DUE
   CANCELLED
+  SUSPENDED
   EXPIRED
 }
 
@@ -209,6 +210,46 @@ enum PaymentStatus {
   COMPLETED
   FAILED
   REFUNDED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  VOID
+  REFUNDED
+}
+
+enum UsageType {
+  OCR_CREDIT
+  AI_CREDIT
+  STORAGE_BYTE
+  DOCUMENT_COUNT
+  FAMILY_MEMBER
+  LEGACY_PLAN
+  EMERGENCY_SESSION
+}
+
+enum BillingEventType {
+  PAYMENT_SUCCESS
+  PAYMENT_FAILURE
+  SUBSCRIPTION_CREATED
+  SUBSCRIPTION_UPDATED
+  SUBSCRIPTION_CANCELLED
+  SUBSCRIPTION_REACTIVATED
+  TRIAL_STARTED
+  TRIAL_ENDED
+  INVOICE_GENERATED
+  REFUND_ISSUED
+  PLAN_UPGRADED
+  PLAN_DOWNGRADED
+}
+
+enum PaymentMethodType {
+  CARD
+  UPI
+  NET_BANKING
+  WALLET
 }
 
 enum NotificationType {
@@ -270,6 +311,17 @@ enum AuditAction {
   ADMIN_USER_SUSPEND
   ADMIN_USER_DELETE
   ADMIN_FEATURE_TOGGLE
+  BILLING_SUBSCRIBE
+  BILLING_UPGRADE
+  BILLING_DOWNGRADE
+  BILLING_CANCEL
+  BILLING_REACTIVATE
+  BILLING_PAYMENT_SUCCESS
+  BILLING_PAYMENT_FAILURE
+  BILLING_PAYMENT_METHOD_ADD
+  BILLING_PAYMENT_METHOD_REMOVE
+  BILLING_INVOICE_GENERATED
+  BILLING_REFUND
 }
 
 // ═══════════════════════════════════════════════════
@@ -314,6 +366,10 @@ model User {
   notifications            Notification[]
   notificationPreference   NotificationPreference?
   subscription             Subscription?
+  paymentMethods           PaymentMethod[]
+  invoices                 Invoice[]
+  usageRecords             UsageRecord[]
+  billingActivities        BillingActivity[]
   legacyVault              LegacyVault?
   auditLogs                AuditLog[]
   createdFamilies          Family[]           @relation("FamilyCreator")
@@ -887,26 +943,50 @@ model LegacyReadinessReport {
 }
 
 // ═══════════════════════════════════════════════════
-// BILLING
+// BILLING & SUBSCRIPTIONS (Sprint 9)
 // ═══════════════════════════════════════════════════
 
-model Plan {
+model SubscriptionPlan {
   id                String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name              String  @unique @db.VarChar(50)
   displayName       String  @map("display_name") @db.VarChar(100)
+  description       String? @db.Text
   priceMonthly      Decimal @map("price_monthly") @db.Decimal(10, 2)
   priceYearly       Decimal @map("price_yearly") @db.Decimal(10, 2)
+  currency          String  @default("INR") @db.VarChar(3)
   storageLimitGb    Int     @map("storage_limit_gb")
   maxDocuments      Int     @map("max_documents")
   maxFamilyMembers  Int     @default(1) @map("max_family_members")
+  maxLegacyPlans    Int     @default(1) @map("max_legacy_plans")
   ocrCreditsMonthly Int     @map("ocr_credits_monthly")
-  aiQueriesMonthly  Int     @map("ai_queries_monthly")
+  aiCreditsMonthly  Int     @map("ai_credits_monthly")
   features          Json    @db.JsonB
+  stripePriceMonthlyId String? @map("stripe_price_monthly_id") @db.VarChar(255)
+  stripePriceYearlyId  String? @map("stripe_price_yearly_id") @db.VarChar(255)
+  trialDays         Int     @default(0) @map("trial_days")
+  displayOrder      Int     @default(0) @map("display_order")
   isActive          Boolean @default(true) @map("is_active")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   subscriptions Subscription[]
+  entitlements  PlanEntitlement[]
 
-  @@map("plans")
+  @@map("subscription_plans")
+}
+
+model PlanEntitlement {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  planId    String @map("plan_id") @db.Uuid
+  feature   String @db.VarChar(100)
+  enabled   Boolean @default(true)
+  limitValue Int?   @map("limit_value")
+  metadata  Json    @default("{}") @db.JsonB
+
+  plan SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, feature])
+  @@map("plan_entitlements")
 }
 
 model Subscription {
@@ -917,34 +997,146 @@ model Subscription {
   billingCycle       BillingCycle       @map("billing_cycle")
   currentPeriodStart DateTime           @map("current_period_start")
   currentPeriodEnd   DateTime           @map("current_period_end")
-  paymentGatewayId   String?            @map("payment_gateway_id") @db.VarChar(255)
+  stripeCustomerId   String?            @map("stripe_customer_id") @db.VarChar(255)
+  stripeSubscriptionId String?          @map("stripe_subscription_id") @db.VarChar(255)
+  trialStartedAt     DateTime?          @map("trial_started_at")
   trialEndsAt        DateTime?          @map("trial_ends_at")
   cancelledAt        DateTime?          @map("cancelled_at")
+  cancelReason       String?            @map("cancel_reason") @db.Text
+  previousPlanId     String?            @map("previous_plan_id") @db.Uuid
   createdAt          DateTime           @default(now()) @map("created_at")
   updatedAt          DateTime           @updatedAt @map("updated_at")
 
-  user     User      @relation(fields: [userId], references: [id])
-  plan     Plan      @relation(fields: [planId], references: [id])
-  payments Payment[]
+  user         User              @relation(fields: [userId], references: [id])
+  plan         SubscriptionPlan  @relation(fields: [planId], references: [id])
+  payments     Payment[]
+  invoices     Invoice[]
+  usageRecords UsageRecord[]
+  billingEvents BillingEvent[]
 
+  @@index([status])
   @@map("subscriptions")
+}
+
+model PaymentMethod {
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String            @map("user_id") @db.Uuid
+  type             PaymentMethodType
+  provider         String            @default("stripe") @db.VarChar(50)
+  providerMethodId String            @map("provider_method_id") @db.VarChar(255)
+  last4            String?           @db.VarChar(4)
+  brand            String?           @db.VarChar(50)
+  expiryMonth      Int?              @map("expiry_month")
+  expiryYear       Int?              @map("expiry_year")
+  isDefault        Boolean           @default(false) @map("is_default")
+  metadata         Json              @default("{}") @db.JsonB
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("payment_methods")
+}
+
+model Invoice {
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String        @map("user_id") @db.Uuid
+  subscriptionId   String?       @map("subscription_id") @db.Uuid
+  invoiceNumber    String        @unique @map("invoice_number") @db.VarChar(50)
+  amount           Decimal       @db.Decimal(10, 2)
+  tax              Decimal       @default(0) @db.Decimal(10, 2)
+  totalAmount      Decimal       @map("total_amount") @db.Decimal(10, 2)
+  currency         String        @default("INR") @db.VarChar(3)
+  status           InvoiceStatus @default(DRAFT)
+  description      String?       @db.Text
+  billingPeriodStart DateTime?   @map("billing_period_start")
+  billingPeriodEnd   DateTime?   @map("billing_period_end")
+  stripeInvoiceId  String?       @map("stripe_invoice_id") @db.VarChar(255)
+  pdfUrl           String?       @map("pdf_url") @db.VarChar(500)
+  paidAt           DateTime?     @map("paid_at")
+  dueDate          DateTime?     @map("due_date")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  payments     Payment[]
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status])
+  @@map("invoices")
 }
 
 model Payment {
   id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  subscriptionId   String        @map("subscription_id") @db.Uuid
+  subscriptionId   String?       @map("subscription_id") @db.Uuid
+  invoiceId        String?       @map("invoice_id") @db.Uuid
   amount           Decimal       @db.Decimal(10, 2)
   currency         String        @default("INR") @db.VarChar(3)
   status           PaymentStatus
-  gatewayPaymentId String        @map("gateway_payment_id") @db.VarChar(255)
-  gatewayOrderId   String        @map("gateway_order_id") @db.VarChar(255)
-  invoiceUrl       String?       @map("invoice_url") @db.VarChar(500)
+  provider         String        @default("stripe") @db.VarChar(50)
+  providerPaymentId String?      @map("provider_payment_id") @db.VarChar(255)
+  providerOrderId  String?       @map("provider_order_id") @db.VarChar(255)
+  refundedAmount   Decimal?      @map("refunded_amount") @db.Decimal(10, 2)
+  failureReason    String?       @map("failure_reason") @db.Text
   paidAt           DateTime?     @map("paid_at")
   createdAt        DateTime      @default(now()) @map("created_at")
 
-  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  invoice      Invoice?      @relation(fields: [invoiceId], references: [id])
 
+  @@index([subscriptionId])
   @@map("payments")
+}
+
+model UsageRecord {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  subscriptionId String?   @map("subscription_id") @db.Uuid
+  type           UsageType
+  quantity       Int       @default(1)
+  periodStart    DateTime  @map("period_start")
+  periodEnd      DateTime  @map("period_end")
+  metadata       Json      @default("{}") @db.JsonB
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  @@index([userId, type, periodStart])
+  @@index([subscriptionId, type])
+  @@map("usage_records")
+}
+
+model BillingEvent {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subscriptionId String?          @map("subscription_id") @db.Uuid
+  type           BillingEventType
+  provider       String           @default("stripe") @db.VarChar(50)
+  providerEventId String?         @map("provider_event_id") @db.VarChar(255)
+  payload        Json             @default("{}") @db.JsonB
+  processed      Boolean          @default(false)
+  idempotencyKey String?          @unique @map("idempotency_key") @db.VarChar(255)
+  createdAt      DateTime         @default(now()) @map("created_at")
+
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  @@index([type, createdAt(sort: Desc)])
+  @@map("billing_events")
+}
+
+model BillingActivity {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  action    String   @db.VarChar(100)
+  details   Json     @default("{}") @db.JsonB
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("billing_activities")
 }
 
 // ═══════════════════════════════════════════════════

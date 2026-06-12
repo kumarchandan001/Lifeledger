@@ -20,35 +20,40 @@ export const FILE_LIMITS = {
 
 export const PLAN_LIMITS = {
   FREE: {
-    storageLimitGb: 1,
-    storageLimitBytes: 1 * 1024 * 1024 * 1024,
-    maxDocuments: 50,
+    storageLimitGb: 5,
+    storageLimitBytes: 5 * 1024 * 1024 * 1024,
+    maxDocuments: 100,
     maxFamilyMembers: 1,
-    ocrCreditsMonthly: 10,
-    aiQueriesMonthly: 5,
+    maxLegacyPlans: 1,
+    ocrCreditsMonthly: 50,
+    aiCreditsMonthly: 50,
     maxShareLinks: 3,
   },
   PREMIUM: {
-    storageLimitGb: 25,
-    storageLimitBytes: 25 * 1024 * 1024 * 1024,
+    storageLimitGb: 100,
+    storageLimitBytes: 100 * 1024 * 1024 * 1024,
     maxDocuments: -1, // unlimited
     maxFamilyMembers: 1,
-    ocrCreditsMonthly: 100,
-    aiQueriesMonthly: 50,
+    maxLegacyPlans: -1, // unlimited
+    ocrCreditsMonthly: 500,
+    aiCreditsMonthly: 500,
     maxShareLinks: -1,
   },
   FAMILY: {
-    storageLimitGb: 100,
-    storageLimitBytes: 100 * 1024 * 1024 * 1024,
+    storageLimitGb: 500,
+    storageLimitBytes: 500 * 1024 * 1024 * 1024,
     maxDocuments: -1,
-    maxFamilyMembers: 6,
-    ocrCreditsMonthly: 300,
-    aiQueriesMonthly: 150,
+    maxFamilyMembers: 10,
+    maxLegacyPlans: -1,
+    ocrCreditsMonthly: 1000,
+    aiCreditsMonthly: 1000,
     maxShareLinks: -1,
   },
 } as const;
 
 export type PlanName = keyof typeof PLAN_LIMITS;
+
+export const TRIAL_DURATION_DAYS = 14;
 
 export const PAGINATION = {
   DEFAULT_PAGE: 1,
