@@ -15,7 +15,7 @@ function AuthCallbackContent() {
     if (token) {
       localStorage.setItem('lifeledger_access_token', token);
       checkAuth().then(() => {
-        router.push('/');
+        router.push('/dashboard');
       });
     } else {
       router.push('/login');

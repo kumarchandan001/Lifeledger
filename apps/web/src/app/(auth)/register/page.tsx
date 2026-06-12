@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/auth-store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
@@ -21,7 +22,8 @@ function getPasswordStrength(password: string) {
 }
 
 export default function RegisterPage() {
-  const { register, isLoading, error, clearError } = useAuthStore();
+  const router = useRouter();
+  const { register, isAuthenticated, isLoading, error, clearError } = useAuthStore();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,6 +31,12 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, router]);
 
   const strength = useMemo(() => getPasswordStrength(password), [password]);
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
+import { useAuthStore } from '@/lib/auth-store';
 import './pricing.css';
 
 interface Plan {
@@ -41,6 +42,7 @@ export default function PricingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [cycle, setCycle] = useState<'MONTHLY' | 'YEARLY'>('MONTHLY');
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     api
@@ -176,14 +178,16 @@ export default function PricingPage() {
 
                 <div className="pricing-cta">
                   <Link
-                    href={isFree ? '/register' : '/register'}
+                    href={isAuthenticated ? '/dashboard/billing' : '/register'}
                     className={`pricing-cta-btn ${isPopular ? 'pricing-cta-primary' : 'pricing-cta-secondary'}`}
                   >
-                    {isFree
-                      ? 'Get Started Free'
-                      : plan.trialDays > 0
-                        ? 'Start Free Trial'
-                        : 'Subscribe Now'}
+                    {isAuthenticated
+                      ? 'Go to Billing'
+                      : isFree
+                        ? 'Get Started Free'
+                        : plan.trialDays > 0
+                          ? 'Start Free Trial'
+                          : 'Subscribe Now'}
                   </Link>
                 </div>
               </div>

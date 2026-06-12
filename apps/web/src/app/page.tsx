@@ -1,6 +1,11 @@
+'use client';
+
 import Link from 'next/link';
+import { useAuthStore } from '@/lib/auth-store';
 
 export default function HomePage() {
+  const { isAuthenticated } = useAuthStore();
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Hero Section */}
@@ -29,10 +34,10 @@ export default function HomePage() {
 
         <div className="flex flex-col gap-4 sm:flex-row">
           <Link
-            href="/register"
+            href={isAuthenticated ? '/dashboard' : '/register'}
             className="bg-primary text-primary-foreground shadow-primary/25 hover:bg-primary/90 hover:shadow-primary/30 inline-flex h-12 items-center justify-center rounded-lg px-8 text-base font-semibold shadow-lg transition-all hover:shadow-xl"
           >
-            Get Started Free
+            {isAuthenticated ? 'Go to Dashboard' : 'Get Started Free'}
           </Link>
           <Link
             href="/about"
