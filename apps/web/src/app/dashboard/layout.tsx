@@ -13,6 +13,7 @@ const NAV_ITEMS = [
     items: [
       { label: 'Dashboard', href: '/dashboard', icon: '📊' },
       { label: 'Emergency Access', href: '/dashboard/emergency', icon: '🚨' },
+      { label: 'Legacy Planning', href: '/dashboard/legacy', icon: '🏛️' },
     ],
   },
   {

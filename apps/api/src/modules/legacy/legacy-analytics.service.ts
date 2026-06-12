@@ -69,13 +69,11 @@ export class LegacyAnalyticsService {
       }),
       this.prisma.legacyPlan.findMany({
         where: { userId },
-        select: { name: true, type: true },
         include: { _count: { select: { beneficiaries: true } } },
       }),
       this.prisma.legacyVaultDocument.findMany({
         where: { userId },
-        select: { category: true },
-        include: { document: { select: { title: true } } },
+        include: { document: { select: { title: true, fileName: true } } },
       }),
       this.prisma.legacyInstruction.findMany({
         where: { userId, isActive: true },

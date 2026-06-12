@@ -446,10 +446,6 @@ Do not include any markdown styling, return ONLY the raw JSON array.`;
 
   // ─── Legacy Readiness Analysis (Sprint 8) ───
 
-  isAvailable(): boolean {
-    return !!this.model;
-  }
-
   async generateLegacyReadinessScore(
     data: LegacyReadinessInput,
   ): Promise<{ suggestions: any[]; missingItems: any[] }> {
