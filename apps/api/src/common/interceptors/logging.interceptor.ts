@@ -18,12 +18,29 @@ export class LoggingInterceptor implements NestInterceptor {
         const { statusCode } = response;
         const duration = Date.now() - startTime;
 
-        const logMessage = `${method} ${url} ${statusCode} ${duration}ms - ${ip} ${userAgent}`;
-
-        if (duration > 3000) {
-          this.logger.warn(`🐌 SLOW: ${logMessage}`);
+        if (process.env.NODE_ENV === 'production') {
+          const logPayload = {
+            timestamp: new Date().toISOString(),
+            context: 'HTTP',
+            method,
+            url,
+            statusCode,
+            durationMs: duration,
+            ip,
+            userAgent,
+          };
+          if (duration > 3000) {
+            this.logger.warn(JSON.stringify({ ...logPayload, level: 'warn', message: `🐌 SLOW: ${method} ${url}` }));
+          } else {
+            this.logger.log(JSON.stringify({ ...logPayload, level: 'info' }));
+          }
         } else {
-          this.logger.log(logMessage);
+          const logMessage = `${method} ${url} ${statusCode} ${duration}ms - ${ip} ${userAgent}`;
+          if (duration > 3000) {
+            this.logger.warn(`🐌 SLOW: ${logMessage}`);
+          } else {
+            this.logger.log(logMessage);
+          }
         }
       }),
     );

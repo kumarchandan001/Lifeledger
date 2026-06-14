@@ -41,6 +41,7 @@ const NAV_ITEMS = [
     items: [
       { label: 'Preferences', href: '/dashboard/settings/preferences', icon: '⚙️' },
       { label: 'Sessions', href: '/settings/sessions', icon: '🔐' },
+      { label: 'Support Center', href: '/dashboard/support', icon: '💬' },
     ],
   },
 ];
@@ -163,8 +164,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return `${days}d ago`;
   };
 
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+  const menuItems = [...NAV_ITEMS];
+  if (isAdmin) {
+    menuItems.push({
+      section: 'Admin Operations',
+      items: [
+        { label: 'Admin Overview', href: '/admin', icon: '⚙️' },
+        { label: 'User Moderation', href: '/admin/users', icon: '👥' },
+        { label: 'Revenue Analytics', href: '/admin/revenue', icon: '💰' },
+        { label: 'Support Tickets', href: '/admin/support', icon: '🎫' },
+      ],
+    });
+  }
+
   const currentTitle =
-    NAV_ITEMS.flatMap((s) => s.items).find((item) => pathname === item.href)?.label ?? 'Dashboard';
+    menuItems.flatMap((s) => s.items).find((item) => pathname === item.href)?.label ?? 'Dashboard';
 
   if (!isAuthenticated) {
     return (
@@ -197,7 +212,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <nav className="sidebar-nav">
-          {NAV_ITEMS.map((section) => (
+          {menuItems.map((section) => (
             <div key={section.section} className="sidebar-section">
               <div className="sidebar-section-title">{section.section}</div>
               {section.items.map((item) => (

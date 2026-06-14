@@ -4,7 +4,7 @@
   "private": true,
   "description": "Prisma ORM schema, client, and migrations",
   "main": "./dist/src/index.js",
-  "types": "./dist/src/index.d.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "db:generate": "prisma generate",

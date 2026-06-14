@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, ConflictException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { StorageService } from '../storage/storage.service';
 import * as bcrypt from 'bcrypt';
 import type { User } from '@lifeledger/database';
 
@@ -9,7 +10,10 @@ const BCRYPT_ROUNDS = 12;
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly storageService: StorageService,
+  ) {}
 
   async findById(id: string): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { id } });
@@ -131,5 +135,120 @@ export class UsersService {
   isAccountLocked(user: User): boolean {
     if (!user.lockoutExpiresAt) return false;
     return new Date() < user.lockoutExpiresAt;
+  }
+
+  async exportUserData(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        documents: {
+          include: {
+            metadata: true,
+            versions: true,
+            tags: true,
+            ocrResult: true,
+            aiAnalysis: true,
+          },
+        },
+        sessions: true,
+        familyMemberships: {
+          include: {
+            family: true,
+          },
+        },
+        trustedContacts: true,
+        beneficiaries: true,
+        legacyPlans: true,
+        personalMessages: true,
+        digitalAssets: true,
+        legacyInstructions: true,
+        auditLogs: {
+          orderBy: { createdAt: 'desc' },
+          take: 100,
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Sanitize sensitive fields
+    const { passwordHash, mfaSecret, ...safeUser } = user as any;
+    return safeUser;
+  }
+
+  async deleteUserData(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // 1. Retrieve all user documents to delete files in Cloudinary
+    const documents = await this.prisma.document.findMany({
+      where: { userId },
+    });
+
+    for (const doc of documents) {
+      try {
+        await this.storageService.deleteObject(doc.fileUrl);
+      } catch (err) {
+        this.logger.error(`GDPR: Failed to delete file ${doc.fileUrl} from storage`, err);
+      }
+    }
+
+    // 2. Perform cascade deletion in proper transaction order
+    await this.prisma.$transaction(async (tx: any) => {
+      // Delete document dependencies
+      await tx.processingJob.deleteMany({ where: { userId } });
+      await tx.documentTag.deleteMany({ where: { createdBy: userId } });
+      await tx.shareLink.deleteMany({ where: { createdBy: userId } });
+      await tx.documentVersion.deleteMany({ where: { document: { userId } } });
+      await tx.documentMetadata.deleteMany({ where: { document: { userId } } });
+      await tx.oCRResult.deleteMany({ where: { document: { userId } } });
+      await tx.aIAnalysis.deleteMany({ where: { document: { userId } } });
+      await tx.legacyVaultDocument.deleteMany({ where: { userId } });
+      await tx.legacyVault.deleteMany({ where: { userId } });
+      await tx.emergencyVaultDocument.deleteMany({ where: { userId } });
+      await tx.document.deleteMany({ where: { userId } });
+
+      // Delete family & relations
+      await tx.familyMembership.deleteMany({ where: { userId } });
+      await tx.family.deleteMany({ where: { createdBy: userId } });
+
+      // Delete emergency & legacy relations
+      await tx.trustedContact.deleteMany({ where: { userId } });
+      await tx.beneficiary.deleteMany({ where: { userId } });
+      await tx.legacyPlan.deleteMany({ where: { userId } });
+      await tx.legacyInstruction.deleteMany({ where: { userId } });
+      await tx.personalMessage.deleteMany({ where: { userId } });
+      await tx.digitalAsset.deleteMany({ where: { userId } });
+      await tx.legacyAccessRequest.deleteMany({ where: { ownerId: userId } });
+      await tx.legacyActivity.deleteMany({ where: { userId } });
+
+      // Delete billing records
+      await tx.payment.deleteMany({ where: { subscription: { userId } } });
+      await tx.invoice.deleteMany({ where: { userId } });
+      await tx.billingActivity.deleteMany({ where: { userId } });
+      await tx.paymentMethod.deleteMany({ where: { userId } });
+      await tx.usageRecord.deleteMany({ where: { userId } });
+      await tx.subscription.deleteMany({ where: { userId } });
+
+      // Delete system records
+      await tx.notification.deleteMany({ where: { userId } });
+      await tx.notificationPreference.deleteMany({ where: { userId } });
+      await tx.auditLog.deleteMany({ where: { userId } });
+      // Delete support tickets associated with the user
+      await tx.supportTicket.deleteMany({ where: { userId } });
+      await tx.userSession.deleteMany({ where: { userId } });
+
+      // Finally delete user
+      await tx.user.delete({ where: { id: userId } });
+    });
+
+    this.logger.log(`GDPR: User ${userId} and all associated data permanently deleted.`);
+    return { success: true, message: 'All personal data has been permanently deleted.' };
   }
 }

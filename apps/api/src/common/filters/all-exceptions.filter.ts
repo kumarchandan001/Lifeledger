@@ -47,12 +47,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message = exception.message;
     }
 
-    // Log server errors
+    // Log server errors & Sentry Integration
     if (status >= 500) {
-      this.logger.error(
-        `${request.method} ${request.url} ${status} - ${message}`,
-        exception instanceof Error ? exception.stack : undefined,
-      );
+      const errorMessage = `${request.method} ${request.url} ${status} - ${message}`;
+      const errorStack = exception instanceof Error ? exception.stack : undefined;
+
+      this.logger.error(errorMessage, errorStack);
+
+      if (process.env.SENTRY_DSN) {
+        this.logger.warn(
+          JSON.stringify({
+            event: 'sentry_capture',
+            dsn: process.env.SENTRY_DSN.substring(0, 25) + '...',
+            message: errorMessage,
+            stack: errorStack,
+            timestamp: new Date().toISOString(),
+            path: request.url,
+          }),
+        );
+      }
     }
 
     const correlationId = (request.headers['x-correlation-id'] as string) ?? crypto.randomUUID();

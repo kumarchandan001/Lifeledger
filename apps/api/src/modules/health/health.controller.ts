@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import * as os from 'os';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { RedisService } from '../redis/redis.service';
@@ -95,5 +96,77 @@ export class HealthController {
     } catch {
       return { status: 'unhealthy', latencyMs: Date.now() - start };
     }
+  }
+
+  @Get('metrics')
+  @ApiOperation({ summary: 'Prometheus metrics endpoint' })
+  async metrics(): Promise<string> {
+    const memory = process.memoryUsage();
+    const dbStart = Date.now();
+    let dbStatus = 1;
+    let dbLatency = 0;
+    try {
+      await this.prisma.$queryRaw`SELECT 1`;
+      dbLatency = Date.now() - dbStart;
+    } catch {
+      dbStatus = 0;
+    }
+
+    const redisStart = Date.now();
+    let redisStatus = 1;
+    let redisLatency = 0;
+    try {
+      await this.redis.ping();
+      redisLatency = Date.now() - redisStart;
+    } catch {
+      redisStatus = 0;
+    }
+
+    const cpus = os.cpus().length;
+    const loadAvg = os.loadavg()[0];
+
+    const lines = [
+      '# HELP process_uptime_seconds Process uptime in seconds',
+      '# TYPE process_uptime_seconds counter',
+      `process_uptime_seconds ${process.uptime()}`,
+      '',
+      '# HELP process_heap_used_bytes Process heap used memory size in bytes',
+      '# TYPE process_heap_used_bytes gauge',
+      `process_heap_used_bytes ${memory.heapUsed}`,
+      '',
+      '# HELP process_heap_total_bytes Process heap total memory size in bytes',
+      '# TYPE process_heap_total_bytes gauge',
+      `process_heap_total_bytes ${memory.heapTotal}`,
+      '',
+      '# HELP process_rss_bytes Process RSS memory size in bytes',
+      '# TYPE process_rss_bytes gauge',
+      `process_rss_bytes ${memory.rss}`,
+      '',
+      '# HELP system_cpu_count CPU cores count',
+      '# TYPE system_cpu_count gauge',
+      `system_cpu_count ${cpus}`,
+      '',
+      '# HELP system_load_average_1m 1 minute system load average',
+      '# TYPE system_load_average_1m gauge',
+      `system_load_average_1m ${loadAvg}`,
+      '',
+      '# HELP lifeledger_database_up Database status (1 = up, 0 = down)',
+      '# TYPE lifeledger_database_up gauge',
+      `lifeledger_database_up ${dbStatus}`,
+      '',
+      '# HELP lifeledger_database_latency_ms Database latency in milliseconds',
+      '# TYPE lifeledger_database_latency_ms gauge',
+      `lifeledger_database_latency_ms ${dbLatency}`,
+      '',
+      '# HELP lifeledger_redis_up Redis status (1 = up, 0 = down)',
+      '# TYPE lifeledger_redis_up gauge',
+      `lifeledger_redis_up ${redisStatus}`,
+      '',
+      '# HELP lifeledger_redis_latency_ms Redis latency in milliseconds',
+      '# TYPE lifeledger_redis_latency_ms gauge',
+      `lifeledger_redis_latency_ms ${redisLatency}`,
+    ];
+
+    return lines.join('\n');
   }
 }

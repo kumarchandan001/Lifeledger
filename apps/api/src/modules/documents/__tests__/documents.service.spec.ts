@@ -149,9 +149,9 @@ describe('DocumentsService', () => {
     it('should throw PayloadTooLargeException if user exceeds size quota limit', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(mockUserFree);
       mockPrisma.document.count.mockResolvedValue(5);
-      // Free limit is 1 GB (1 * 1024 * 1024 * 1024 bytes)
+      // Free limit is 5 GB
       mockPrisma.document.aggregate.mockResolvedValue({
-        _sum: { fileSize: BigInt(1024 * 1024 * 1024) },
+        _sum: { fileSize: BigInt(5 * 1024 * 1024 * 1024) },
       });
 
       await expect(
@@ -161,8 +161,8 @@ describe('DocumentsService', () => {
 
     it('should throw BadRequestException if user exceeds max document count limit', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(mockUserFree);
-      // Free limit is 50 documents
-      mockPrisma.document.count.mockResolvedValue(50);
+      // Free limit is 100 documents
+      mockPrisma.document.count.mockResolvedValue(100);
       mockPrisma.document.aggregate.mockResolvedValue({ _sum: { fileSize: BigInt(0) } });
 
       await expect(

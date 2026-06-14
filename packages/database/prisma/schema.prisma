@@ -388,6 +388,7 @@ model User {
   digitalAssets            DigitalAsset[]
   legacyAccessRequests     LegacyAccessRequest[] @relation("LegacyRequestOwner")
   legacyActivities         LegacyActivity[]
+  supportTickets           SupportTicket[]
 
   @@map("users")
 }
@@ -1265,5 +1266,25 @@ model ProcessingJob {
   @@index([status, createdAt])
   @@index([userId, status])
   @@map("processing_jobs")
+}
+
+model SupportTicket {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String?  @map("user_id") @db.Uuid
+  name        String   @db.VarChar(255)
+  email       String   @db.VarChar(255)
+  subject     String   @db.VarChar(255)
+  message     String   @db.Text
+  category    String   @default("SUPPORT") @db.VarChar(50) // SUPPORT, BUG_REPORT, FEEDBACK
+  status      String   @default("OPEN") @db.VarChar(20) // OPEN, IN_PROGRESS, RESOLVED
+  adminNotes  String?  @map("admin_notes") @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([status])
+  @@map("support_tickets")
 }
 

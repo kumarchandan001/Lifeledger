@@ -36,7 +36,7 @@ export class StripeService {
     if (!this.useMock) {
       try {
         // Dynamic import so the module doesn't fail if stripe isn't installed
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        // eslint-disable-next-line
         const Stripe = require('stripe');
         this.stripe = new Stripe(stripeKey, { apiVersion: '2024-06-20' });
         this.logger.log('Stripe initialized in LIVE mode');

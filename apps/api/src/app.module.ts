@@ -31,6 +31,9 @@ import { EmergencyModule } from './modules/emergency/emergency.module';
 import { BillingModule } from './modules/billing/billing.module';
 import { LegacyModule } from './modules/legacy/legacy.module';
 
+// Sprint 10: Launch & Customer Support
+import { SupportModule } from './modules/support/support.module';
+
 @Module({
   imports: [
     // ─── Global Config ───
@@ -90,6 +93,9 @@ import { LegacyModule } from './modules/legacy/legacy.module';
 
     // ─── Sprint 9: SaaS Billing & Subscriptions ───
     BillingModule,
+
+    // ─── Sprint 10: Launch & Customer Support ───
+    SupportModule,
   ],
   providers: [
     {
