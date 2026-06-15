@@ -9,39 +9,26 @@ import './dashboard.css';
 
 const NAV_ITEMS = [
   {
-    section: 'Overview',
+    section: 'Life Operations',
     items: [
-      { label: 'Dashboard', href: '/dashboard', icon: '📊' },
-      { label: 'Emergency Access', href: '/dashboard/emergency', icon: '🚨' },
-      { label: 'Legacy Planning', href: '/dashboard/legacy', icon: '🏛️' },
+      { label: 'Home', href: '/dashboard', icon: '🏠' },
+      { label: 'Documents', href: '/dashboard/documents', icon: '📂' },
+      { label: 'AI Intelligence', href: '/dashboard/intelligence', icon: '🤖' },
     ],
   },
   {
-    section: 'Documents',
+    section: 'Protection & Legacy',
     items: [
-      { label: 'All Documents', href: '/dashboard/documents', icon: '📄' },
-      { label: 'Categories', href: '/dashboard/categories', icon: '📁' },
-      { label: 'Intelligence', href: '/dashboard/intelligence', icon: '🧠' },
+      { label: 'Family', href: '/dashboard/family', icon: '👨‍👩‍👧' },
+      { label: 'Emergency', href: '/dashboard/emergency', icon: '🚨' },
+      { label: 'Legacy', href: '/dashboard/legacy', icon: '🕊️' },
     ],
   },
   {
-    section: 'Alerts',
-    items: [{ label: 'Notifications', href: '/dashboard/notifications', icon: '🔔' }],
-  },
-  {
-    section: 'Billing',
+    section: 'Management',
     items: [
-      { label: 'Subscription', href: '/dashboard/billing', icon: '💳' },
-      { label: 'Usage & Limits', href: '/dashboard/billing/usage', icon: '📈' },
-      { label: 'Invoices', href: '/dashboard/billing/invoices', icon: '🧾' },
-    ],
-  },
-  {
-    section: 'Settings',
-    items: [
-      { label: 'Preferences', href: '/dashboard/settings/preferences', icon: '⚙️' },
-      { label: 'Sessions', href: '/settings/sessions', icon: '🔐' },
-      { label: 'Support Center', href: '/dashboard/support', icon: '💬' },
+      { label: 'Billing', href: '/dashboard/billing', icon: '💳' },
+      { label: 'Settings', href: '/dashboard/settings/preferences', icon: '⚙️' },
     ],
   },
 ];
@@ -178,8 +165,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     });
   }
 
-  const currentTitle =
-    menuItems.flatMap((s) => s.items).find((item) => pathname === item.href)?.label ?? 'Dashboard';
+  const matchedItem = menuItems.flatMap((s) => s.items).find((item) => {
+    if (item.href === '/dashboard') {
+      return pathname === '/dashboard';
+    }
+    return pathname === item.href || pathname.startsWith(item.href + '/');
+  });
+  const currentTitle = matchedItem?.label === 'Home' ? 'Life Command Center' : (matchedItem?.label ?? 'Dashboard');
 
   if (!isAuthenticated) {
     return (
