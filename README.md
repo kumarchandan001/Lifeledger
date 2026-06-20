@@ -156,7 +156,6 @@ LifeLedger supports **11 life categories** with 50+ sub-categories:
 
 This project is proprietary and **UNLICENSED**. All rights reserved.
 
----
 
 <div align="center">
   <strong>Built with ❤️ by the LifeLedger Team</strong>
