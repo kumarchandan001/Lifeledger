@@ -152,9 +152,7 @@ LifeLedger supports **11 life categories** with 50+ sub-categories:
 - [ ] **Sprint 5** — Family Vault, Emergency Access
 - [ ] **Sprint 6** — AI Assistant, Digital Legacy, Billing
 
-## 📄 License
-
-This project is proprietary and **UNLICENSED**. All rights reserved.
+All rights reserved.
 
 
 <div align="center">
