@@ -153,8 +153,3 @@ LifeLedger supports **11 life categories** with 50+ sub-categories:
 - [ ] **Sprint 6** — AI Assistant, Digital Legacy, Billing
 
 All rights reserved.
-
-
-<div align="center">
-  <strong>Built with ❤️ by the LifeLedger Team</strong>
-</div>
